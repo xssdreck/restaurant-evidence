@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>评价录入生成器</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;margin:20px;line-height:1.5}
+    .wrap{max-width:980px;margin:0 auto}
+    .row{display:grid;grid-template-columns:120px 80px 120px 1fr 1fr 1fr 110px;gap:8px;margin:8px 0}
+    .head{font-weight:700;color:#444}
+    input,textarea,button{padding:8px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box;width:100%}
+    textarea{min-height:72px;resize:vertical}
+    button{background:#111;color:#fff;border:none;font-weight:700;cursor:pointer}
+    .muted{color:#666;font-size:14px}
+    .ops{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+    .card{border:1px solid #e3e3e3;border-radius:10px;padding:12px;margin-top:14px}
+    @media (max-width:900px){
+      .row{grid-template-columns:1fr;}
+      .head{display:none}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h2>Google评价录入生成器（从截图整理）</h2>
+  <p class="muted">每行录一条，最后导出 JSON，粘贴到 <code>reviews.html</code> 渲染。</p>
+
+  <div class="row head">
+    <div>证据编号</div><div>评分</div><div>日期</div><div>评论者</div><div>评论内容</div><div>店家回复</div><div>操作</div>
+  </div>
+
+  <div id="rows"></div>
+
+  <div class="ops">
+    <button id="add">新增一条</button>
+    <button id="seed">加载示例</button>
+    <button id="gen">生成JSON</button>
+    <button id="copy">复制JSON</button>
+    <button id="download">下载 reviews-data.json</button>
+  </div>
+
+  <div class="card">
+    <div><strong>生成结果 JSON</strong></div>
+    <textarea id="out" placeholder="点击‘生成JSON’后出现在这里"></textarea>
+  </div>
+</div>
+
+<script>
+const rows = document.getElementById('rows');
+const out = document.getElementById('out');
+
+function makeRow(data={}){
+  const wrap=document.createElement('div');
+  wrap.className='row';
+  wrap.innerHTML=`
+    <input placeholder="E-022" value="${data.eid||''}">
+    <input type="number" min="1" max="5" placeholder="1" value="${data.rating||''}">
+    <input placeholder="2025-10-31" value="${data.date||''}">
+    <input placeholder="评论者昵称" value="${data.author||''}">
+    <textarea placeholder="评论内容">${data.text||''}</textarea>
+    <textarea placeholder="店家回复（可空）">${data.ownerReply||''}</textarea>
+    <button>删除</button>
+  `;
+  wrap.querySelector('button').onclick=()=>wrap.remove();
+  rows.appendChild(wrap);
+}
+
+function collect(){
+  const list=[];
+  [...rows.children].forEach(r=>{
+    const c=r.querySelectorAll('input,textarea');
+    const item={
+      evidenceId:c[0].value.trim(),
+      rating:Number(c[1].value||0),
+      date:c[2].value.trim(),
+      author:c[3].value.trim(),
+      text:c[4].value.trim(),
+      ownerReply:c[5].value.trim()
+    };
+    if(item.author||item.text||item.ownerReply||item.rating||item.date||item.evidenceId){
+      list.push(item);
+    }
+  });
+  return list.map(x=>({
+    author:x.author||'匿名用户',
+    rating:x.rating||0,
+    date:x.date||'',
+    text:x.text||'',
+    ownerReply:x.ownerReply||'',
+    url:'',
+    evidenceId:x.evidenceId||''
+  }));
+}
+
+document.getElementById('add').onclick=()=>makeRow();
+document.getElementById('seed').onclick=()=>{
+  rows.innerHTML='';
+  makeRow({eid:'E-022',rating:1,date:'2025-10-31',author:'某用户',text:'服务态度差。',ownerReply:'你不会点就别来。'});
+  makeRow({eid:'E-023',rating:2,date:'2025-11-01',author:'某用户2',text:'上菜慢。',ownerReply:''});
+};
+document.getElementById('gen').onclick=()=>{ out.value=JSON.stringify(collect(),null,2); };
+document.getElementById('copy').onclick=async()=>{ if(!out.value) out.value=JSON.stringify(collect(),null,2); await navigator.clipboard.writeText(out.value); alert('已复制'); };
+document.getElementById('download').onclick=()=>{
+  if(!out.value) out.value=JSON.stringify(collect(),null,2);
+  const blob=new Blob([out.value],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='reviews-data.json';
+  a.click();
+};
+
+makeRow();
+</script>
+</body>
+</html>
