@@ -10,3 +10,5 @@
 - E-027: JI W 评论及店家回复
 - E-028: sussy baka 评论及店家回复
 - E-029: jason bonny 评论及店家回复
+- E-030: sun Daniel 评论及店家回复
+- E-031: Miao Liu 评论及店家回复
