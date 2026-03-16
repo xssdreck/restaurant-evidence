@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Google评价公示</title>
+  <style>
+    body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif; margin: 20px; line-height: 1.5; }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    textarea { width:100%; min-height:220px; padding:10px; border:1px solid #ccc; border-radius:10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    button { padding:10px 14px; border:none; border-radius:8px; background:#111; color:#fff; font-weight:700; cursor:pointer; }
+    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0; }
+    .muted { color:#666; font-size:14px; }
+    .card { border:1px solid #e3e3e3; border-radius:10px; padding:12px; margin:10px 0; }
+    .meta { font-size:13px; color:#666; }
+    .owner { margin-top:8px; padding:8px; background:#fafafa; border-left:3px solid #333; }
+    .pill { display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; background:#f2f2f2; margin-right:8px; }
+    .danger { color:#b00020; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h2>店铺 Google 评价公示页</h2>
+  <p class="muted">用途：集中展示公开评价与店家回复。建议默认匿名化普通用户昵称，降低无关第三方风险。</p>
+
+  <div class="row">
+    <label><input id="maskNames" type="checkbox" checked /> 默认匿名化评论者昵称</label>
+    <label><input id="showOwnerReply" type="checkbox" checked /> 显示店家回复</label>
+  </div>
+
+  <p><strong>粘贴 JSON（数组）</strong></p>
+  <textarea id="jsonInput" placeholder='[
+  {
+    "author": "张三",
+    "rating": 1,
+    "date": "2025-10-20",
+    "text": "评价内容...",
+    "ownerReply": "店家回复...",
+    "url": "https://maps.google.com/..."
+  }
+]'></textarea>
+
+  <div class="row">
+    <button id="renderBtn">渲染预览</button>
+    <button id="downloadBtn">下载为 reviews-data.json</button>
+    <span id="stat" class="muted"></span>
+  </div>
+
+  <p class="muted danger">注意：请勿发布非公开个人信息（电话、住址、身份证、车牌等）。</p>
+
+  <hr />
+  <h3>预览</h3>
+  <div id="list"></div>
+</div>
+
+<script>
+const input = document.getElementById('jsonInput');
+const list = document.getElementById('list');
+const stat = document.getElementById('stat');
+
+function maskName(name){
+  if(!name) return '匿名用户';
+  const s = String(name).trim();
+  if(s.length<=1) return s+'*';
+  if(s.length===2) return s[0]+'*';
+  return s[0] + '*'.repeat(Math.max(1,s.length-2)) + s[s.length-1];
+}
+
+function stars(n){
+  const x = Math.max(0, Math.min(5, Number(n)||0));
+  return '★'.repeat(x) + '☆'.repeat(5-x);
+}
+
+function render(){
+  list.innerHTML='';
+  let arr=[];
+  try { arr = JSON.parse(input.value || '[]'); }
+  catch(e){ stat.textContent='JSON 格式错误：'+e.message; return; }
+  if(!Array.isArray(arr)){ stat.textContent='JSON 须为数组'; return; }
+
+  const mask = document.getElementById('maskNames').checked;
+  const showOwnerReply = document.getElementById('showOwnerReply').checked;
+  let total=0, withReply=0;
+
+  arr.forEach((r,i)=>{
+    total++;
+    if(r.ownerReply) withReply++;
+    const div = document.createElement('div');
+    div.className='card';
+
+    const author = mask ? maskName(r.author) : (r.author || '匿名用户');
+    const date = r.date || '未标注日期';
+    const rating = Number(r.rating)||0;
+    const text = r.text || '';
+    const url = r.url || '';
+
+    div.innerHTML = `
+      <div><span class="pill">#${i+1}</span><strong>${author}</strong></div>
+      <div class="meta">评分：${stars(rating)}（${rating}/5） · 日期：${date}${url ? ` · <a target="_blank" href="${url}">原链接</a>` : ''}</div>
+      <div style="margin-top:8px; white-space:pre-wrap;">${text}</div>
+      ${showOwnerReply && r.ownerReply ? `<div class="owner"><div class="meta"><strong>店家回复</strong></div><div style="white-space:pre-wrap;">${r.ownerReply}</div></div>` : ''}
+    `;
+    list.appendChild(div);
+  });
+
+  stat.textContent = `共 ${total} 条评价，其中 ${withReply} 条含店家回复`;
+}
+
+document.getElementById('renderBtn').onclick = render;
+
+document.getElementById('downloadBtn').onclick = ()=>{
+  let arr=[];
+  try { arr = JSON.parse(input.value || '[]'); } catch(e){ stat.textContent='JSON 格式错误，无法下载'; return; }
+  const blob = new Blob([JSON.stringify(arr,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'reviews-data.json';
+  a.click();
+};
+</script>
+</body>
+</html>
