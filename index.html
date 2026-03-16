@@ -11,6 +11,10 @@
     .muted{color:#666;font-size:14px}
     a{color:#0b57d0}
     iframe{width:100%;height:1200px;border:1px solid #ddd;border-radius:8px;background:#fff}
+    .shop-row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .shop-left{flex:0 0 280px}
+    .shop-left img{width:100%;border-radius:10px;border:1px solid #e5e5e5}
+    .shop-right{flex:1 1 420px;min-width:280px}
   </style>
 </head>
 <body>
@@ -20,14 +24,21 @@
 
   <div class="card">
     <h3>店铺信息</h3>
-    <ul>
-      <li><strong>店铺名称</strong>：学生时代米线烧烤</li>
-      <li><strong>店铺地址</strong>：640 W Valley Blvd, Alhambra, CA 91803</li>
-      <li><strong>店铺电话</strong>：<a href="tel:+16269316986">(626) 931-6986</a></li>
-      <li><strong>店主（据公开信息）</strong>：石敬琳</li>
-      <li><strong>老板娘（据公开信息）</strong>：吕雪娇</li>
-      <li><strong>事件时间</strong>：2025-10-31</li>
-    </ul>
+    <div class="shop-row">
+      <div class="shop-left">
+        <img src="./assets/storefront-info.jpg" alt="店铺信息截图" />
+      </div>
+      <div class="shop-right">
+        <ul>
+          <li><strong>店铺名称</strong>：学生时代米线烧烤</li>
+          <li><strong>店铺地址</strong>：640 W Valley Blvd, Alhambra, CA 91803</li>
+          <li><strong>店铺电话</strong>：<a href="tel:+16269316986">(626) 931-6986</a></li>
+          <li><strong>店主（据公开信息）</strong>：石敬琳</li>
+          <li><strong>老板娘（据公开信息）</strong>：吕雪娇</li>
+          <li><strong>事件时间</strong>：2025-10-31</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="card">
