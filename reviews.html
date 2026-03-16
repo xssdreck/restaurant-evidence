@@ -29,8 +29,20 @@
     <label><input id="showOwnerReply" type="checkbox" checked /> 显示店家回复</label>
   </div>
 
-  <p><strong>粘贴 JSON（数组）</strong></p>
-  <textarea id="jsonInput" placeholder='[
+  <h3>评价截图预览</h3>
+  <div id="list"></div>
+
+  <div class="row">
+    <span id="stat" class="muted"></span>
+  </div>
+
+  <p class="muted danger">注意：请勿发布非公开个人信息（电话、住址、身份证、车牌等）。</p>
+
+  <hr />
+  <details>
+    <summary><strong>后台维护（JSON编辑）</strong></summary>
+    <p><strong>粘贴 JSON（数组）</strong></p>
+    <textarea id="jsonInput" placeholder='[
   {
     "author": "张三",
     "rating": 1,
@@ -41,17 +53,11 @@
   }
 ]'></textarea>
 
-  <div class="row">
-    <button id="renderBtn">渲染预览</button>
-    <button id="downloadBtn">下载为 reviews-data.json</button>
-    <span id="stat" class="muted"></span>
-  </div>
-
-  <p class="muted danger">注意：请勿发布非公开个人信息（电话、住址、身份证、车牌等）。</p>
-
-  <hr />
-  <h3>预览</h3>
-  <div id="list"></div>
+    <div class="row">
+      <button id="renderBtn">渲染预览</button>
+      <button id="downloadBtn">下载为 reviews-data.json</button>
+    </div>
+  </details>
 </div>
 
 <script>
