@@ -43,7 +43,6 @@
 </div>
 
 <script>
-const input = document.getElementById('jsonInput');
 const list = document.getElementById('list');
 const stat = document.getElementById('stat');
 
@@ -60,13 +59,8 @@ function stars(n){
   return '★'.repeat(x) + '☆'.repeat(5-x);
 }
 
-function render(){
+function render(arr){
   list.innerHTML='';
-  let arr=[];
-  try { arr = JSON.parse(input.value || '[]'); }
-  catch(e){ stat.textContent='JSON 格式错误：'+e.message; return; }
-  if(!Array.isArray(arr)){ stat.textContent='JSON 须为数组'; return; }
-
   const mask = document.getElementById('maskNames').checked;
   const showOwnerReply = document.getElementById('showOwnerReply').checked;
   let total=0, withReply=0;
@@ -96,33 +90,24 @@ function render(){
   stat.textContent = `共 ${total} 条评价，其中 ${withReply} 条含店家回复`;
 }
 
-document.getElementById('renderBtn').onclick = render;
-
-document.getElementById('downloadBtn').onclick = ()=>{
-  let arr=[];
-  try { arr = JSON.parse(input.value || '[]'); } catch(e){ stat.textContent='JSON 格式错误，无法下载'; return; }
-  const blob = new Blob([JSON.stringify(arr,null,2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'reviews-data.json';
-  a.click();
-};
-
-
 async function loadDefaultData(){
   try{
     const res = await fetch('./reviews-data.json', {cache:'no-store'});
-    if(!res.ok) return;
+    if(!res.ok){ stat.textContent='未读取到 reviews-data.json'; return; }
     const arr = await res.json();
     if(Array.isArray(arr) && arr.length){
-      input.value = JSON.stringify(arr,null,2);
-      render();
+      render(arr);
+      document.getElementById('maskNames').addEventListener('change', ()=>render(arr));
+      document.getElementById('showOwnerReply').addEventListener('change', ()=>render(arr));
+    } else {
+      stat.textContent = '暂无评价数据';
     }
-  }catch(e){}
+  }catch(e){
+    stat.textContent = '加载失败：' + e.message;
+  }
 }
 
 loadDefaultData();
-
 </script>
 </body>
 </html>
