@@ -16,6 +16,7 @@
     .owner { margin-top:8px; padding:8px; background:#fafafa; border-left:3px solid #333; }
     .pill { display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; background:#f2f2f2; margin-right:8px; }
     .danger { color:#b00020; }
+    .shot { margin-top:8px; max-width:100%; border-radius:8px; border:1px solid #eee; }
   </style>
 </head>
 <body>
@@ -95,7 +96,7 @@ function render(){
     const url = r.url || '';
 
     div.innerHTML = `
-      <div><span class="pill">#${i+1}</span><strong>${author}</strong></div>
+      <div><span class="pill">#${i+1}</span><strong>${author}</strong>${r.evidenceId ? ` <span class="pill">${r.evidenceId}</span>` : ""}</div>
       <div class="meta">评分：${stars(rating)}（${rating}/5） · 日期：${date}${url ? ` · <a target="_blank" href="${url}">原链接</a>` : ''}</div>
       <div style="margin-top:8px; white-space:pre-wrap;">${text}</div>
       ${showOwnerReply && r.ownerReply ? `<div class="owner"><div class="meta"><strong>店家回复</strong></div><div style="white-space:pre-wrap;">${r.ownerReply}</div></div>` : ''}
@@ -117,6 +118,22 @@ document.getElementById('downloadBtn').onclick = ()=>{
   a.download = 'reviews-data.json';
   a.click();
 };
+
+
+async function loadDefaultData(){
+  try{
+    const res = await fetch('./reviews-data.json', {cache:'no-store'});
+    if(!res.ok) return;
+    const arr = await res.json();
+    if(Array.isArray(arr) && arr.length){
+      input.value = JSON.stringify(arr,null,2);
+      render();
+    }
+  }catch(e){}
+}
+
+loadDefaultData();
+
 </script>
 </body>
 </html>
