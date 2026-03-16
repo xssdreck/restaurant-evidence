@@ -4,33 +4,87 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Google评价公示</title>
+  <meta name="description" content="学生时代米线烧烤 Google 评价截图公示页，含信息备注与店家回复展示。" />
   <style>
-    body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif; margin: 20px; line-height: 1.5; }
-    .wrap { max-width: 980px; margin: 0 auto; }
-    textarea { width:100%; min-height:220px; padding:10px; border:1px solid #ccc; border-radius:10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-    button { padding:10px 14px; border:none; border-radius:8px; background:#111; color:#fff; font-weight:700; cursor:pointer; }
-    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0; }
-    .muted { color:#666; font-size:14px; }
-    .card { border:1px solid #e3e3e3; border-radius:10px; padding:12px; margin:10px 0; }
-    .meta { font-size:13px; color:#666; }
-    .owner { margin-top:8px; padding:8px; background:#fafafa; border-left:3px solid #333; }
-    .pill { display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; background:#f2f2f2; margin-right:8px; }
-    .danger { color:#b00020; }
-    .shot { margin-top:8px; max-width:100%; border-radius:8px; border:1px solid #eee; }
+    :root {
+      --bg: #f8fafc;
+      --panel: #fff;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --brand: #1d4ed8;
+      --danger: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: #111827;
+      line-height: 1.6;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 16px; }
+    .top {
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(248,250,252,.92);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--border);
+      margin: -16px -16px 12px; padding: 14px 16px 10px;
+    }
+    .title { margin: 0 0 6px; font-size: clamp(20px, 2.8vw, 28px); }
+    .muted { color: var(--muted); font-size: 14px; margin: 0; }
+
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center;
+      margin-top: 10px;
+    }
+    .toolbar label { font-size: 14px; color: #374151; }
+    .toolbar input[type="text"] {
+      min-width: 220px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px;
+    }
+
+    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin: 8px 0 0; }
+    .danger { color: var(--danger); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin: 12px 0;
+      box-shadow: 0 6px 16px rgba(15,23,42,.04);
+    }
+    .card-head { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .pill {
+      display:inline-block; font-size:12px; padding:3px 9px;
+      border-radius:999px; background:#eef2ff; color:#3730a3; border: 1px solid #c7d2fe;
+    }
+    .meta { font-size:13px; color:var(--muted); margin-top: 6px; }
+    .text { margin-top:8px; white-space: pre-wrap; }
+    .owner {
+      margin-top:10px; padding:10px;
+      background:#f9fafb; border-left:3px solid #111827; border-radius:8px;
+    }
+    .shot {
+      margin-top:10px; width: 100%; border-radius: 10px; border: 1px solid #e5e7eb;
+    }
+
+    @media (max-width: 640px) {
+      .top { position: static; margin: 0 0 10px; padding: 0 0 10px; background: transparent; backdrop-filter: none; border-bottom: none; }
+      .toolbar input[type="text"] { width: 100%; min-width: 0; }
+    }
   </style>
 </head>
 <body>
 <div class="wrap">
-  <h2>店铺 Google 评价公示页</h2>
-  <p class="muted">用途：集中展示公开评价与店家回复。建议默认匿名化普通用户昵称，降低无关第三方风险。</p>
-
-  <div class="row">
-    <label><input id="maskNames" type="checkbox" checked /> 默认匿名化评论者昵称</label>
-    <label><input id="showOwnerReply" type="checkbox" checked /> 显示店家回复</label>
+  <div class="top">
+    <h2 class="title">店铺 Google 评价公示页</h2>
+    <p class="muted">用途：集中展示公开评价与店家回复。建议默认匿名化普通用户昵称，降低无关第三方风险。</p>
+    <div class="toolbar">
+      <label><input id="maskNames" type="checkbox" checked /> 默认匿名化评论者昵称</label>
+      <label><input id="showOwnerReply" type="checkbox" checked /> 显示店家回复</label>
+      <input id="keyword" type="text" placeholder="搜索编号/备注/评论内容（如 E-050）" />
+    </div>
   </div>
-
-  <h3>评价截图预览</h3>
-  <div id="list"></div>
 
   <div class="row">
     <span id="stat" class="muted"></span>
@@ -38,13 +92,14 @@
 
   <p class="muted danger">注意：请勿发布非公开个人信息（电话、住址、身份证、车牌等）。</p>
 
-  <hr />
-  
+  <div id="list"></div>
 </div>
 
 <script>
 const list = document.getElementById('list');
 const stat = document.getElementById('stat');
+const keyword = document.getElementById('keyword');
+let sourceData = [];
 
 function maskName(name){
   if(!name) return '匿名用户';
@@ -63,31 +118,43 @@ function render(arr){
   list.innerHTML='';
   const mask = document.getElementById('maskNames').checked;
   const showOwnerReply = document.getElementById('showOwnerReply').checked;
-  let total=0, withReply=0;
 
+  let withReply=0;
   arr.forEach((r,i)=>{
-    total++;
     if(r.ownerReply) withReply++;
-    const div = document.createElement('div');
+    const div = document.createElement('article');
     div.className='card';
 
     const author = mask ? maskName(r.author) : (r.author || '匿名用户');
-    const date = r.date || '未标注日期';
+    const note = r.date || '未标注';
     const rating = Number(r.rating)||0;
     const text = r.text || '';
     const url = r.url || '';
 
     div.innerHTML = `
-      <div><span class="pill">#${i+1}</span><strong>${author}</strong>${r.evidenceId ? ` <span class="pill">${r.evidenceId}</span>` : ""}</div>
-      <div class="meta">评分：${stars(rating)}（${rating}/5） · 信息备注：${date}${url ? ` · <a target="_blank" href="${url}">原链接</a>` : ''}</div>
-      <div style="margin-top:8px; white-space:pre-wrap;">${text}</div>
-      ${showOwnerReply && r.ownerReply ? `<div class="owner"><div class="meta"><strong>店家回复</strong></div><div style="white-space:pre-wrap;">${r.ownerReply}</div></div>` : ''}
-      ${r.imageUrl ? `<a href="${r.imageUrl}" target="_blank"><img class="shot" src="${r.imageUrl}" alt="evidence screenshot" /></a>` : ''}
+      <div class="card-head">
+        <span class="pill">#${i+1}</span>
+        <strong>${author}</strong>
+        ${r.evidenceId ? `<span class="pill">${r.evidenceId}</span>` : ''}
+      </div>
+      <div class="meta">评分：${stars(rating)}（${rating}/5） · 信息备注：${note}${url ? ` · <a target="_blank" href="${url}">原链接</a>` : ''}</div>
+      <div class="text">${text}</div>
+      ${showOwnerReply && r.ownerReply ? `<div class="owner"><div class="meta"><strong>店家回复</strong></div><div class="text">${r.ownerReply}</div></div>` : ''}
+      ${r.imageUrl ? `<a href="${r.imageUrl}" target="_blank"><img loading="lazy" class="shot" src="${r.imageUrl}" alt="evidence screenshot" /></a>` : ''}
     `;
     list.appendChild(div);
   });
 
-  stat.textContent = `共 ${total} 条评价，其中 ${withReply} 条含店家回复`;
+  stat.textContent = `当前展示 ${arr.length} 条（含店家回复 ${withReply} 条）`;
+}
+
+function applyFilters(){
+  const q = keyword.value.trim().toLowerCase();
+  const filtered = !q ? sourceData : sourceData.filter(x => {
+    const blob = [x.evidenceId, x.author, x.date, x.text, x.ownerReply].join(' ').toLowerCase();
+    return blob.includes(q);
+  });
+  render(filtered);
 }
 
 async function loadDefaultData(){
@@ -96,9 +163,11 @@ async function loadDefaultData(){
     if(!res.ok){ stat.textContent='未读取到 reviews-data.json'; return; }
     const arr = await res.json();
     if(Array.isArray(arr) && arr.length){
-      render(arr);
-      document.getElementById('maskNames').addEventListener('change', ()=>render(arr));
-      document.getElementById('showOwnerReply').addEventListener('change', ()=>render(arr));
+      sourceData = arr;
+      applyFilters();
+      document.getElementById('maskNames').addEventListener('change', applyFilters);
+      document.getElementById('showOwnerReply').addEventListener('change', applyFilters);
+      keyword.addEventListener('input', applyFilters);
     } else {
       stat.textContent = '暂无评价数据';
     }
