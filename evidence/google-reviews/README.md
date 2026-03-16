@@ -30,3 +30,4 @@
 - E-047: 新增截图（待整理） -> E-047_google-review.jpg
 - E-048: 新增截图（待整理） -> E-048_google-review.jpg
 - E-049: M X 评论及店家回复
+- E-050: Austin 评论及店家回复
