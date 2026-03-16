@@ -20,12 +20,14 @@
 
 本页用于展示该店铺公开可见的 Google 评价及店家回复。
 
-- 评价展示页：[
-查看 Google 评价公示](./reviews.html)
-- 截图录入工具：[
-打开评价录入生成器](./reviews-builder.html)
+- 评价展示页：[查看 Google 评价公示](./reviews.html)
+- 截图录入工具：[打开评价录入生成器](./reviews-builder.html)
 
 > 说明：公示内容应以可核验截图/链接为依据，不捏造、不篡改。
+
+### 截图直接展示（首页）
+
+<iframe src="./reviews.html" title="Google评论截图公示" style="width:100%;height:900px;border:1px solid #ddd;border-radius:8px;"></iframe>
 
 ---
 
