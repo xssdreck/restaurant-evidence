@@ -21,19 +21,19 @@
 <body>
 <div class="wrap">
   <h1>投稿中心（登录投稿 + 审核发布）</h1>
-  <p class="muted">投稿需 GitHub 账号登录。发布后先进入待审核，管理员审核通过后自动显示在首页。</p>
+  <p class="muted">投稿需登录本站账号。每个账号仅限一篇投稿，发布后先进入待审核，管理员审核通过后自动显示在首页。</p>
 
   <div class="card">
     <h3>1) 投稿入口（需要登录）</h3>
-    <p class="muted">点击后会跳转 GitHub 投稿页；未登录会先要求登录。</p>
-    <a class="btn" target="_blank" href="https://github.com/xssdreck/restaurant-evidence/issues/new?labels=story&title=%E3%80%90%E7%BB%8F%E5%8E%86%E6%8A%95%E7%A8%BF%E3%80%91%E8%AF%B7%E5%A1%AB%E5%86%99%E6%A0%87%E9%A2%98&body=%23%23%20%E5%8F%91%E7%94%9F%E6%97%B6%E9%97%B4%0A%0A%23%23%20%E5%8F%91%E7%94%9F%E5%9C%B0%E7%82%B9%0A%0A%23%23%20%E7%BB%8F%E8%BF%87%E6%8F%8F%E8%BF%B0%EF%BC%88%E5%8F%AA%E5%86%99%E5%8F%AF%E6%A0%B8%E9%AA%8C%E4%BA%8B%E5%AE%9E%EF%BC%89%0A%0A%23%23%20%E8%AF%81%E6%8D%AE%E7%BC%96%E5%8F%B7%E6%88%96%E9%93%BE%E6%8E%A5%0A%0A%23%23%20%E4%BF%A1%E6%81%AF%E5%A4%87%E6%B3%A8%0A">我要投稿</a>
-    <a class="btn secondary" target="_blank" href="https://github.com/xssdreck/restaurant-evidence/issues?q=is%3Aissue+label%3Astory">查看全部投稿</a>
+    <p class="muted">点击后进入投稿页面；未登录请先登录。</p>
+    <a class="btn" href="./submit.html">我要投稿</a>
+    <a class="btn secondary" href="./auth.html">登录/注册</a>
   </div>
 
   <div class="card">
     <h3>2) 管理员审核</h3>
-    <p class="muted">管理员给投稿添加 <code>approved</code> 标签，即视为审核通过并自动展示到首页。</p>
-    <a class="btn secondary" target="_blank" href="https://github.com/xssdreck/restaurant-evidence/issues?q=is%3Aissue+label%3Astory">打开待审核投稿列表</a>
+    <p class="muted">管理员在后台审核投稿，通过后将自动展示到首页。</p>
+    <a class="btn secondary" href="./admin.html">进入管理员审核后台</a>
   </div>
 
   <div class="card">
@@ -42,18 +42,34 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
 <script>
 const list = document.getElementById('list');
 async function loadApproved(){
   try{
-    const url = 'https://api.github.com/repos/xssdreck/restaurant-evidence/issues?state=open&labels=story,approved&per_page=30';
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('读取失败');
-    const arr = await res.json();
-    if(!Array.isArray(arr) || !arr.length){
-      list.innerHTML = '<p class="muted">暂无审核通过内容。</p>'; return;
+    const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    const { data, error } = await sb
+      .from('stories')
+      .select('id,title,content,user_email,created_at')
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    
+    if(error) throw error;
+    
+    if(!data || !data.length){
+      list.innerHTML = '<p class="muted">暂无审核通过内容。</p>'; 
+      return;
     }
-    list.innerHTML = arr.map((it,idx)=>`<article class="story"><div><strong>${idx+1}. ${(it.title||'未命名').replace(/</g,'&lt;')}</strong></div><div class="muted">作者：${it.user?.login||'匿名'} · ${new Date(it.created_at).toLocaleString('zh-CN')}</div><p>${(it.body||'').slice(0,220).replace(/</g,'&lt;').replace(/\n/g,'<br>')}...</p><a target="_blank" href="${it.html_url}">查看全文</a></article>`).join('');
+    
+    list.innerHTML = data.map((it,idx)=>`
+      <article class="story">
+        <div><strong>${idx+1}. ${(it.title||'未命名').replace(/</g,'&lt;')}</strong></div>
+        <div class="muted">作者：${(it.user_email||'匿名').replace(/</g,'&lt;')} · ${new Date(it.created_at).toLocaleString('zh-CN')}</div>
+        <p>${(it.content||'').slice(0,220).replace(/</g,'&lt;').replace(/\n/g,'<br>')}...</p>
+      </article>
+    `).join('');
   }catch(e){
     list.innerHTML = '<p class="muted">加载失败，请稍后刷新。</p>';
   }
