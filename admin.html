@@ -44,7 +44,7 @@
         <th>标题 / 内容</th>
         <th style="width:180px;">作者</th>
         <th style="width:170px;">时间</th>
-        <th style="width:220px;">操作</th>
+        <th style="width:280px;">操作</th>
       </tr>
     </thead>
     <tbody id="rows">
@@ -106,6 +106,7 @@
               <button type="button" data-id="${x.id}" data-status="approved">通过</button>
               <button type="button" data-id="${x.id}" data-status="rejected">驳回</button>
               <button type="button" data-id="${x.id}" data-status="pending" class="secondary">待审</button>
+              <button type="button" data-id="${x.id}" data-action="delete" class="secondary">删除</button>
             </div>
           </td>
         </tr>`;
@@ -164,12 +165,33 @@
 
     document.getElementById('reloadBtn').addEventListener('click', () => load());
 
+    async function deleteStory(id){
+      const user = await getUser();
+      if(!user || !isAdmin(user)){
+        say('无管理员权限', 'err');
+        return;
+      }
+      if(!confirm('确认删除这篇投稿？删除后不可恢复。')) return;
+      say('正在删除...');
+      const { error } = await sb.from('stories').delete().eq('id', id);
+      if(error){
+        say('删除失败：' + error.message, 'err');
+        return;
+      }
+      say('删除成功', 'ok');
+      await load();
+    }
+
     rows.addEventListener('click', async (e) => {
-      const btn = e.target.closest('button[data-id][data-status]');
+      const btn = e.target.closest('button[data-id]');
       if(!btn) return;
       btn.disabled = true;
       try {
-        await setStatus(btn.dataset.id, btn.dataset.status);
+        if (btn.dataset.action === 'delete') {
+          await deleteStory(btn.dataset.id);
+        } else if (btn.dataset.status) {
+          await setStatus(btn.dataset.id, btn.dataset.status);
+        }
       } finally {
         btn.disabled = false;
       }
