@@ -3,90 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>我的经历｜免登录协同编辑</title>
-  <meta name="description" content="免登录协同编辑页面，仅密码进入，实时保存。" />
+  <title>投稿中心｜登录投稿 + 管理员审核</title>
+  <meta name="description" content="投稿需登录，管理员审核通过后自动显示在首页。" />
   <style>
     :root{--bg:#f8fafc;--card:#fff;--border:#e5e7eb;--muted:#6b7280}
     *{box-sizing:border-box}
     body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;background:var(--bg);color:#111827}
-    .wrap{max-width:1080px;margin:0 auto;padding:16px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0}
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin:12px 0}
     .muted{color:var(--muted);font-size:14px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    input{padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;min-width:220px}
-    button{padding:10px 14px;border:none;border-radius:10px;background:#111827;color:#fff;font-weight:700;cursor:pointer}
-    .ok{color:#065f46}.err{color:#b91c1c}
-    iframe{width:100%;height:78vh;border:1px solid var(--border);border-radius:12px;background:#fff}
-    .hidden{display:none}
+    .btn{display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:9px 13px;border-radius:10px;margin-right:8px}
+    .btn.secondary{background:#fff;color:#111827;border:1px solid var(--border)}
     code{background:#eef2ff;padding:2px 6px;border-radius:6px}
+    .story{border-top:1px dashed #d1d5db;padding-top:10px;margin-top:10px}
   </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>我的经历（免登录协同编辑）</h1>
-  <p class="muted">模式：仅密码进入、无需账号、无需审核、实时保存。请仅记录可核验事实。</p>
+  <h1>投稿中心（登录投稿 + 审核发布）</h1>
+  <p class="muted">投稿需 GitHub 账号登录。发布后先进入待审核，管理员审核通过后自动显示在首页。</p>
 
-  <section class="card" id="gate">
-    <h3>输入编辑密码</h3>
-    <div class="row">
-      <input id="pwd" type="password" placeholder="请输入编辑密码" />
-      <button id="enter">进入编辑</button>
-      <span id="msg" class="muted"></span>
-    </div>
-  </section>
+  <div class="card">
+    <h3>1) 投稿入口（需要登录）</h3>
+    <p class="muted">点击后会跳转 GitHub 投稿页；未登录会先要求登录。</p>
+    <a class="btn" target="_blank" href="https://github.com/xssdreck/restaurant-evidence/issues/new?labels=story&title=%E3%80%90%E7%BB%8F%E5%8E%86%E6%8A%95%E7%A8%BF%E3%80%91%E8%AF%B7%E5%A1%AB%E5%86%99%E6%A0%87%E9%A2%98&body=%23%23%20%E5%8F%91%E7%94%9F%E6%97%B6%E9%97%B4%0A%0A%23%23%20%E5%8F%91%E7%94%9F%E5%9C%B0%E7%82%B9%0A%0A%23%23%20%E7%BB%8F%E8%BF%87%E6%8F%8F%E8%BF%B0%EF%BC%88%E5%8F%AA%E5%86%99%E5%8F%AF%E6%A0%B8%E9%AA%8C%E4%BA%8B%E5%AE%9E%EF%BC%89%0A%0A%23%23%20%E8%AF%81%E6%8D%AE%E7%BC%96%E5%8F%B7%E6%88%96%E9%93%BE%E6%8E%A5%0A%0A%23%23%20%E4%BF%A1%E6%81%AF%E5%A4%87%E6%B3%A8%0A">我要投稿</a>
+    <a class="btn secondary" target="_blank" href="https://github.com/xssdreck/restaurant-evidence/issues?q=is%3Aissue+label%3Astory">查看全部投稿</a>
+  </div>
 
-  <section class="card hidden" id="editorWrap">
-    <h3>协同编辑器（实时自动保存）</h3>
-    <p class="muted">多人可同时编辑。建议按“时间 / 地点 / 经过 / 证据编号 / 信息备注”结构填写。</p>
-    <div class="row" style="margin:8px 0 10px;">
-      <button id="saveTxt">保存并下载 TXT</button>
-      <button id="saveHtml">保存并下载 HTML</button>
-      <span id="saveMsg" class="muted">按钮用于手动导出备份（编辑器本身会自动保存）。</span>
-    </div>
-    <iframe id="pad" src="about:blank" title="collab-editor"></iframe>
-    <p class="muted" style="margin-top:10px;">如无法加载，可直接打开：<a target="_blank" href="https://etherpad.wikimedia.org/p/restaurant-evidence-story-1031xpp">Etherpad 协同文档</a></p>
-  </section>
+  <div class="card">
+    <h3>2) 管理员审核</h3>
+    <p class="muted">管理员给投稿添加 <code>approved</code> 标签，即视为审核通过并自动展示到首页。</p>
+    <a class="btn secondary" target="_blank" href="https://github.com/xssdreck/restaurant-evidence/issues?q=is%3Aissue+label%3Astory">打开待审核投稿列表</a>
+  </div>
+
+  <div class="card">
+    <h3>3) 已审核通过（预览）</h3>
+    <div id="list">加载中...</div>
+  </div>
 </div>
 
 <script>
-  const PASS = '1031xpp';
-  const PAD_ID = 'restaurant-evidence-story-1031xpp';
-  const PAD_URL = `https://etherpad.wikimedia.org/p/${PAD_ID}?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false`;
-
-  const gate = document.getElementById('gate');
-  const editorWrap = document.getElementById('editorWrap');
-  const pad = document.getElementById('pad');
-  const msg = document.getElementById('msg');
-
-  function unlock(){
-    gate.classList.add('hidden');
-    editorWrap.classList.remove('hidden');
-    pad.src = PAD_URL;
-    sessionStorage.setItem('exp_unlocked','1');
-  }
-
-  document.getElementById('enter').onclick = () => {
-    const val = document.getElementById('pwd').value;
-    if(val === PASS){
-      msg.className='ok';
-      msg.textContent='验证通过，正在进入编辑器...';
-      unlock();
-    }else{
-      msg.className='err';
-      msg.textContent='密码错误';
+const list = document.getElementById('list');
+async function loadApproved(){
+  try{
+    const url = 'https://api.github.com/repos/xssdreck/restaurant-evidence/issues?state=open&labels=story,approved&per_page=30';
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('读取失败');
+    const arr = await res.json();
+    if(!Array.isArray(arr) || !arr.length){
+      list.innerHTML = '<p class="muted">暂无审核通过内容。</p>'; return;
     }
-  };
-
-  document.getElementById('saveTxt').onclick = () => {
-    window.open(`https://etherpad.wikimedia.org/p/${PAD_ID}/export/txt`, '_blank');
-  };
-  document.getElementById('saveHtml').onclick = () => {
-    window.open(`https://etherpad.wikimedia.org/p/${PAD_ID}/export/html`, '_blank');
-  };
-
-  if(sessionStorage.getItem('exp_unlocked') === '1'){
-    unlock();
+    list.innerHTML = arr.map((it,idx)=>`<article class="story"><div><strong>${idx+1}. ${(it.title||'未命名').replace(/</g,'&lt;')}</strong></div><div class="muted">作者：${it.user?.login||'匿名'} · ${new Date(it.created_at).toLocaleString('zh-CN')}</div><p>${(it.body||'').slice(0,220).replace(/</g,'&lt;').replace(/\n/g,'<br>')}...</p><a target="_blank" href="${it.html_url}">查看全文</a></article>`).join('');
+  }catch(e){
+    list.innerHTML = '<p class="muted">加载失败，请稍后刷新。</p>';
   }
+}
+loadApproved();
 </script>
 </body>
 </html>

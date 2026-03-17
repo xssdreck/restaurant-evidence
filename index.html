@@ -126,6 +126,14 @@
     </section>
 
 
+    
+    <section class="card" id="approvedStoriesSection">
+      <h3>审核通过故事（自动显示）</h3>
+      <p class="muted">投稿人登录提交后，管理员审核通过（approved）即自动显示在这里。</p>
+      <div id="approvedStories" class="muted">加载中...</div>
+      <div class="actions" style="margin-top:10px;"><a class="btn" href="./experience.html" target="_blank">进入投稿中心</a></div>
+    </section>
+
     <section>
       <iframe src="./reviews.html" title="Google评论截图公示" style="border:none; box-shadow:none; border-radius:0;"></iframe>
     </section>
@@ -143,6 +151,34 @@
   }
   </script>
 
+
+
+<script>
+async function loadApprovedStories(){
+  const box = document.getElementById('approvedStories');
+  if(!box) return;
+  try{
+    const url='https://api.github.com/repos/xssdreck/restaurant-evidence/issues?state=open&labels=story,approved&per_page=20';
+    const res=await fetch(url);
+    if(!res.ok) throw new Error('load failed');
+    const arr=await res.json();
+    if(!Array.isArray(arr) || !arr.length){
+      box.textContent='暂无审核通过内容。';
+      return;
+    }
+    box.innerHTML = arr.map((it,idx)=>`<article style="border-top:1px dashed #d1d5db;padding-top:10px;margin-top:10px;">
+      <div><strong>${idx+1}. ${(it.title||'未命名').replace(/</g,'&lt;')}</strong></div>
+      <div class="muted">作者：${(it.user?.login||'匿名')} · 时间：${new Date(it.created_at).toLocaleString('zh-CN')}</div>
+      <p style="margin:8px 0;">${(it.body||'').slice(0,220).replace(/</g,'&lt;').replace(/
+/g,'<br>')}...</p>
+      <a target="_blank" href="${it.html_url}">查看全文</a>
+    </article>`).join('');
+  }catch(e){
+    box.textContent='暂时无法加载审核内容，请稍后刷新。';
+  }
+}
+loadApprovedStories();
+</script>
 
 </body>
 </html>
