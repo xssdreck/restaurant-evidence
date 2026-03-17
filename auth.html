@@ -1,273 +1,67 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>登录｜洛杉矶米线烧烤公示</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #0f172a;
-      --accent: #3b82f6;
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --text: #0f172a;
-      --text-secondary: #64748b;
-      --border: #e2e8f0;
-      --radius: 12px;
-    }
-    
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      font-family: 'Inter', 'Noto Sans SC', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    
-    .login-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 40px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-    }
-    
-    .logo {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-    
-    .logo h1 {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    
-    .logo p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-top: 4px;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      margin-bottom: 6px;
-    }
-    
-    .form-input {
-      width: 100%;
-      padding: 12px 16px;
-      font-size: 15px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      transition: all 0.2s;
-    }
-    
-    .form-input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
-    }
-    
-    .btn {
-      width: 100%;
-      padding: 14px;
-      font-size: 15px;
-      font-weight: 600;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      margin-bottom: 12px;
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    
-    .btn-secondary {
-      background: var(--bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    
-    .btn-secondary:hover {
-      border-color: var(--text-secondary);
-    }
-    
-    .divider {
-      display: flex;
-      align-items: center;
-      margin: 24px 0;
-      color: var(--text-secondary);
-      font-size: 13px;
-    }
-    
-    .divider::before,
-    .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-    
-    .divider span {
-      padding: 0 12px;
-    }
-    
-    .message {
-      text-align: center;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-bottom: 16px;
-      display: none;
-    }
-    
-    .message.show {
-      display: block;
-    }
-    
-    .message.success {
-      background: #d1fae5;
-      color: #065f46;
-    }
-    
-    .message.error {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-    
-    .back-link {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      font-size: 13px;
-      color: var(--text-secondary);
-      text-decoration: none;
-    }
-    
-    .back-link:hover {
-      color: var(--text);
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>注册 / 登录</title>
+  <style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;max-width:720px;margin:24px auto;padding:0 16px}input,button{padding:10px;border:1px solid #ccc;border-radius:8px}input{width:100%;margin:8px 0}button{background:#111;color:#fff} .row{display:flex;gap:8px;flex-wrap:wrap}.muted{color:#666}</style>
 </head>
 <body>
-  <div class="login-card">
-    <div class="logo">
-      <h1>洛杉矶米线烧烤公示</h1>
-      <p>登录以投稿或管理内容</p>
-    </div>
-    
-    <div id="message" class="message"></div>
-    
-    <div id="loginForm">
-      <div class="form-group">
-        <label class="form-label">邮箱</label>
-        <input type="email" id="email" class="form-input" placeholder="your@email.com">
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">密码</label>
-        <input type="password" id="password" class="form-input" placeholder="••••••">
-      </div>
-      
-      <button id="loginBtn" class="btn btn-primary">登录</button>
-      
-      <div class="divider"><span>或</span></div>
-      
-      <button id="signupBtn" class="btn btn-secondary">注册新账号</button>
-    </div>
-    
-    <a href="./" class="back-link">← 返回首页</a>
+  <h2>网站账号注册 / 登录</h2>
+  <p class="muted">注册后可投稿；管理员可审核发布。</p>
+  <input id="email" type="email" placeholder="邮箱" />
+  <input id="password" type="password" placeholder="密码（至少6位）" />
+  <div class="row">
+    <button id="signup">注册</button>
+    <button id="login">登录</button>
+    <button id="logout">退出</button>
   </div>
+  <p id="msg" class="muted"></p>
+  <p><a href="./experience.html">去投稿</a> · <a href="./admin.html">管理员审核</a> · <a href="./">回首页</a></p>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./supabase-config.js"></script>
-  <script>
-    const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-    const msg = document.getElementById('message');
-    
-    function showMessage(text, type) {
-      msg.textContent = text;
-      msg.className = 'message show ' + type;
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+<script>
+const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+const msg = document.getElementById('msg');
+function say(t){msg.textContent=t;}
+
+document.getElementById('signup').onclick = async ()=>{
+  const email=emailEl.value.trim(), password=pwdEl.value;
+  const {error}=await sb.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: window.location.origin + '/restaurant-evidence/auth.html'
     }
+  });
+  say(error?('注册失败：'+error.message):'注册成功，请检查邮箱验证邮件并从邮件返回本站。');
+};
 
-    // Check if already logged in
-    (async () => {
-      const { data } = await sb.auth.getUser();
-      if (data?.user) {
-        showMessage('已登录，正在跳转...', 'success');
-        setTimeout(() => location.href = './submit.html', 800);
-      }
-    })();
+document.getElementById('login').onclick = async ()=>{
+  const email=emailEl.value.trim(), password=pwdEl.value;
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  if(error){
+    say('登录失败：'+error.message);
+  } else {
+    say('登录成功，正在进入投稿页面...');
+    setTimeout(()=>{ window.location.href='./submit.html'; }, 800);
+  }
+};
 
-    document.getElementById('loginBtn').onclick = async () => {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      
-      if (!email || !password) {
-        showMessage('请填写邮箱和密码', 'error');
-        return;
-      }
-      
-      const { error } = await sb.auth.signInWithPassword({ email, password });
-      
-      if (error) {
-        showMessage('登录失败：' + error.message, 'error');
-      } else {
-        showMessage('登录成功！', 'success');
-        setTimeout(() => location.href = './submit.html', 800);
-      }
-    };
+document.getElementById('logout').onclick = async ()=>{
+  await sb.auth.signOut(); say('已退出');
+};
 
-    document.getElementById('signupBtn').onclick = async () => {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      
-      if (!email || !password) {
-        showMessage('请填写邮箱和密码', 'error');
-        return;
-      }
-      
-      if (password.length < 6) {
-        showMessage('密码至少需要6位', 'error');
-        return;
-      }
-      
-      const { error } = await sb.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: location.href }
-      });
-      
-      if (error) {
-        showMessage('注册失败：' + error.message, 'error');
-      } else {
-        showMessage('注册成功！请检查邮箱验证邮件', 'success');
-      }
-    };
-  </script>
+const emailEl=document.getElementById('email');
+const pwdEl=document.getElementById('password');
+(async()=>{
+  const {data}=await sb.auth.getUser(); 
+  if(data?.user) {
+    say('已登录：'+data.user.email+'，正在跳转...');
+    setTimeout(()=>{ window.location.href='./submit.html'; }, 600);
+  }
+})();
+</script>
 </body>
 </html>

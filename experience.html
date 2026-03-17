@@ -1,260 +1,121 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>投稿中心｜分享您的经历</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>投稿中心｜登录投稿 + 管理员审核</title>
+  <meta name="description" content="投稿需登录，管理员审核通过后自动显示在首页。" />
   <style>
-    :root {
-      --primary: #0f172a;
-      --accent: #3b82f6;
-      --success: #10b981;
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --text: #0f172a;
-      --text-secondary: #64748b;
-      --border: #e2e8f0;
-      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-      --radius: 12px;
-    }
-    
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      font-family: 'Inter', 'Noto Sans SC', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-    
-    .container {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-    
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    
-    .back-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 18px;
-      transition: all 0.2s;
-    }
-    
-    .back-btn:hover {
-      background: var(--bg);
-      color: var(--text);
-    }
-    
-    .header h1 {
-      font-size: 24px;
-      font-weight: 700;
-    }
-
-    .intro {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 24px;
-      border-radius: var(--radius);
-      margin-bottom: 24px;
-    }
-    
-    .intro h2 {
-      font-size: 18px;
-      margin-bottom: 8px;
-    }
-    
-    .intro p {
-      font-size: 14px;
-      opacity: 0.9;
-    }
-    
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow);
-    }
-    
-    .card h3 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .card p {
-      color: var(--text-secondary);
-      font-size: 14px;
-      margin-bottom: 16px;
-    }
-    
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 20px;
-      font-size: 14px;
-      font-weight: 500;
-      border-radius: 6px;
-      text-decoration: none;
-      transition: all 0.2s;
-      border: none;
-      cursor: pointer;
-    }
-    
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    
-    .btn-secondary {
-      background: var(--bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    
-    .btn-secondary:hover {
-      border-color: var(--text-secondary);
-    }
-
-    .story-item {
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .story-item:last-child {
-      border-bottom: none;
-    }
-    
-    .story-title {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    
-    .story-meta {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-    
-    .empty {
-      text-align: center;
-      padding: 48px;
-      color: var(--text-secondary);
-    }
+    :root{--bg:#f8fafc;--card:#fff;--border:#e5e7eb;--muted:#6b7280}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;background:var(--bg);color:#111827}
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin:12px 0}
+    .muted{color:var(--muted);font-size:14px}
+    .btn{display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:9px 13px;border-radius:10px;margin-right:8px}
+    .btn.secondary{background:#fff;color:#111827;border:1px solid var(--border)}
+    code{background:#eef2ff;padding:2px 6px;border-radius:6px}
+    .story{border-top:1px dashed #d1d5db;padding-top:10px;margin-top:10px}
+    .status{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
+    .pending{background:#fff7ed;color:#9a3412}
+    .approved{background:#ecfdf5;color:#065f46}
+    .rejected{background:#fef2f2;color:#991b1b}
   </style>
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <a href="./" class="back-btn">←</a>
-      <h1>投稿中心</h1>
-    </header>
+<div class="wrap">
+  <h1>投稿中心（登录投稿 + 审核发布）</h1>
+  <p class="muted">投稿需登录本站账号。每个账号仅限一篇投稿，发布后先进入待审核，管理员审核通过后自动显示在首页。</p>
 
-    <div class="intro">
-      <h2>分享您的真实经历</h2>
-      <p>您的投稿将帮助更多人了解真实情况。每个账号限一篇，审核通过后公开展示。</p>
-    </div>
-
-    <div id="myPostCard" style="display:none;"></div>
-
-    <div class="card">
-      <h3>📝 我要投稿</h3>
-      <p>点击下方按钮开始撰写您的投稿内容，支持文字、图片和视频。</p>
-      <a href="./submit.html" class="btn btn-primary">开始投稿 →</a>
-      <a href="./auth.html" class="btn btn-secondary" style="margin-left:8px">登录/注册</a>
-    </div>
-
-    <div class="card">
-      <h3>📋 最新审核通过</h3>
-      <div id="storiesList">
-        <div class="empty">加载中...</div>
-      </div>
-    </div>
+  <div class="card" id="myPostCard" style="display:none;">
+    <h3>我的投稿</h3>
+    <div id="myPostContent"></div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./supabase-config.js"></script>
-  <script>
+  <div class="card">
+    <h3>1) 投稿入口（需要登录）</h3>
+    <p class="muted">点击后进入投稿页面；未登录请先登录。</p>
+    <a class="btn" href="./submit.html">我要投稿</a>
+    <a class="btn secondary" href="./auth.html">登录/注册</a>
+  </div>
+
+  <div class="card">
+    <h3>2) 管理员审核</h3>
+    <p class="muted">管理员在后台审核投稿，通过后将自动展示到首页。</p>
+    <a class="btn secondary" href="./admin.html">进入管理员审核后台</a>
+  </div>
+
+  <div class="card">
+    <h3>3) 已审核通过（预览）</h3>
+    <div id="list">加载中...</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+<script>
+const list = document.getElementById('list');
+async function loadApproved(){
+  try{
     const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-
-    async function loadData() {
-      // Load user's post
-      const { data: userData } = await sb.auth.getUser();
-      const user = userData?.user;
-      
-      if (user) {
-        const { data: myPost } = await sb
-          .from('stories')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        
-        if (myPost) {
-          const statusMap = { pending: '待审核', approved: '已通过', rejected: '已驳回' };
-          const statusColors = { pending: '#f59e0b', approved: '#10b981', rejected: '#ef4444' };
-          document.getElementById('myPostCard').innerHTML = `
-            <div class="card" style="border-left:4px solid ${statusColors[myPost.status]}">
-              <h3>我的投稿</h3>
-              <div style="margin-bottom:12px">
-                <div class="story-title">${myPost.title || '未命名'}</div>
-                <div class="story-meta">状态：${statusMap[myPost.status]} · 提交于 ${new Date(myPost.created_at).toLocaleDateString('zh-CN')}</div>
-              </div>
-              <a href="./submit.html" class="btn btn-secondary">编辑投稿</a>
-            </div>
-          `;
-          document.getElementById('myPostCard').style.display = 'block';
-        }
-      }
-
-      // Load approved stories
-      const { data: stories } = await sb
-        .from('stories')
-        .select('title,user_email,created_at')
-        .eq('status', 'approved')
-        .order('created_at', { ascending: false })
-        .limit(5);
-      
-      const list = document.getElementById('storiesList');
-      if (stories?.length) {
-        list.innerHTML = stories.map(s => `
-          <div class="story-item">
-            <div class="story-title">${s.title || '未命名'}</div>
-            <div class="story-meta">${s.user_email?.split('@')[0]} · ${new Date(s.created_at).toLocaleDateString('zh-CN')}</div>
-          </div>
-        `).join('');
-      } else {
-        list.innerHTML = '<div class="empty">暂无已审核内容</div>';
-      }
+    const { data, error } = await sb
+      .from('stories')
+      .select('id,title,content,user_email,created_at')
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    
+    if(error) throw error;
+    
+    if(!data || !data.length){
+      list.innerHTML = '<p class="muted">暂无审核通过内容。</p>'; 
+      return;
     }
+    
+    list.innerHTML = data.map((it,idx)=>`
+      <article class="story">
+        <div><strong>${idx+1}. ${(it.title||'未命名').replace(/</g,'&lt;')}</strong></div>
+        <div class="muted">作者：${(it.user_email||'匿名').replace(/</g,'&lt;')} · ${new Date(it.created_at).toLocaleString('zh-CN')}</div>
+        <p>${(it.content||'').slice(0,220).replace(/</g,'&lt;').replace(/\n/g,'<br>')}...</p>
+      </article>
+    `).join('');
+  }catch(e){
+    list.innerHTML = '<p class="muted">加载失败，请稍后刷新。</p>';
+  }
+}
+async function loadMyPost(){
+  try{
+    const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    const { data: userData } = await sb.auth.getUser();
+    const user = userData?.user;
+    if(!user) return;
+    
+    const { data, error } = await sb
+      .from('stories')
+      .select('id,title,content,status,created_at')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    
+    if(error || !data) return;
+    
+    const card = document.getElementById('myPostCard');
+    const content = document.getElementById('myPostContent');
+    card.style.display = 'block';
+    
+    const statusMap = {'pending':'待审核','approved':'已通过','rejected':'已驳回'};
+    const statusClass = 'status ' + (data.status || 'pending');
+    
+    content.innerHTML = `
+      <div><strong>${(data.title||'').replace(/</g,'&lt;')}</strong> <span class="${statusClass}">${statusMap[data.status]||data.status}</span></div>
+      <div class="muted">提交时间：${new Date(data.created_at).toLocaleString('zh-CN')}</div>
+      <p>${(data.content||'').slice(0,200).replace(/</g,'&lt;').replace(/\n/g,'<br>')}${(data.content||'').length>200?'...':''}</p>
+      <a class="btn secondary" href="./submit.html">编辑/更新投稿</a>
+    `;
+  }catch(e){}
+}
 
-    loadData();
-  </script>
+loadMyPost();
+loadApproved();
+</script>
 </body>
 </html>
