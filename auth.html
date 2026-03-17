@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>注册 / 登录</title>
+  <style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;max-width:720px;margin:24px auto;padding:0 16px}input,button{padding:10px;border:1px solid #ccc;border-radius:8px}input{width:100%;margin:8px 0}button{background:#111;color:#fff} .row{display:flex;gap:8px;flex-wrap:wrap}.muted{color:#666}</style>
+</head>
+<body>
+  <h2>网站账号注册 / 登录</h2>
+  <p class="muted">注册后可投稿；管理员可审核发布。</p>
+  <input id="email" type="email" placeholder="邮箱" />
+  <input id="password" type="password" placeholder="密码（至少6位）" />
+  <div class="row">
+    <button id="signup">注册</button>
+    <button id="login">登录</button>
+    <button id="logout">退出</button>
+  </div>
+  <p id="msg" class="muted"></p>
+  <p><a href="./submit.html">去投稿</a> · <a href="./admin.html">管理员审核</a> · <a href="./">回首页</a></p>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+<script>
+const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+const msg = document.getElementById('msg');
+function say(t){msg.textContent=t;}
+
+document.getElementById('signup').onclick = async ()=>{
+  const email=emailEl.value.trim(), password=pwdEl.value;
+  const {error}=await sb.auth.signUp({email,password});
+  say(error?('注册失败：'+error.message):'注册成功，请检查邮箱验证（若开启）。');
+};
+
+document.getElementById('login').onclick = async ()=>{
+  const email=emailEl.value.trim(), password=pwdEl.value;
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  say(error?('登录失败：'+error.message):'登录成功');
+};
+
+document.getElementById('logout').onclick = async ()=>{
+  await sb.auth.signOut(); say('已退出');
+};
+
+const emailEl=document.getElementById('email');
+const pwdEl=document.getElementById('password');
+(async()=>{const {data}=await sb.auth.getUser(); if(data?.user) say('当前已登录：'+data.user.email);})();
+</script>
+</body>
+</html>

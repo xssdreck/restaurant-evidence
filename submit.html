@@ -1,0 +1,23 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>投稿</title>
+<style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;max-width:860px;margin:24px auto;padding:0 16px}input,textarea,button{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:8px 0}button{background:#111;color:#fff}.muted{color:#666}</style></head><body>
+<h2>投稿（登录后）</h2><p class="muted">提交后状态为 pending，管理员审核通过后首页自动显示。</p>
+<input id="title" placeholder="标题" />
+<textarea id="content" rows="8" placeholder="内容（只写可核验事实）"></textarea>
+<button id="submit">提交投稿</button>
+<p id="msg" class="muted"></p>
+<p><a href="./auth.html">登录/注册</a> · <a href="./">回首页</a></p>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./supabase-config.js"></script>
+<script>
+const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+const msg=document.getElementById('msg'); const say=t=>msg.textContent=t;
+async function requireUser(){ const {data}=await sb.auth.getUser(); return data?.user; }
+
+document.getElementById('submit').onclick = async ()=>{
+ const user = await requireUser(); if(!user){ say('请先登录再投稿'); return; }
+ const title=document.getElementById('title').value.trim(); const content=document.getElementById('content').value.trim();
+ if(!title||!content){ say('请填写标题和内容'); return; }
+ const {error}=await sb.from('stories').insert({title,content,status:'pending',user_id:user.id,user_email:user.email});
+ say(error?('提交失败：'+error.message):'投稿成功，等待管理员审核。');
+};
+(async()=>{ const u=await requireUser(); say(u?('已登录：'+u.email):'未登录');})();
+</script></body></html>
