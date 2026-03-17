@@ -4,69 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>我的经历｜协同编辑页面</title>
-  <meta name="description" content="公开协同编辑经历页面，收集相关当事人的真实经历与证据线索。" />
+  <meta name="description" content="免登录协同编辑经历页面。" />
   <style>
     :root{--bg:#f8fafc;--card:#fff;--border:#e5e7eb;--muted:#6b7280;--brand:#1d4ed8}
     *{box-sizing:border-box}
     body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;background:var(--bg);color:#111827}
-    .wrap{max-width:980px;margin:0 auto;padding:16px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin:12px 0}
+    .wrap{max-width:1080px;margin:0 auto;padding:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0}
     .muted{color:var(--muted);font-size:14px}
-    .btn{display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:9px 13px;border-radius:10px;margin-right:8px}
-    .btn.secondary{background:#fff;color:#111827;border:1px solid var(--border)}
-    .story{border-top:1px dashed #d1d5db;padding-top:10px;margin-top:10px}
-    h1{margin:6px 0 8px}
-    code{background:#eef2ff;padding:2px 6px;border-radius:6px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    input{padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;min-width:220px}
+    button{padding:10px 14px;border:none;border-radius:10px;background:#111827;color:#fff;font-weight:700;cursor:pointer}
+    .ok{color:#065f46}.err{color:#b91c1c}
+    iframe{width:100%;height:78vh;border:1px solid var(--border);border-radius:12px;background:#fff}
+    .hidden{display:none}
   </style>
 </head>
 <body>
 <div class="wrap">
   <h1>我的经历（协同编辑）</h1>
-  <p class="muted">此页面用于公开收集经历与线索。请仅提交可核验事实，不要发布身份证号、住址、电话等敏感隐私信息。</p>
+  <p class="muted">免登录协同编辑：输入编辑密码后可直接编辑。请只填写可核验事实，不要发布身份证号、住址、电话等敏感信息。</p>
 
-  <div class="card">
-    <h3>如何协同编辑</h3>
-    <p>点击下方按钮即可提交你的经历（会跳转到 GitHub 提交页）。提交后不会立即公开；仅在管理员审核并标记 <code>approved</code> 后显示。</p>
-    <a class="btn" target="_blank" href="https://github.com/xssdreck/restaurant-evidence/issues/new?labels=story&title=%E3%80%90%E7%BB%8F%E5%8E%86%E6%8A%95%E7%A8%BF%E3%80%91%E8%AF%B7%E5%A1%AB%E5%86%99%E6%A0%87%E9%A2%98&body=%23%23%20%E5%8F%91%E7%94%9F%E6%97%B6%E9%97%B4%0A%0A%23%23%20%E5%8F%91%E7%94%9F%E5%9C%B0%E7%82%B9%0A%0A%23%23%20%E7%BB%8F%E8%BF%87%E6%8F%8F%E8%BF%B0%EF%BC%88%E8%AF%B7%E5%8F%AA%E5%86%99%E5%8F%AF%E6%A0%B8%E9%AA%8C%E4%BA%8B%E5%AE%9E%EF%BC%89%0A%0A%23%23%20%E8%AF%81%E6%8D%AE%E9%93%BE%E6%8E%A5%E6%88%96%E6%88%AA%E5%9B%BE%E8%AF%B4%E6%98%8E%0A%0A%23%23%20%E4%BF%A1%E6%81%AF%E5%A4%87%E6%B3%A8%0A">提交我的经历</a>
-    <a class="btn secondary" target="_blank" href="https://github.com/xssdreck/restaurant-evidence/issues?q=is%3Aissue+label%3Astory">查看全部投稿（GitHub）</a>
-  </div>
+  <section class="card" id="gate">
+    <h3>输入编辑密码</h3>
+    <div class="row">
+      <input id="pwd" type="password" placeholder="请输入编辑密码" />
+      <button id="enter">进入编辑</button>
+      <span id="msg" class="muted"></span>
+    </div>
+  </section>
 
-  
-  <div class="card">
-    <h3>审核操作（管理员）</h3>
-    <p class="muted">在 GitHub 对投稿 issue 添加 <code>approved</code> 标签即可公开显示；移除该标签即下线。</p>
-    <a class="btn secondary" target="_blank" href="https://github.com/xssdreck/restaurant-evidence/issues?q=is%3Aissue+label%3Astory">打开待审投稿列表</a>
-  </div>
-
-  <div class="card">
-    <h3>投稿展示（自动同步）</h3>
-    <p class="muted">来源：<code>repo issues label: story + approved</code>（审核通过后公开）</p>
-    <div id="list">加载中...</div>
-  </div>
+  <section class="card hidden" id="editorWrap">
+    <h3>协同编辑器（实时）</h3>
+    <p class="muted">多人可同时编辑。建议按“时间 / 地点 / 经过 / 证据编号 / 信息备注”格式记录。</p>
+    <iframe id="pad" src="about:blank" title="collab-editor"></iframe>
+  </section>
 </div>
 
 <script>
-const list = document.getElementById('list');
-async function loadStories(){
-  try{
-    const url = 'https://api.github.com/repos/xssdreck/restaurant-evidence/issues?state=open&labels=story,approved&per_page=50';
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('读取失败');
-    const issues = await res.json();
-    if(!Array.isArray(issues) || !issues.length){ list.innerHTML='<p class="muted">暂无已通过审核的投稿。</p>'; return; }
-    list.innerHTML = issues.map(it => `
-      <article class="story">
-        <div><strong>${(it.title||'未命名').replace(/</g,'&lt;')}</strong></div>
-        <div class="muted">作者：${(it.user?.login||'匿名')} · 创建：${new Date(it.created_at).toLocaleString('zh-CN')}</div>
-        <p>${(it.body||'').slice(0,280).replace(/</g,'&lt;').replace(/\n/g,'<br>')}</p>
-        <a target="_blank" href="${it.html_url}">查看全文</a>
-      </article>
-    `).join('');
-  }catch(e){
-    list.innerHTML = '<p class="muted">暂时无法加载投稿，请稍后刷新。</p>';
+  // 按你的要求：编辑密码
+  const PASS = '1031xpp';
+  const PAD_URL = 'https://etherpad.wikimedia.org/p/restaurant-evidence-story-1031xpp?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false';
+
+  const gate = document.getElementById('gate');
+  const editorWrap = document.getElementById('editorWrap');
+  const pad = document.getElementById('pad');
+  const msg = document.getElementById('msg');
+
+  function unlock(){
+    gate.classList.add('hidden');
+    editorWrap.classList.remove('hidden');
+    pad.src = PAD_URL;
+    sessionStorage.setItem('exp_unlocked','1');
   }
-}
-loadStories();
+
+  document.getElementById('enter').onclick = () => {
+    const val = document.getElementById('pwd').value;
+    if(val === PASS){
+      msg.className='ok';
+      msg.textContent='验证通过，正在进入编辑器...';
+      unlock();
+    }else{
+      msg.className='err';
+      msg.textContent='密码错误';
+    }
+  };
+
+  if(sessionStorage.getItem('exp_unlocked') === '1'){
+    unlock();
+  }
 </script>
 </body>
 </html>
