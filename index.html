@@ -154,53 +154,42 @@
   </script>
 
 
-
-<script>
-async function loadApprovedStories(){
-  const box = document.getElementById('approvedStories');
-  if(!box) return;
-  try{
-    const url='https://api.github.com/repos/xssdreck/restaurant-evidence/issues?state=open&labels=story,approved&per_page=20';
-    const res=await fetch(url);
-    if(!res.ok) throw new Error('load failed');
-    const arr=await res.json();
-    if(!Array.isArray(arr) || !arr.length){
-      box.textContent='暂无审核通过内容。';
-      return;
-    }
-    box.innerHTML = arr.map((it,idx)=>`<article style="border-top:1px dashed #d1d5db;padding-top:10px;margin-top:10px;">
-      <div><strong>${idx+1}. ${(it.title||'未命名').replace(/</g,'&lt;')}</strong></div>
-      <div class="muted">作者：${(it.user?.login||'匿名')} · 时间：${new Date(it.created_at).toLocaleString('zh-CN')}</div>
-      <p style="margin:8px 0;">${(it.body||'').slice(0,220).replace(/</g,'&lt;').replace(/
-/g,'<br>')}...</p>
-      <a target="_blank" href="${it.html_url}">查看全文</a>
-    </article>`).join('');
-  }catch(e){
-    box.textContent='暂时无法加载审核内容，请稍后刷新。';
-  }
-}
-loadApprovedStories();
-</script>
-
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./supabase-config.js"></script>
 <script>
 (async function(){
-  const box=document.getElementById('approvedStories');
+  const box = document.getElementById('approvedStories');
   if(!box) return;
-  try{
+
+  try {
     const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-    const {data,error}=await sb.from('stories').select('id,title,content,user_email,created_at').eq('status','approved').order('created_at',{ascending:false}).limit(20);
-    if(error){ box.textContent='加载失败：'+error.message; return; }
-    if(!data || !data.length){ box.textContent='暂无审核通过内容。'; return; }
-    box.innerHTML = data.map((it,idx)=>`<article style="border-top:1px dashed #d1d5db;padding-top:10px;margin-top:10px;">
-      <div><strong>${idx+1}. ${(it.title||'').replace(/</g,'&lt;')}</strong></div>
-      <div class="muted">作者：${(it.user_email||'匿名')} · 时间：${new Date(it.created_at).toLocaleString('zh-CN')}</div>
-      <p style="margin:8px 0;">${(it.content||'').slice(0,260).replace(/</g,'&lt;').replace(/
-/g,'<br>')}...</p>
-    </article>`).join('');
-  }catch(e){ box.textContent='暂时无法加载，请稍后刷新。'; }
+    const { data, error } = await sb
+      .from('stories')
+      .select('id,title,content,user_email,created_at,status')
+      .eq('status', 'approved')
+      .order('created_at', { ascending:false })
+      .limit(20);
+
+    if (error) {
+      box.textContent = '加载失败：' + error.message;
+      return;
+    }
+
+    if (!data || !data.length) {
+      box.textContent = '暂无审核通过内容。';
+      return;
+    }
+
+    box.innerHTML = data.map((it, idx) => `
+      <article style="border-top:1px dashed #d1d5db;padding-top:10px;margin-top:10px;">
+        <div><strong>${idx + 1}. ${(it.title || '').replace(/</g, '&lt;')}</strong></div>
+        <div class="muted">作者：${(it.user_email || '匿名').replace(/</g, '&lt;')} · 时间：${new Date(it.created_at).toLocaleString('zh-CN')}</div>
+        <p style="margin:8px 0;">${(it.content || '').slice(0, 260).replace(/</g, '&lt;').replace(/\n/g, '<br>')}...</p>
+      </article>
+    `).join('');
+  } catch (e) {
+    box.textContent = '暂时无法加载，请稍后刷新。';
+  }
 })();
 </script>
 
