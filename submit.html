@@ -8,12 +8,18 @@
     body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;max-width:860px;margin:24px auto;padding:0 16px}
     input,textarea,button{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:8px 0}
     button{background:#111;color:#fff}
+    button:disabled{background:#666;cursor:not-allowed}
     .muted{color:#666}
     .card{border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin:12px 0;background:#fff}
     .status{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
     .pending{background:#fff7ed;color:#9a3412}
     .approved{background:#ecfdf5;color:#065f46}
     .rejected{background:#fef2f2;color:#991b1b}
+    .image-preview{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+    .image-preview img{width:100px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb}
+    .upload-area{border:2px dashed #d1d5db;border-radius:8px;padding:20px;text-align:center;background:#f9fafb;cursor:pointer}
+    .upload-area:hover{border-color:#9ca3af;background:#f3f4f6}
+    .upload-area input[type="file"]{display:none}
   </style>
 </head>
 <body>
@@ -27,6 +33,18 @@
 
   <input id="title" placeholder="标题" />
   <textarea id="content" rows="8" placeholder="内容（只写可核验事实）"></textarea>
+  
+  <div class="card">
+    <h4>插入图片</h4>
+    <div class="upload-area" onclick="document.getElementById('imageInput').click()">
+      <input type="file" id="imageInput" accept="image/*" multiple />
+      <p class="muted">点击选择图片，或拖拽图片到此处</p>
+      <p class="muted" style="font-size:12px">支持 JPG、PNG、GIF，单张最大 5MB</p>
+    </div>
+    <div id="imagePreview" class="image-preview"></div>
+    <p id="uploadMsg" class="muted"></p>
+  </div>
+
   <button id="submit">提交投稿</button>
   <p id="msg" class="muted"></p>
   <p><a href="./auth.html">登录/注册</a> · <a href="./">回首页</a></p>
@@ -37,6 +55,9 @@
     const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
     const msg = document.getElementById('msg');
     const say = t => msg.textContent = t;
+    const uploadMsg = document.getElementById('uploadMsg');
+    
+    let uploadedImages = [];
 
     async function getUser() {
       const { data } = await sb.auth.getUser();
@@ -46,6 +67,69 @@
     function statusClass(s) {
       return 'status ' + (s || 'pending');
     }
+
+    function renderImagePreviews() {
+      const preview = document.getElementById('imagePreview');
+      preview.innerHTML = uploadedImages.map((url, idx) => `
+        <div style="position:relative">
+          <img src="${url}" alt="图片${idx+1}"/>
+          <button type="button" onclick="removeImage(${idx})" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;padding:0;border-radius:50%;background:#ef4444;color:#fff;font-size:12px">×</button>
+        </div>
+      `).join('');
+    }
+
+    window.removeImage = function(idx) {
+      uploadedImages.splice(idx, 1);
+      renderImagePreviews();
+    };
+
+    async function uploadImage(file) {
+      const user = await getUser();
+      if (!user) {
+        uploadMsg.textContent = '请先登录';
+        return null;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        uploadMsg.textContent = '图片大小不能超过 5MB';
+        return null;
+      }
+
+      const ext = file.name.split('.').pop().toLowerCase();
+      const fileName = `${user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+
+      uploadMsg.textContent = '正在上传...';
+
+      const { data, error } = await sb.storage
+        .from('story-images')
+        .upload(fileName, file, { contentType: file.type });
+
+      if (error) {
+        uploadMsg.textContent = '上传失败：' + error.message;
+        return null;
+      }
+
+      const { data: urlData } = sb.storage
+        .from('story-images')
+        .getPublicUrl(fileName);
+
+      uploadMsg.textContent = '上传成功';
+      return urlData.publicUrl;
+    }
+
+    document.getElementById('imageInput').onchange = async (e) => {
+      const files = e.target.files;
+      if (!files.length) return;
+
+      for (const file of files) {
+        const url = await uploadImage(file);
+        if (url) {
+          uploadedImages.push(url);
+          renderImagePreviews();
+        }
+      }
+      e.target.value = '';
+    };
 
     async function loadMyPost() {
       const user = await getUser();
@@ -57,7 +141,7 @@
 
       const { data, error } = await sb
         .from('stories')
-        .select('id,title,content,status,created_at')
+        .select('id,title,content,status,created_at,images')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -70,6 +154,11 @@
         document.getElementById('title').value = data.title || '';
         document.getElementById('content').value = data.content || '';
         
+        if (data.images && Array.isArray(data.images)) {
+          uploadedImages = data.images;
+          renderImagePreviews();
+        }
+        
         const box = document.getElementById('myPost');
         const content = document.getElementById('postContent');
         box.style.display = 'block';
@@ -80,10 +169,15 @@
           'rejected': '已驳回'
         };
         
+        const imageHtml = uploadedImages.length 
+          ? `<div class="image-preview" style="margin-top:10px">${uploadedImages.map(u=>`<img src="${u}" style="width:80px;height:80px"/>`).join('')}</div>` 
+          : '';
+        
         content.innerHTML = `
           <div><strong>${(data.title || '').replace(/</g, '&lt;')}</strong> <span class="${statusClass(data.status)}">${statusText[data.status] || data.status}</span></div>
           <div class="muted">提交时间：${new Date(data.created_at).toLocaleString('zh-CN')}</div>
           <div style="margin-top:8px;white-space:pre-wrap;">${(data.content || '').slice(0,200).replace(/</g, '&lt;')}${(data.content||'').length > 200 ? '...' : ''}</div>
+          ${imageHtml}
         `;
       }
     }
@@ -97,7 +191,15 @@
       
       if (!title || !content) { say('请填写标题和内容'); return; }
       
-      const payload = { title, content, status: 'pending', user_id: user.id, user_email: user.email };
+      const payload = { 
+        title, 
+        content, 
+        status: 'pending', 
+        user_id: user.id, 
+        user_email: user.email,
+        images: uploadedImages
+      };
+      
       const { error } = await sb.from('stories').upsert(payload, { onConflict: 'user_id' });
       
       if (error) {

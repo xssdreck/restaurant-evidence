@@ -166,7 +166,7 @@ window.loadApprovedStories = async function () {
     var sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
     var resp = await sb
       .from('stories')
-      .select('id,title,content,user_email,created_at,status')
+      .select('id,title,content,user_email,created_at,status,images')
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
       .limit(20);
@@ -191,9 +191,18 @@ window.loadApprovedStories = async function () {
       var content = full.slice(0, 260);
       var time = new Date(it.created_at).toLocaleString('zh-CN');
       var sid = 'story-full-' + (it.id || i);
+      
+      var imagesHtml = '';
+      if (it.images && Array.isArray(it.images) && it.images.length) {
+        imagesHtml = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">' 
+          + it.images.map(function(img) { return '<img src="' + img + '" style="width:100px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb"/>'; }).join('') 
+          + '</div>';
+      }
+      
       html += '<article style="border-top:1px dashed #d1d5db;padding-top:10px;margin-top:10px;">'
         + '<div><strong>' + (i + 1) + '. ' + title + '</strong></div>'
         + '<div class="muted">作者：' + email + ' · 时间：' + time + '</div>'
+        + imagesHtml
         + '<p style="margin:8px 0;">' + content + '...</p>'
         + '<div id="' + sid + '" style="display:none;margin:8px 0;white-space:normal;line-height:1.65;">' + full + '</div>'
         + '<button type="button" class="btn secondary" data-toggle-full="' + sid + '">显示全文</button>'
