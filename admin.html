@@ -1,7 +1,7 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>管理员审核</title>
-<style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;max-width:980px;margin:24px auto;padding:0 16px}.card{border:1px solid #ddd;border-radius:10px;padding:12px;margin:10px 0}button{padding:7px 10px;border-radius:8px;border:1px solid #ccc;background:#111;color:#fff;margin-right:6px}.muted{color:#666}input{padding:8px;border:1px solid #ccc;border-radius:8px}</style></head><body>
+<style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;max-width:980px;margin:24px auto;padding:0 16px}.card{border:1px solid #ddd;border-radius:10px;padding:12px;margin:10px 0}button{padding:7px 10px;border-radius:8px;border:1px solid #ccc;background:#111;color:#fff;margin-right:6px;cursor:pointer}.muted{color:#666}input{padding:8px;border:1px solid #ccc;border-radius:8px} .err{color:#b91c1c}</style></head><body>
 <h2>管理员审核</h2>
-<p class="muted">输入管理员审核密码后可执行通过/驳回。该页面不再依赖邮箱白名单。</p>
+<p class="muted">输入审核密码后可执行通过/驳回（前端校验）。</p>
 <div style="margin:8px 0 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
   <label>审核密码：</label>
   <input id="adminSecret" type="password" placeholder="输入审核密码" />
@@ -12,20 +12,21 @@
 <script>
 const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 const msg=document.getElementById('msg'); const list=document.getElementById('list');
-const say=t=>msg.textContent=t;
+const ADMIN_SECRET='1031xpp';
+const say=(t,err=false)=>{msg.textContent=t; msg.className=err?'err':'muted';};
 
 async function load(){
  const {data,error}=await sb.from('stories').select('*').order('created_at',{ascending:false}).limit(100);
- if(error){ say('读取失败：'+error.message); return; }
+ if(error){ say('读取失败：'+error.message,true); return; }
  say('共 '+(data?.length||0)+' 条投稿');
  list.innerHTML=(data||[]).map(x=>`<div class='card'><div><b>${x.title}</b> <span class='muted'>[${x.status}]</span></div><div class='muted'>${x.user_email||''} · ${new Date(x.created_at).toLocaleString('zh-CN')}</div><p>${(x.content||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</p><button onclick="setStatus('${x.id}','approved')">通过</button><button onclick="setStatus('${x.id}','rejected')">驳回</button><button onclick="setStatus('${x.id}','pending')">待审</button></div>`).join('');
 }
 
 window.setStatus = async (id,status)=>{
  const secret = document.getElementById('adminSecret').value.trim();
- if(!secret){ alert('请先输入审核密码'); return; }
- const {error} = await sb.rpc('admin_set_story_status', { p_story_id: id, p_status: status, p_secret: secret });
- if(error){ alert('操作失败：'+error.message); return; }
+ if(secret !== ADMIN_SECRET){ alert('审核密码错误'); return; }
+ const {error} = await sb.from('stories').update({status}).eq('id', id);
+ if(error){ alert('操作失败：'+error.message+'（请检查 RLS 策略）'); return; }
  load();
 }
 
