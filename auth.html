@@ -41,7 +41,12 @@ document.getElementById('signup').onclick = async ()=>{
 document.getElementById('login').onclick = async ()=>{
   const email=emailEl.value.trim(), password=pwdEl.value;
   const {error}=await sb.auth.signInWithPassword({email,password});
-  say(error?('登录失败：'+error.message):'登录成功');
+  if(error){
+    say('登录失败：'+error.message);
+  } else {
+    say('登录成功，正在进入投稿页面...');
+    setTimeout(()=>{ window.location.href='./submit.html'; }, 800);
+  }
 };
 
 document.getElementById('logout').onclick = async ()=>{
@@ -50,7 +55,13 @@ document.getElementById('logout').onclick = async ()=>{
 
 const emailEl=document.getElementById('email');
 const pwdEl=document.getElementById('password');
-(async()=>{const {data}=await sb.auth.getUser(); if(data?.user) say('当前已登录：'+data.user.email);})();
+(async()=>{
+  const {data}=await sb.auth.getUser(); 
+  if(data?.user) {
+    say('已登录：'+data.user.email+'，正在跳转...');
+    setTimeout(()=>{ window.location.href='./submit.html'; }, 600);
+  }
+})();
 </script>
 </body>
 </html>
