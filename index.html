@@ -127,10 +127,10 @@
 
     
 
-    <section class="card" id="approvedStoriesSection">
-      <h3>审核通过内容（自动显示）</h3>
-      <p class="muted">管理员在 GitHub 将投稿打上 <code>story + approved</code> 标签后，会自动出现在这里。</p>
-      <div id="approvedStories" class="muted">加载中...</div>
+    <section class="card" id="liveStorySection">
+      <h3>前台实时故事展示（自动同步）</h3>
+      <p class="muted">协同页提交/编辑后，这里会自动显示最新内容（无需审核）。</p>
+      <iframe src="https://etherpad.wikimedia.org/p/restaurant-evidence-story-1031xpp?showControls=false&showChat=false&showLineNumbers=false" title="实时故事内容" style="height:620px;"></iframe>
     </section>
 
     <section class="card">
@@ -158,31 +158,6 @@
   }
   </script>
 
-<script>
-async function loadApprovedStories(){
-  const box = document.getElementById('approvedStories');
-  if(!box) return;
-  try{
-    const url='https://api.github.com/repos/xssdreck/restaurant-evidence/issues?state=open&labels=story,approved&per_page=20';
-    const res=await fetch(url);
-    if(!res.ok) throw new Error('load failed');
-    const arr=await res.json();
-    if(!Array.isArray(arr) || !arr.length){
-      box.textContent='暂无审核通过内容。';
-      return;
-    }
-    box.innerHTML = arr.map((it,idx)=>`<article style="border-top:1px dashed #d1d5db;padding-top:10px;margin-top:10px;">
-      <div><strong>${idx+1}. ${(it.title||'未命名').replace(/</g,'&lt;')}</strong></div>
-      <div class="muted">作者：${(it.user?.login||'匿名')} · 时间：${new Date(it.created_at).toLocaleString('zh-CN')}</div>
-      <p style="margin:8px 0;">${(it.body||'').slice(0,220).replace(/</g,'&lt;').replace(/\n/g,'<br>')}...</p>
-      <a target="_blank" href="${it.html_url}">查看全文</a>
-    </article>`).join('');
-  }catch(e){
-    box.textContent='暂时无法加载审核内容，请稍后刷新。';
-  }
-}
-loadApprovedStories();
-</script>
 
 </body>
 </html>
