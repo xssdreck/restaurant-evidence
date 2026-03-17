@@ -125,21 +125,6 @@
       </div>
     </section>
 
-    
-
-    <section class="card" id="liveStorySection">
-      <h3>前台发布版故事展示（自动同步）</h3>
-      <p class="muted">这里显示的是发布版（只读），不是编辑页。协同页更新后会自动刷新到前台。</p>
-      <iframe id="storyPublishedFrame" src="https://etherpad.wikimedia.org/p/restaurant-evidence-story-1031xpp/export/html" title="发布版故事内容" style="height:620px;"></iframe>
-    </section>
-
-    <section class="card">
-      <h3>协同编辑经历页面</h3>
-      <p class="muted">欢迎当事人提交可核验事实与线索（公开协同）。</p>
-      <div class="actions">
-        <a class="btn" href="./experience.html" target="_blank">打开协同编辑页面</a>
-      </div>
-    </section>
 
     <section>
       <iframe src="./reviews.html" title="Google评论截图公示" style="border:none; box-shadow:none; border-radius:0;"></iframe>
@@ -158,16 +143,6 @@
   }
   </script>
 
-<script>
-  // 前台发布版自动刷新（每30秒拉取一次只读HTML快照）
-  (function(){
-    const frame = document.getElementById('storyPublishedFrame');
-    if(!frame) return;
-    const base = 'https://etherpad.wikimedia.org/p/restaurant-evidence-story-1031xpp/export/html';
-    const refresh = () => { frame.src = `${base}?t=${Date.now()}`; };
-    setInterval(refresh, 30000);
-  })();
-</script>
 
 </body>
 </html>
