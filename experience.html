@@ -37,6 +37,13 @@
   <section class="card hidden" id="editorWrap">
     <h3>协同编辑器（实时）</h3>
     <p class="muted">多人可同时编辑。建议按“时间 / 地点 / 经过 / 证据编号 / 信息备注”格式记录。</p>
+    
+    <div class="row" style="margin:8px 0 10px;">
+      <button id="saveTxt">保存并下载 TXT</button>
+      <button id="saveHtml">保存并下载 HTML</button>
+      <span id="saveMsg" class="muted">提示：协同编辑器会自动保存；按钮用于手动导出备份。</span>
+    </div>
+
     <iframe id="pad" src="about:blank" title="collab-editor"></iframe>
   </section>
 </div>
@@ -68,6 +75,15 @@
       msg.className='err';
       msg.textContent='密码错误';
     }
+  };
+
+  
+  const PAD_ID = 'restaurant-evidence-story-1031xpp';
+  document.getElementById('saveTxt').onclick = () => {
+    window.open(`https://etherpad.wikimedia.org/p/${PAD_ID}/export/txt`, '_blank');
+  };
+  document.getElementById('saveHtml').onclick = () => {
+    window.open(`https://etherpad.wikimedia.org/p/${PAD_ID}/export/html`, '_blank');
   };
 
   if(sessionStorage.getItem('exp_unlocked') === '1'){
