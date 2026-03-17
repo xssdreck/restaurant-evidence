@@ -166,7 +166,7 @@ window.loadApprovedStories = async function () {
     var sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
     var resp = await sb
       .from('stories')
-      .select('id,title,content,user_email,created_at,status,images')
+      .select('id,title,content,user_email,created_at,status,images,videos')
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
       .limit(20);
@@ -187,7 +187,27 @@ window.loadApprovedStories = async function () {
       var it = data[i] || {};
       var title = String(it.title || '').replace(/</g, '&lt;');
       var email = String(it.user_email || '匿名').replace(/</g, '&lt;');
-      var full = String(it.content || '').replace(/</g, '&lt;').replace(/\n/g, '<br>');
+      var fullContent = String(it.content || '');
+      
+      // Process video placeholders in content
+      var videoHtml = '';
+      var videos = it.videos || [];
+      if (videos.length > 0) {
+        videoHtml = '<div style="margin:10px 0">';
+        for (var v = 0; v < videos.length; v++) {
+          var vid = videos[v];
+          if (vid.embed) {
+            videoHtml += '<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;margin:8px 0;background:#000">'
+              + '<iframe src="' + vid.embed + '" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen></iframe>'
+              + '</div>';
+          }
+        }
+        videoHtml += '</div>';
+      }
+      
+      // Remove video placeholders from text content
+      var textContent = fullContent.replace(/\[VIDEO:\d+\]/g, '').replace(/<[^>]*>/g, '');
+      var full = textContent.replace(/\n/g, '<br>');
       var content = full.slice(0, 260);
       var time = new Date(it.created_at).toLocaleString('zh-CN');
       var sid = 'story-full-' + (it.id || i);
@@ -203,6 +223,7 @@ window.loadApprovedStories = async function () {
         + '<div><strong>' + (i + 1) + '. ' + title + '</strong></div>'
         + '<div class="muted">作者：' + email + ' · 时间：' + time + '</div>'
         + imagesHtml
+        + videoHtml
         + '<p style="margin:8px 0;">' + content + '...</p>'
         + '<div id="' + sid + '" style="display:none;margin:8px 0;white-space:normal;line-height:1.65;">' + full + '</div>'
         + '<button type="button" class="btn secondary" data-toggle-full="' + sid + '">显示全文</button>'

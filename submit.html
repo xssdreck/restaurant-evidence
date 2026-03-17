@@ -5,21 +5,50 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>投稿</title>
   <style>
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;max-width:860px;margin:24px auto;padding:0 16px}
-    input,textarea,button{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:8px 0}
-    button{background:#111;color:#fff}
+    *{box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;max-width:860px;margin:24px auto;padding:0 16px;background:#f8fafc}
+    input,textarea,button{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:8px 0;font-family:inherit}
+    button{background:#111;color:#fff;cursor:pointer}
     button:disabled{background:#666;cursor:not-allowed}
-    .muted{color:#666}
-    .card{border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin:12px 0;background:#fff}
-    .status{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
-    .pending{background:#fff7ed;color:#9a3412}
-    .approved{background:#ecfdf5;color:#065f46}
-    .rejected{background:#fef2f2;color:#991b1b}
-    .image-preview{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
-    .image-preview img{width:100px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb}
-    .upload-area{border:2px dashed #d1d5db;border-radius:8px;padding:20px;text-align:center;background:#f9fafb;cursor:pointer}
+    .muted{color:#6b7280}
+    .card{border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:12px 0;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+    .card h4{margin:0 0 12px;font-size:15px;color:#374151}
+    .status{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:500}
+    .pending{background:#fef3c7;color:#92400e}
+    .approved{background:#d1fae5;color:#065f46}
+    .rejected{background:#fee2e2;color:#991b1b}
+    
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:8px;background:#f3f4f6;border-radius:8px}
+    .toolbar button{width:auto;padding:6px 12px;margin:0;font-size:13px;background:#fff;color:#374151;border:1px solid #d1d5db}
+    .toolbar button:hover{background:#f9fafb}
+    
+    .editor{min-height:200px;padding:12px;border:1px solid #d1d5db;border-radius:8px;background:#fff;outline:none;line-height:1.6}
+    .editor:empty:before{content:"在此输入内容...";color:#9ca3af}
+    .editor img{max-width:100%;border-radius:8px;margin:8px 0}
+    .editor iframe{max-width:100%;border-radius:8px;margin:8px 0}
+    
+    .media-preview{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+    .media-preview .thumb{position:relative;width:120px;height:90px;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;background:#f3f4f6}
+    .media-preview .thumb img{width:100%;height:100%;object-fit:cover}
+    .media-preview .thumb.video{display:flex;align-items:center;justify-content:center;background:#1f2937}
+    .media-preview .thumb.video:before{content:"▶";color:#fff;font-size:24px}
+    .media-preview .thumb button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;padding:0;border-radius:50%;background:#ef4444;color:#fff;font-size:12px;border:none;cursor:pointer}
+    
+    .upload-area{border:2px dashed #d1d5db;border-radius:8px;padding:24px;text-align:center;background:#f9fafb;cursor:pointer;transition:all .2s}
     .upload-area:hover{border-color:#9ca3af;background:#f3f4f6}
     .upload-area input[type="file"]{display:none}
+    
+    .video-input{display:flex;gap:8px;margin-top:8px}
+    .video-input input{flex:1;margin:0}
+    .video-input button{width:auto;margin:0;padding:8px 16px}
+    
+    .modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100}
+    .modal.active{display:flex}
+    .modal-content{background:#fff;padding:20px;border-radius:12px;width:90%;max-width:400px}
+    .modal-content h4{margin:0 0 12px}
+    .modal-content input{width:100%;margin:8px 0}
+    .modal-content .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+    .modal-content .actions button{width:auto;margin:0}
   </style>
 </head>
 <body>
@@ -32,16 +61,20 @@
   </div>
 
   <input id="title" placeholder="标题" />
-  <textarea id="content" rows="8" placeholder="内容（只写可核验事实）"></textarea>
   
   <div class="card">
-    <h4>插入图片</h4>
-    <div class="upload-area" onclick="document.getElementById('imageInput').click()">
-      <input type="file" id="imageInput" accept="image/*" multiple />
-      <p class="muted">点击选择图片，或拖拽图片到此处</p>
-      <p class="muted" style="font-size:12px">支持 JPG、PNG、GIF，单张最大 5MB</p>
+    <div class="toolbar">
+      <button type="button" onclick="insertImage()">📷 插入图片</button>
+      <button type="button" onclick="showVideoModal()">🎬 插入视频</button>
+      <button type="button" onclick="formatText('bold')"><b>B</b></button>
+      <button type="button" onclick="formatText('italic')"><i>I</i></button>
     </div>
-    <div id="imagePreview" class="image-preview"></div>
+    <div id="editor" class="editor" contenteditable="true" placeholder="在此输入内容..."></div>
+  </div>
+
+  <div class="card">
+    <h4>已添加的媒体</h4>
+    <div id="mediaPreview" class="media-preview"></div>
     <p id="uploadMsg" class="muted"></p>
   </div>
 
@@ -49,147 +82,223 @@
   <p id="msg" class="muted"></p>
   <p><a href="./auth.html">登录/注册</a> · <a href="./">回首页</a></p>
 
+  <!-- Video Modal -->
+  <div id="videoModal" class="modal">
+    <div class="modal-content">
+      <h4>插入视频链接</h4>
+      <p class="muted" style="font-size:13px">支持 YouTube、Bilibili、抖音等视频链接</p>
+      <input type="text" id="videoUrl" placeholder="粘贴视频链接，如 https://www.youtube.com/watch?v=..." />
+      <div class="actions">
+        <button type="button" class="secondary" onclick="hideVideoModal()" style="background:#f3f4f6;color:#374151">取消</button>
+        <button type="button" onclick="insertVideo()">插入</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="imageInput" accept="image/*" multiple style="display:none" />
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./supabase-config.js"></script>
   <script>
     const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
     const msg = document.getElementById('msg');
-    const say = t => msg.textContent = t;
     const uploadMsg = document.getElementById('uploadMsg');
+    const editor = document.getElementById('editor');
     
     let uploadedImages = [];
+    let videoLinks = [];
 
     async function getUser() {
       const { data } = await sb.auth.getUser();
       return data?.user || null;
     }
 
-    function statusClass(s) {
-      return 'status ' + (s || 'pending');
+    function formatText(cmd) {
+      document.execCommand(cmd, false, null);
+      editor.focus();
     }
 
-    function renderImagePreviews() {
-      const preview = document.getElementById('imagePreview');
-      preview.innerHTML = uploadedImages.map((url, idx) => `
-        <div style="position:relative">
-          <img src="${url}" alt="图片${idx+1}"/>
-          <button type="button" onclick="removeImage(${idx})" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;padding:0;border-radius:50%;background:#ef4444;color:#fff;font-size:12px">×</button>
-        </div>
-      `).join('');
+    function showVideoModal() {
+      document.getElementById('videoModal').classList.add('active');
+      document.getElementById('videoUrl').focus();
     }
 
-    window.removeImage = function(idx) {
-      uploadedImages.splice(idx, 1);
-      renderImagePreviews();
+    function hideVideoModal() {
+      document.getElementById('videoModal').classList.remove('active');
+      document.getElementById('videoUrl').value = '';
+    }
+
+    function getVideoEmbedInfo(url) {
+      // YouTube
+      let match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/);
+      if (match) return { type: 'youtube', id: match[1], embed: `https://www.youtube.com/embed/${match[1]}` };
+      
+      // Bilibili
+      match = url.match(/bilibili\.com\/video\/(BV[\w]+)/i);
+      if (match) return { type: 'bilibili', id: match[1], embed: `https://player.bilibili.com/player.html?bvid=${match[1]}` };
+      
+      match = url.match(/bilibili\.com\/video\/(av\d+)/i);
+      if (match) return { type: 'bilibili', id: match[1], embed: `https://player.bilibili.com/player.html?aid=${match[1].slice(2)}` };
+      
+      // Generic iframe support
+      return { type: 'link', url: url };
+    }
+
+    window.insertVideo = function() {
+      const url = document.getElementById('videoUrl').value.trim();
+      if (!url) return;
+      
+      const info = getVideoEmbedInfo(url);
+      if (info.embed) {
+        videoLinks.push({ url: url, embed: info.embed, type: info.type });
+        
+        // Insert placeholder in editor
+        const placeholder = document.createElement('div');
+        placeholder.className = 'video-placeholder';
+        placeholder.style.cssText = 'background:#1f2937;color:#fff;padding:12px 16px;border-radius:8px;text-align:center;margin:8px 0';
+        placeholder.innerHTML = `🎬 ${info.type === 'youtube' ? 'YouTube' : 'Bilibili'} 视频: ${url}`;
+        placeholder.dataset.videoIndex = videoLinks.length - 1;
+        
+        editor.appendChild(placeholder);
+        editor.appendChild(document.createElement('br'));
+      }
+      
+      renderMediaPreview();
+      hideVideoModal();
+    };
+
+    window.insertImage = function() {
+      document.getElementById('imageInput').click();
     };
 
     async function uploadImage(file) {
       const user = await getUser();
-      if (!user) {
-        uploadMsg.textContent = '请先登录';
-        return null;
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        uploadMsg.textContent = '图片大小不能超过 5MB';
-        return null;
-      }
+      if (!user) { uploadMsg.textContent = '请先登录'; return null; }
+      if (file.size > 5 * 1024 * 1024) { uploadMsg.textContent = '图片大小不能超过 5MB'; return null; }
 
       const ext = file.name.split('.').pop().toLowerCase();
       const fileName = `${user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-
       uploadMsg.textContent = '正在上传...';
 
-      const { data, error } = await sb.storage
-        .from('story-images')
-        .upload(fileName, file, { contentType: file.type });
+      const { data, error } = await sb.storage.from('story-images').upload(fileName, file, { contentType: file.type });
+      if (error) { uploadMsg.textContent = '上传失败：' + error.message; return null; }
 
-      if (error) {
-        uploadMsg.textContent = '上传失败：' + error.message;
-        return null;
-      }
-
-      const { data: urlData } = sb.storage
-        .from('story-images')
-        .getPublicUrl(fileName);
-
+      const { data: urlData } = sb.storage.from('story-images').getPublicUrl(fileName);
       uploadMsg.textContent = '上传成功';
       return urlData.publicUrl;
     }
 
     document.getElementById('imageInput').onchange = async (e) => {
-      const files = e.target.files;
-      if (!files.length) return;
-
-      for (const file of files) {
+      for (const file of e.target.files) {
         const url = await uploadImage(file);
         if (url) {
           uploadedImages.push(url);
-          renderImagePreviews();
+          const img = document.createElement('img');
+          img.src = url;
+          img.style.maxWidth = '100%';
+          editor.appendChild(img);
+          editor.appendChild(document.createElement('br'));
         }
       }
       e.target.value = '';
+      renderMediaPreview();
     };
+
+    window.removeImage = function(idx) {
+      uploadedImages.splice(idx, 1);
+      renderMediaPreview();
+    };
+
+    window.removeVideo = function(idx) {
+      videoLinks.splice(idx, 1);
+      renderMediaPreview();
+    };
+
+    function renderMediaPreview() {
+      const preview = document.getElementById('mediaPreview');
+      let html = '';
+      
+      uploadedImages.forEach((url, idx) => {
+        html += `<div class="thumb"><img src="${url}"/><button onclick="removeImage(${idx})">×</button></div>`;
+      });
+      
+      videoLinks.forEach((v, idx) => {
+        html += `<div class="thumb video"><button onclick="removeVideo(${idx})">×</button></div>`;
+      });
+      
+      preview.innerHTML = html;
+    }
+
+    function editorToContent() {
+      const clone = editor.cloneNode(true);
+      // Replace video placeholders with markers
+      clone.querySelectorAll('.video-placeholder').forEach(el => {
+        const idx = el.dataset.videoIndex;
+        const marker = document.createElement('span');
+        marker.textContent = `[VIDEO:${idx}]`;
+        el.parentNode.replaceChild(marker, el);
+      });
+      return clone.innerHTML;
+    }
+
+    function contentToEditor(html, images, videos) {
+      uploadedImages = images || [];
+      videoLinks = videos || [];
+      
+      // Restore video placeholders
+      html = html.replace(/\[VIDEO:(\d+)\]/g, (match, idx) => {
+        const v = videoLinks[idx];
+        if (!v) return '';
+        const name = v.type === 'youtube' ? 'YouTube' : 'Bilibili';
+        return `<div class="video-placeholder" data-video-index="${idx}" style="background:#1f2937;color:#fff;padding:12px 16px;border-radius:8px;text-align:center;margin:8px 0">🎬 ${name} 视频: ${v.url}</div>`;
+      });
+      
+      editor.innerHTML = html;
+      renderMediaPreview();
+    }
 
     async function loadMyPost() {
       const user = await getUser();
-      if (!user) {
-        say('请先登录再投稿');
-        return;
-      }
-      say('已登录：' + user.email);
+      if (!user) { msg.textContent = '请先登录再投稿'; return; }
+      msg.textContent = '已登录：' + user.email;
 
       const { data, error } = await sb
         .from('stories')
-        .select('id,title,content,status,created_at,images')
+        .select('id,title,content,status,created_at,images,videos')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (error) {
-        console.log('读取投稿失败：', error.message);
-        return;
-      }
+      if (error) { console.log('读取投稿失败：', error.message); return; }
 
       if (data) {
         document.getElementById('title').value = data.title || '';
-        document.getElementById('content').value = data.content || '';
-        
-        if (data.images && Array.isArray(data.images)) {
-          uploadedImages = data.images;
-          renderImagePreviews();
-        }
+        contentToEditor(data.content || '', data.images || [], data.videos || []);
         
         const box = document.getElementById('myPost');
-        const content = document.getElementById('postContent');
+        const contentDiv = document.getElementById('postContent');
         box.style.display = 'block';
         
-        const statusText = {
-          'pending': '待审核',
-          'approved': '已通过',
-          'rejected': '已驳回'
-        };
+        const statusText = { pending: '待审核', approved: '已通过', rejected: '已驳回' };
+        const statusClass = 'status ' + (data.status || 'pending');
         
-        const imageHtml = uploadedImages.length 
-          ? `<div class="image-preview" style="margin-top:10px">${uploadedImages.map(u=>`<img src="${u}" style="width:80px;height:80px"/>`).join('')}</div>` 
-          : '';
-        
-        content.innerHTML = `
-          <div><strong>${(data.title || '').replace(/</g, '&lt;')}</strong> <span class="${statusClass(data.status)}">${statusText[data.status] || data.status}</span></div>
+        contentDiv.innerHTML = `
+          <div><strong>${(data.title || '').replace(/</g, '&lt;')}</strong> <span class="${statusClass}">${statusText[data.status] || data.status}</span></div>
           <div class="muted">提交时间：${new Date(data.created_at).toLocaleString('zh-CN')}</div>
-          <div style="margin-top:8px;white-space:pre-wrap;">${(data.content || '').slice(0,200).replace(/</g, '&lt;')}${(data.content||'').length > 200 ? '...' : ''}</div>
-          ${imageHtml}
         `;
       }
     }
 
     document.getElementById('submit').onclick = async () => {
       const user = await getUser();
-      if (!user) { say('请先登录再投稿'); return; }
+      if (!user) { msg.textContent = '请先登录再投稿'; return; }
       
       const title = document.getElementById('title').value.trim();
-      const content = document.getElementById('content').value.trim();
+      const content = editorToContent();
       
-      if (!title || !content) { say('请填写标题和内容'); return; }
+      if (!title || !content.replace(/<[^>]*>/g, '').trim()) { 
+        msg.textContent = '请填写标题和内容'; 
+        return; 
+      }
       
       const payload = { 
         title, 
@@ -197,15 +306,16 @@
         status: 'pending', 
         user_id: user.id, 
         user_email: user.email,
-        images: uploadedImages
+        images: uploadedImages,
+        videos: videoLinks
       };
       
       const { error } = await sb.from('stories').upsert(payload, { onConflict: 'user_id' });
       
       if (error) {
-        say('提交失败：' + error.message);
+        msg.textContent = '提交失败：' + error.message;
       } else {
-        say('提交成功（如已有旧稿，已自动覆盖并重置为待审）。');
+        msg.textContent = '提交成功（如已有旧稿，已自动覆盖并重置为待审）。';
         await loadMyPost();
       }
     };
