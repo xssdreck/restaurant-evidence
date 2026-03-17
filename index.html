@@ -40,6 +40,32 @@
       color: #fff;
       padding: 28px 16px;
       border-bottom: 1px solid rgba(255,255,255,.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      right: 40px;
+      width: 60px;
+      height: 60px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='1.5'%3E%3Cpath d='M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z'/%3E%3Ccircle cx='12' cy='13' r='4'/%3E%3C/svg%3E") center/contain no-repeat;
+      animation: blink 2s infinite;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 30px;
+      right: 110px;
+      width: 40px;
+      height: 40px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='1.5'%3E%3Cpath d='M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z'/%3E%3Ccircle cx='12' cy='13' r='4'/%3E%3C/svg%3E") center/contain no-repeat;
+      animation: blink 3s infinite 0.5s;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.8; }
     }
     .hero-wrap { max-width: 1080px; margin: 0 auto; }
     .hero h1 { margin: 0 0 8px; font-size: clamp(24px, 3.2vw, 38px); line-height: 1.2; }
