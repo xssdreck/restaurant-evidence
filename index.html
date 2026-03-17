@@ -187,15 +187,30 @@ window.loadApprovedStories = async function () {
       var it = data[i] || {};
       var title = String(it.title || '').replace(/</g, '&lt;');
       var email = String(it.user_email || '匿名').replace(/</g, '&lt;');
-      var content = String(it.content || '').slice(0, 260).replace(/</g, '&lt;').replace(/\n/g, '<br>');
+      var full = String(it.content || '').replace(/</g, '&lt;').replace(/\n/g, '<br>');
+      var content = full.slice(0, 260);
       var time = new Date(it.created_at).toLocaleString('zh-CN');
+      var sid = 'story-full-' + (it.id || i);
       html += '<article style="border-top:1px dashed #d1d5db;padding-top:10px;margin-top:10px;">'
         + '<div><strong>' + (i + 1) + '. ' + title + '</strong></div>'
         + '<div class="muted">作者：' + email + ' · 时间：' + time + '</div>'
         + '<p style="margin:8px 0;">' + content + '...</p>'
+        + '<div id="' + sid + '" style="display:none;margin:8px 0;white-space:normal;line-height:1.65;">' + full + '</div>'
+        + '<button type="button" class="btn secondary" data-toggle-full="' + sid + '">显示全文</button>'
         + '</article>';
     }
     box.innerHTML = html;
+
+    box.onclick = function(ev){
+      var btn = ev.target.closest('button[data-toggle-full]');
+      if(!btn) return;
+      var id = btn.getAttribute('data-toggle-full');
+      var el = document.getElementById(id);
+      if(!el) return;
+      var open = el.style.display !== 'none';
+      el.style.display = open ? 'none' : 'block';
+      btn.textContent = open ? '显示全文' : '收起全文';
+    };
   } catch (e) {
     box.textContent = '暂时无法加载，请稍后刷新。';
   }
