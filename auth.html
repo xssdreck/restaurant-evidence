@@ -28,8 +28,14 @@ function say(t){msg.textContent=t;}
 
 document.getElementById('signup').onclick = async ()=>{
   const email=emailEl.value.trim(), password=pwdEl.value;
-  const {error}=await sb.auth.signUp({email,password});
-  say(error?('注册失败：'+error.message):'注册成功，请检查邮箱验证（若开启）。');
+  const {error}=await sb.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: window.location.origin + '/restaurant-evidence/auth.html'
+    }
+  });
+  say(error?('注册失败：'+error.message):'注册成功，请检查邮箱验证邮件并从邮件返回本站。');
 };
 
 document.getElementById('login').onclick = async ()=>{
