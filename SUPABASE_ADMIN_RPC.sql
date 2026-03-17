@@ -1,19 +1,22 @@
 -- 在 Supabase SQL Editor 执行（一次）
--- 设置一个审核密码（可改）
--- 目前示例：1031xpp
+-- 安全版：仅已登录且邮箱在管理员白名单中的用户可调用
 
 create or replace function public.admin_set_story_status(
   p_story_id uuid,
-  p_status text,
-  p_secret text
+  p_status text
 )
 returns void
 language plpgsql
 security definer
+set search_path = public
 as $$
+declare
+  v_email text;
 begin
-  if p_secret <> '1031xpp' then
-    raise exception 'invalid admin secret';
+  v_email := lower(coalesce(auth.jwt() ->> 'email', ''));
+
+  if v_email not in ('xssdmxreckoning@gmail.com') then
+    raise exception 'forbidden';
   end if;
 
   if p_status not in ('pending','approved','rejected') then
@@ -26,5 +29,5 @@ begin
 end;
 $$;
 
-revoke all on function public.admin_set_story_status(uuid,text,text) from public;
-grant execute on function public.admin_set_story_status(uuid,text,text) to anon, authenticated;
+revoke all on function public.admin_set_story_status(uuid,text) from public;
+grant execute on function public.admin_set_story_status(uuid,text) to authenticated;
