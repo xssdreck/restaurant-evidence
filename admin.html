@@ -1,203 +1,673 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>管理员审核后台</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>管理员审核</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;max-width:1100px;margin:24px auto;padding:0 16px}
-    .muted{color:#666}
-    .err{color:#b91c1c}
-    .ok{color:#065f46}
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 14px}
-    button{padding:6px 10px;border-radius:8px;border:1px solid #d1d5db;background:#111;color:#fff;cursor:pointer}
-    button.secondary{background:#fff;color:#111}
-    table{width:100%;border-collapse:collapse;font-size:14px}
-    th,td{border-bottom:1px solid #e5e7eb;padding:10px;vertical-align:top;text-align:left}
-    th{background:#f9fafb;position:sticky;top:0}
-    .status{font-weight:600}
-    .pill{padding:2px 8px;border-radius:999px;font-size:12px;display:inline-block}
-    .pending{background:#fff7ed;color:#9a3412}
-    .approved{background:#ecfdf5;color:#065f46}
-    .rejected{background:#fef2f2;color:#991b1b}
-    .snippet{max-width:420px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .actions{display:flex;gap:6px;flex-wrap:wrap}
-    details{margin-top:6px}
+    :root {
+      --primary: #0f172a;
+      --accent: #3b82f6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --radius: 12px;
+      --transition: all 0.2s ease;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', 'Noto Sans SC', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .badge {
+      padding: 6px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .stat-icon.pending { background: #fef3c7; }
+    .stat-icon.approved { background: #d1fae5; }
+    .stat-icon.rejected { background: #fee2e2; }
+    .stat-icon.total { background: #e0e7ff; }
+    
+    .stat-content h4 {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .stat-content .number {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    
+    /* Filter Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      background: var(--surface);
+      padding: 6px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      width: fit-content;
+    }
+    
+    .tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .tab:hover {
+      color: var(--text);
+    }
+    
+    .tab.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Table */
+    .table-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    
+    th {
+      background: var(--bg);
+      padding: 14px 16px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    td {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      vertical-align: top;
+    }
+    
+    tr:hover td {
+      background: #fafafa;
+    }
+    
+    .story-title {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    
+    .story-preview {
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .author {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .author-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-pill::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    
+    .status-pill.pending { background: #fef3c7; color: #92400e; }
+    .status-pill.pending::before { background: #f59e0b; }
+    
+    .status-pill.approved { background: #d1fae5; color: #065f46; }
+    .status-pill.approved::before { background: #10b981; }
+    
+    .status-pill.rejected { background: #fee2e2; color: #991b1b; }
+    .status-pill.rejected::before { background: #ef4444; }
+    
+    .date {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 14px;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .btn-icon:hover {
+      background: var(--bg);
+      transform: translateY(-1px);
+    }
+    
+    .btn-icon.approve:hover {
+      background: #d1fae5;
+      border-color: #10b981;
+    }
+    
+    .btn-icon.reject:hover {
+      background: #fee2e2;
+      border-color: #ef4444;
+    }
+    
+    .btn-icon.delete:hover {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #dc2626;
+    }
+    
+    /* Empty State */
+    .empty {
+      text-align: center;
+      padding: 64px 24px;
+      color: var(--text-secondary);
+    }
+    
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+    
+    /* Detail Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 24px;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+    }
+    
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 640px;
+      max-height: 80vh;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    }
+    
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: none;
+      background: var(--bg);
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text-secondary);
+    }
+    
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      max-height: 50vh;
+    }
+    
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+    
+    .modal-footer button {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .modal-footer .secondary {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    
+    .modal-footer .success {
+      background: var(--success);
+      border: none;
+      color: white;
+    }
+    
+    .modal-footer .danger {
+      background: var(--danger);
+      border: none;
+      color: white;
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--primary);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
-  <h2>管理员审核后台（列表）</h2>
-  <p class="muted">仅允许管理员邮箱登录后操作。你要的“文章列表显示”已启用。</p>
+  <div class="container">
+    <div class="header">
+      <h1>管理员审核</h1>
+      <div class="header-meta">
+        <span id="adminEmail"></span>
+        <a href="./" class="badge">返回首页 →</a>
+      </div>
+    </div>
 
-  <div class="toolbar">
-    <button id="reloadBtn" class="secondary" type="button">刷新列表</button>
-    <span id="meta" class="muted"></span>
+    <div class="stats" id="stats">
+      <!-- Stats will be loaded here -->
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-filter="all">全部</button>
+      <button class="tab" data-filter="pending">待审核</button>
+      <button class="tab" data-filter="approved">已通过</button>
+      <button class="tab" data-filter="rejected">已驳回</button>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 40%">投稿内容</th>
+            <th>作者</th>
+            <th>状态</th>
+            <th>时间</th>
+            <th style="width: 120px">操作</th>
+          </tr>
+        </thead>
+        <tbody id="storiesTable">
+          <tr><td colspan="5" class="empty"><div class="empty-icon">⏳</div><p>加载中...</p></td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <p id="msg" class="muted"></p>
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">投稿详情</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer" id="modalFooter"></div>
+    </div>
+  </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th style="width:56px;">#</th>
-        <th style="width:140px;">状态</th>
-        <th>标题 / 内容</th>
-        <th style="width:180px;">作者</th>
-        <th style="width:170px;">时间</th>
-        <th style="width:280px;">操作</th>
-      </tr>
-    </thead>
-    <tbody id="rows">
-      <tr><td colspan="6" class="muted">加载中...</td></tr>
-    </tbody>
-  </table>
-
-  <p style="margin-top:12px"><a href="./auth.html">登录/注册</a> · <a href="./">回首页</a></p>
+  <div class="toast" id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./supabase-config.js"></script>
   <script>
     const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-    const ADMIN_EMAILS = (window.ADMIN_EMAILS || []).map(x => String(x || '').toLowerCase());
-    const msg = document.getElementById('msg');
-    const meta = document.getElementById('meta');
-    const rows = document.getElementById('rows');
+    const ADMIN_EMAILS = (window.ADMIN_EMAILS || []).map(x => x.toLowerCase());
+    let currentFilter = 'all';
+    let currentStory = null;
 
-    const say = (t, cls='muted') => { msg.textContent = t; msg.className = cls; };
-    const fmt = (d) => new Date(d).toLocaleString('zh-CN');
-
-    async function getUser(){
-      const { data, error } = await sb.auth.getUser();
-      if(error) throw error;
-      return data?.user || null;
+    async function checkAuth() {
+      const { data } = await sb.auth.getUser();
+      const user = data?.user;
+      
+      if (!user || !ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+        document.body.innerHTML = `
+          <div class="container">
+            <div class="empty">
+              <div class="empty-icon">🔒</div>
+              <h2>无访问权限</h2>
+              <p>请使用管理员账号登录</p>
+              <a href="./auth.html" style="display:inline-block;margin-top:16px;padding:10px 20px;background:var(--primary);color:white;border-radius:6px;text-decoration:none;">去登录</a>
+            </div>
+          </div>`;
+        return false;
+      }
+      
+      document.getElementById('adminEmail').textContent = user.email;
+      return true;
     }
 
-    function isAdmin(user){
-      const email = String(user?.email || '').toLowerCase();
-      return !!email && ADMIN_EMAILS.includes(email);
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    function statusPill(status){
-      const s = String(status || 'pending');
-      return `<span class="pill ${s}">${s}</span>`;
+    async function loadStats() {
+      const { data } = await sb.from('stories').select('status');
+      const stats = { pending: 0, approved: 0, rejected: 0, total: data?.length || 0 };
+      data?.forEach(s => { if (stats[s.status] !== undefined) stats[s.status]++; });
+      
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-icon total">📊</div>
+          <div class="stat-content">
+            <h4>全部投稿</h4>
+            <div class="number">${stats.total}</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon pending">⏳</div>
+          <div class="stat-content">
+            <h4>待审核</h4>
+            <div class="number">${stats.pending}</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon approved">✓</div>
+          <div class="stat-content">
+            <h4>已通过</h4>
+            <div class="number">${stats.approved}</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon rejected">✕</div>
+          <div class="stat-content">
+            <h4>已驳回</h4>
+            <div class="number">${stats.rejected}</div>
+          </div>
+        </div>
+      `;
     }
 
-    function render(list){
-      if(!list.length){
-        rows.innerHTML = '<tr><td colspan="6" class="muted">暂无投稿</td></tr>';
+    async function loadStories() {
+      let query = sb.from('stories').select('*').order('created_at', { ascending: false });
+      if (currentFilter !== 'all') query = query.eq('status', currentFilter);
+      
+      const { data, error } = await query;
+      const tbody = document.getElementById('storiesTable');
+      
+      if (error || !data?.length) {
+        tbody.innerHTML = `
+          <tr><td colspan="5" class="empty">
+            <div class="empty-icon">📝</div>
+            <p>暂无${currentFilter === 'all' ? '' : '该状态的'}投稿</p>
+          </td></tr>`;
         return;
       }
-      rows.innerHTML = list.map((x, i) => {
-        const title = (x.title || '').replace(/</g,'&lt;');
-        const content = (x.content || '').replace(/</g,'&lt;');
-        const snippet = content.slice(0, 80);
-        return `<tr>
-          <td>${i + 1}</td>
-          <td class="status">${statusPill(x.status)}</td>
-          <td>
-            <div><strong>${title || '(无标题)'}</strong></div>
-            <div class="snippet muted">${snippet}</div>
-            <details><summary>展开全文</summary><div style="white-space:pre-wrap;margin-top:6px">${content}</div></details>
-          </td>
-          <td>${(x.user_email || '').replace(/</g,'&lt;')}</td>
-          <td>${fmt(x.created_at)}</td>
-          <td>
-            <div class="actions">
-              <button type="button" data-id="${x.id}" data-status="approved">通过</button>
-              <button type="button" data-id="${x.id}" data-status="rejected">驳回</button>
-              <button type="button" data-id="${x.id}" data-status="pending" class="secondary">待审</button>
-              <button type="button" data-id="${x.id}" data-action="delete" class="secondary">删除</button>
-            </div>
-          </td>
-        </tr>`;
+      
+      tbody.innerHTML = data.map(s => {
+        const initials = (s.user_email || 'A')[0].toUpperCase();
+        return `
+          <tr onclick="showDetail('${s.id}')" style="cursor:pointer">
+            <td>
+              <div class="story-title">${(s.title || '未命名').slice(0, 40)}${s.title?.length > 40 ? '...' : ''}</div>
+              <div class="story-preview">${(s.content || '').replace(/<[^>]*>/g, '').slice(0, 80)}...</div>
+            </td>
+            <td>
+              <div class="author">
+                <div class="author-avatar">${initials}</div>
+                <span>${(s.user_email || '').split('@')[0]}</span>
+              </div>
+            </td>
+            <td><span class="status-pill ${s.status}">${{pending:'待审核',approved:'已通过',rejected:'已驳回'}[s.status]}</span></td>
+            <td class="date">${new Date(s.created_at).toLocaleDateString('zh-CN')}</td>
+            <td>
+              <div class="actions" onclick="event.stopPropagation()">
+                ${s.status !== 'approved' ? `<button class="btn-icon approve" onclick="updateStatus('${s.id}', 'approved')" title="通过">✓</button>` : ''}
+                ${s.status !== 'rejected' ? `<button class="btn-icon reject" onclick="updateStatus('${s.id}', 'rejected')" title="驳回">✕</button>` : ''}
+                <button class="btn-icon delete" onclick="deleteStory('${s.id}')" title="删除">🗑</button>
+              </div>
+            </td>
+          </tr>
+        `;
       }).join('');
     }
 
-    async function load(){
-      const user = await getUser();
-      if(!user){
-        say('请先登录管理员账号。', 'err');
-        rows.innerHTML = '<tr><td colspan="6" class="muted">未登录</td></tr>';
-        return;
+    async function showDetail(id) {
+      const { data } = await sb.from('stories').select('*').eq('id', id).single();
+      if (!data) return;
+      currentStory = data;
+      
+      document.getElementById('modalTitle').textContent = data.title || '投稿详情';
+      
+      let mediaHtml = '';
+      if (data.images?.length) {
+        mediaHtml += `<div style="display:flex;gap:8px;margin:16px 0;overflow-x:auto">${data.images.map(i=>`<img src="${i}" style="width:120px;height:90px;object-fit:cover;border-radius:6px">`).join('')}</div>`;
       }
-      if(!isAdmin(user)){
-        say('当前账号无管理员权限：' + user.email, 'err');
-        rows.innerHTML = '<tr><td colspan="6" class="muted">无管理员权限</td></tr>';
-        return;
+      if (data.videos?.length) {
+        mediaHtml += data.videos.map(v=> v.embed ? `<div style="position:relative;padding-bottom:56.25%;margin:16px 0;border-radius:8px;overflow:hidden;background:#000"><iframe src="${v.embed}" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>` : '').join('');
       }
-
-      meta.textContent = '管理员：' + user.email;
-      say('加载中...');
-      const { data, error } = await sb.from('stories').select('*').order('created_at', { ascending:false }).limit(200);
-      if(error){
-        say('读取失败：' + error.message, 'err');
-        rows.innerHTML = '<tr><td colspan="6" class="muted">读取失败</td></tr>';
-        return;
-      }
-      render(data || []);
-      say('共 ' + (data?.length || 0) + ' 条投稿', 'ok');
+      
+      document.getElementById('modalBody').innerHTML = `
+        <p style="color:var(--text-secondary);margin-bottom:16px">👤 ${data.user_email} · 🕐 ${new Date(data.created_at).toLocaleString('zh-CN')}</p>
+        ${mediaHtml}
+        <div style="line-height:1.8;white-space:pre-wrap">${(data.content || '').replace(/</g, '&lt;')}</div>
+      `;
+      
+      document.getElementById('modalFooter').innerHTML = `
+        ${data.status !== 'approved' ? `<button class="success" onclick="updateStatus('${data.id}', 'approved');closeModal()">✓ 审核通过</button>` : ''}
+        ${data.status !== 'rejected' ? `<button class="danger" onclick="updateStatus('${data.id}', 'rejected');closeModal()">✕ 驳回</button>` : ''}
+        <button class="secondary" onclick="closeModal()">关闭</button>
+      `;
+      
+      document.getElementById('detailModal').classList.add('active');
     }
 
-    async function setStatus(id, status){
-      const user = await getUser();
-      if(!user || !isAdmin(user)){
-        say('无管理员权限', 'err');
-        return;
-      }
-      say('正在更新状态为 ' + status + ' ...');
-
-      // 优先调用管理员 RPC（更稳），失败再 fallback update
-      let rpcError = null;
-      const rpc = await sb.rpc('admin_set_story_status', { p_story_id: id, p_status: status });
-      if(rpc.error) rpcError = rpc.error;
-
-      if(rpcError){
-        const { error } = await sb.from('stories').update({ status }).eq('id', id);
-        if(error){
-          say('操作失败：' + (rpcError.message || error.message), 'err');
-          return;
-        }
-      }
-
-      say('更新成功：' + status, 'ok');
-      await load();
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('active');
+      currentStory = null;
     }
 
-    document.getElementById('reloadBtn').addEventListener('click', () => load());
-
-    async function deleteStory(id){
-      const user = await getUser();
-      if(!user || !isAdmin(user)){
-        say('无管理员权限', 'err');
-        return;
+    async function updateStatus(id, status) {
+      const { error } = await sb.from('stories').update({ status }).eq('id', id);
+      if (error) {
+        showToast('操作失败');
+      } else {
+        showToast('操作成功');
+        loadStories();
+        loadStats();
       }
-      if(!confirm('确认删除这篇投稿？删除后不可恢复。')) return;
-      say('正在删除...');
+    }
+
+    async function deleteStory(id) {
+      if (!confirm('确定删除此投稿？不可恢复。')) return;
       const { error } = await sb.from('stories').delete().eq('id', id);
-      if(error){
-        say('删除失败：' + error.message, 'err');
-        return;
+      if (error) {
+        showToast('删除失败');
+      } else {
+        showToast('已删除');
+        loadStories();
+        loadStats();
       }
-      say('删除成功', 'ok');
-      await load();
     }
 
-    rows.addEventListener('click', async (e) => {
-      const btn = e.target.closest('button[data-id]');
-      if(!btn) return;
-      btn.disabled = true;
-      try {
-        if (btn.dataset.action === 'delete') {
-          await deleteStory(btn.dataset.id);
-        } else if (btn.dataset.status) {
-          await setStatus(btn.dataset.id, btn.dataset.status);
-        }
-      } finally {
-        btn.disabled = false;
-      }
+    // Tab filter
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentFilter = tab.dataset.filter;
+        loadStories();
+      };
     });
 
-    load();
+    // Close modal on overlay click
+    document.getElementById('detailModal').onclick = (e) => {
+      if (e.target.id === 'detailModal') closeModal();
+    };
+
+    // Init
+    checkAuth().then(ok => {
+      if (ok) {
+        loadStats();
+        loadStories();
+      }
+    });
   </script>
 </body>
 </html>

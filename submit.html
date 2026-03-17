@@ -1,121 +1,583 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>投稿</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>投稿｜分享您的经历</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    *{box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;max-width:860px;margin:24px auto;padding:0 16px;background:#f8fafc}
-    input,textarea,button{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:8px 0;font-family:inherit}
-    button{background:#111;color:#fff;cursor:pointer}
-    button:disabled{background:#666;cursor:not-allowed}
-    .muted{color:#6b7280}
-    .card{border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:12px 0;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-    .card h4{margin:0 0 12px;font-size:15px;color:#374151}
-    .status{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:500}
-    .pending{background:#fef3c7;color:#92400e}
-    .approved{background:#d1fae5;color:#065f46}
-    .rejected{background:#fee2e2;color:#991b1b}
+    :root {
+      --primary: #0f172a;
+      --primary-light: #1e293b;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-secondary: #64748b;
+      --text-tertiary: #94a3b8;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --radius-sm: 6px;
+      --radius: 12px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
     
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:8px;background:#f3f4f6;border-radius:8px}
-    .toolbar button{width:auto;padding:6px 12px;margin:0;font-size:13px;background:#fff;color:#374151;border:1px solid #d1d5db}
-    .toolbar button:hover{background:#f9fafb}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     
-    .editor{min-height:200px;padding:12px;border:1px solid #d1d5db;border-radius:8px;background:#fff;outline:none;line-height:1.6}
-    .editor:empty:before{content:"在此输入内容...";color:#9ca3af}
-    .editor img{max-width:100%;border-radius:8px;margin:8px 0}
-    .editor iframe{max-width:100%;border-radius:8px;margin:8px 0}
+    body {
+      font-family: 'Inter', 'Noto Sans SC', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
     
-    .media-preview{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
-    .media-preview .thumb{position:relative;width:120px;height:90px;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;background:#f3f4f6}
-    .media-preview .thumb img{width:100%;height:100%;object-fit:cover}
-    .media-preview .thumb.video{display:flex;align-items:center;justify-content:center;background:#1f2937}
-    .media-preview .thumb.video:before{content:"▶";color:#fff;font-size:24px}
-    .media-preview .thumb button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;padding:0;border-radius:50%;background:#ef4444;color:#fff;font-size:12px;border:none;cursor:pointer}
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px;
+    }
     
-    .upload-area{border:2px dashed #d1d5db;border-radius:8px;padding:24px;text-align:center;background:#f9fafb;cursor:pointer;transition:all .2s}
-    .upload-area:hover{border-color:#9ca3af;background:#f3f4f6}
-    .upload-area input[type="file"]{display:none}
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
     
-    .video-input{display:flex;gap:8px;margin-top:8px}
-    .video-input input{flex:1;margin:0}
-    .video-input button{width:auto;margin:0;padding:8px 16px}
+    .back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 18px;
+      transition: var(--transition);
+    }
     
-    .modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100}
-    .modal.active{display:flex}
-    .modal-content{background:#fff;padding:20px;border-radius:12px;width:90%;max-width:400px}
-    .modal-content h4{margin:0 0 12px}
-    .modal-content input{width:100%;margin:8px 0}
-    .modal-content .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
-    .modal-content .actions button{width:auto;margin:0}
+    .back-btn:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    
+    /* Status Card */
+    .status-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .status-card.pending { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .status-card.approved { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .status-card.rejected { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    
+    .status-info h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .status-info p {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    
+    .status-badge {
+      padding: 6px 14px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    /* Form */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .form-group {
+      margin-bottom: 24px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    
+    .form-label span {
+      color: var(--text-tertiary);
+      font-weight: 400;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 15px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text);
+      transition: var(--transition);
+      font-family: inherit;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    textarea.form-input {
+      min-height: 200px;
+      resize: vertical;
+      line-height: 1.7;
+    }
+    
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    }
+    
+    .toolbar-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 18px;
+      transition: var(--transition);
+    }
+    
+    .toolbar-btn:hover {
+      background: var(--surface);
+    }
+    
+    .toolbar-btn.active {
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    textarea.form-input.with-toolbar {
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    }
+    
+    /* Media Upload */
+    .media-section {
+      margin-top: 24px;
+    }
+    
+    .media-title {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    
+    .upload-item {
+      position: relative;
+      aspect-ratio: 4/3;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+    
+    .upload-item img, .upload-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .upload-item.video::before {
+      content: '▶';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      font-size: 24px;
+    }
+    
+    .upload-item .remove {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: var(--transition);
+    }
+    
+    .upload-item:hover .remove {
+      opacity: 1;
+    }
+    
+    .upload-add {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 2px dashed var(--border);
+      background: transparent;
+      transition: var(--transition);
+    }
+    
+    .upload-add:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .upload-add .icon {
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+    
+    .upload-add .text {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    
+    /* Video Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 24px;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+    }
+    
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 24px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .modal h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    
+    .modal p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    
+    .modal-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+    
+    .modal-actions button {
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .modal-actions .cancel {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    
+    .modal-actions .confirm {
+      background: var(--accent);
+      border: none;
+      color: white;
+    }
+    
+    .modal-actions .confirm:hover {
+      background: var(--accent-hover);
+    }
+    
+    /* Submit Button */
+    .submit-section {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .btn-submit {
+      width: 100%;
+      padding: 14px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .btn-submit:hover {
+      background: var(--primary-light);
+      transform: translateY(-1px);
+    }
+    
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .helper-text {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--primary);
+      color: white;
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1001;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    .toast.success {
+      background: var(--success);
+    }
+    
+    .toast.error {
+      background: var(--danger);
+    }
   </style>
 </head>
 <body>
-  <h2>投稿（登录后）</h2>
-  <p class="muted">每个账号仅允许 1 篇投稿。再次提交会覆盖你之前的投稿，并重置为 pending。</p>
+  <div class="container">
+    <header class="header">
+      <a href="./" class="back-btn">←</a>
+      <h1>分享您的经历</h1>
+    </header>
 
-  <div id="myPost" class="card" style="display:none;">
-    <h3>我的投稿</h3>
-    <div id="postContent"></div>
-  </div>
+    <div id="statusCard"></div>
 
-  <input id="title" placeholder="标题" />
-  
-  <div class="card">
-    <div class="toolbar">
-      <button type="button" onclick="insertImage()">📷 插入图片</button>
-      <button type="button" onclick="showVideoModal()">🎬 插入视频</button>
-      <button type="button" onclick="formatText('bold')"><b>B</b></button>
-      <button type="button" onclick="formatText('italic')"><i>I</i></button>
-    </div>
-    <div id="editor" class="editor" contenteditable="true" placeholder="在此输入内容..."></div>
-  </div>
+    <div class="form-card">
+      <div class="form-group">
+        <label class="form-label">标题</label>
+        <input type="text" id="title" class="form-input" placeholder="简短描述您的经历">
+      </div>
 
-  <div class="card">
-    <h4>已添加的媒体</h4>
-    <div id="mediaPreview" class="media-preview"></div>
-    <p id="uploadMsg" class="muted"></p>
-  </div>
+      <div class="form-group">
+        <label class="form-label">详细内容 <span>（支持文字描述，可添加图片和视频）</span></label>
+        <div class="toolbar">
+          <button type="button" class="toolbar-btn" onclick="insertImage()" title="插入图片">📷</button>
+          <button type="button" class="toolbar-btn" onclick="showVideoModal()" title="插入视频">🎬</button>
+          <button type="button" class="toolbar-btn" onclick="formatText('bold')" title="粗体"><b>B</b></button>
+        </div>
+        <textarea id="content" class="form-input with-toolbar" placeholder="请详细描述您的经历，包括时间、地点、经过等可核验的事实..."></textarea>
+      </div>
 
-  <button id="submit">提交投稿</button>
-  <p id="msg" class="muted"></p>
-  <p><a href="./auth.html">登录/注册</a> · <a href="./">回首页</a></p>
+      <div class="media-section">
+        <div class="media-title">已添加的媒体</div>
+        <div class="upload-grid" id="mediaGrid">
+          <div class="upload-item upload-add" onclick="insertImage()">
+            <span class="icon">+</span>
+            <span class="text">添加图片</span>
+          </div>
+          <div class="upload-item upload-add" onclick="showVideoModal()">
+            <span class="icon">▶</span>
+            <span class="text">添加视频</span>
+          </div>
+        </div>
+      </div>
 
-  <!-- Video Modal -->
-  <div id="videoModal" class="modal">
-    <div class="modal-content">
-      <h4>插入视频链接</h4>
-      <p class="muted" style="font-size:13px">支持 YouTube、Bilibili、抖音等视频链接</p>
-      <input type="text" id="videoUrl" placeholder="粘贴视频链接，如 https://www.youtube.com/watch?v=..." />
-      <div class="actions">
-        <button type="button" class="secondary" onclick="hideVideoModal()" style="background:#f3f4f6;color:#374151">取消</button>
-        <button type="button" onclick="insertVideo()">插入</button>
+      <div class="submit-section">
+        <button id="submitBtn" class="btn-submit">提交投稿</button>
+        <p class="helper-text">提交后将进入审核，通过后公开展示 · 每个账号限一篇</p>
       </div>
     </div>
   </div>
 
-  <input type="file" id="imageInput" accept="image/*" multiple style="display:none" />
+  <!-- Video Modal -->
+  <div class="modal-overlay" id="videoModal">
+    <div class="modal">
+      <h3>插入视频</h3>
+      <p>支持 YouTube、Bilibili、抖音等平台链接</p>
+      <input type="text" class="modal-input" id="videoUrl" placeholder="粘贴视频链接...">
+      <div class="modal-actions">
+        <button class="cancel" onclick="hideVideoModal()">取消</button>
+        <button class="confirm" onclick="insertVideo()">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="imageInput" accept="image/*" multiple hidden>
+  <div class="toast" id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./supabase-config.js"></script>
   <script>
     const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-    const msg = document.getElementById('msg');
-    const uploadMsg = document.getElementById('uploadMsg');
-    const editor = document.getElementById('editor');
-    
     let uploadedImages = [];
     let videoLinks = [];
 
     async function getUser() {
       const { data } = await sb.auth.getUser();
-      return data?.user || null;
+      return data?.user;
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + type;
+      setTimeout(() => toast.classList.add('show'), 10);
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    async function loadMyPost() {
+      const user = await getUser();
+      if (!user) {
+        showToast('请先登录', 'error');
+        setTimeout(() => location.href = './auth.html', 1500);
+        return;
+      }
+
+      const { data, error } = await sb
+        .from('stories')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (data) {
+        document.getElementById('title').value = data.title || '';
+        document.getElementById('content').value = data.content || '';
+        uploadedImages = data.images || [];
+        videoLinks = data.videos || [];
+        renderMediaGrid();
+
+        const statusMap = {
+          pending: { text: '待审核', class: 'pending' },
+          approved: { text: '已通过', class: 'approved' },
+          rejected: { text: '已驳回', class: 'rejected' }
+        };
+        const status = statusMap[data.status] || statusMap.pending;
+
+        document.getElementById('statusCard').innerHTML = `
+          <div class="status-card ${status.class}">
+            <div class="status-info">
+              <h3>我的投稿</h3>
+              <p>上次提交：${new Date(data.created_at).toLocaleDateString('zh-CN')}</p>
+            </div>
+            <span class="status-badge">${status.text}</span>
+          </div>
+        `;
+      }
     }
 
     function formatText(cmd) {
-      document.execCommand(cmd, false, null);
-      editor.focus();
+      const textarea = document.getElementById('content');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      const selected = text.slice(start, end);
+      
+      let replacement;
+      switch(cmd) {
+        case 'bold': replacement = `**${selected}**`; break;
+        default: return;
+      }
+      
+      textarea.value = text.slice(0, start) + replacement + text.slice(end);
+      textarea.focus();
+      textarea.setSelectionRange(start + 2, end + 2);
     }
 
     function showVideoModal() {
@@ -129,63 +591,46 @@
     }
 
     function getVideoEmbedInfo(url) {
-      // YouTube
       let match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/);
-      if (match) return { type: 'youtube', id: match[1], embed: `https://www.youtube.com/embed/${match[1]}` };
+      if (match) return { type: 'youtube', embed: `https://www.youtube.com/embed/${match[1]}` };
       
-      // Bilibili
       match = url.match(/bilibili\.com\/video\/(BV[\w]+)/i);
-      if (match) return { type: 'bilibili', id: match[1], embed: `https://player.bilibili.com/player.html?bvid=${match[1]}` };
+      if (match) return { type: 'bilibili', embed: `https://player.bilibili.com/player.html?bvid=${match[1]}` };
       
-      match = url.match(/bilibili\.com\/video\/(av\d+)/i);
-      if (match) return { type: 'bilibili', id: match[1], embed: `https://player.bilibili.com/player.html?aid=${match[1].slice(2)}` };
-      
-      // Generic iframe support
-      return { type: 'link', url: url };
+      return null;
     }
 
-    window.insertVideo = function() {
+    function insertVideo() {
       const url = document.getElementById('videoUrl').value.trim();
       if (!url) return;
       
       const info = getVideoEmbedInfo(url);
-      if (info.embed) {
-        videoLinks.push({ url: url, embed: info.embed, type: info.type });
-        
-        // Insert placeholder in editor
-        const placeholder = document.createElement('div');
-        placeholder.className = 'video-placeholder';
-        placeholder.style.cssText = 'background:#1f2937;color:#fff;padding:12px 16px;border-radius:8px;text-align:center;margin:8px 0';
-        placeholder.innerHTML = `🎬 ${info.type === 'youtube' ? 'YouTube' : 'Bilibili'} 视频: ${url}`;
-        placeholder.dataset.videoIndex = videoLinks.length - 1;
-        
-        editor.appendChild(placeholder);
-        editor.appendChild(document.createElement('br'));
+      if (info) {
+        videoLinks.push({ url, ...info });
+        renderMediaGrid();
+        hideVideoModal();
+        showToast('视频已添加');
+      } else {
+        showToast('暂不支持该链接格式', 'error');
       }
-      
-      renderMediaPreview();
-      hideVideoModal();
-    };
+    }
 
-    window.insertImage = function() {
+    function insertImage() {
       document.getElementById('imageInput').click();
-    };
+    }
 
     async function uploadImage(file) {
       const user = await getUser();
-      if (!user) { uploadMsg.textContent = '请先登录'; return null; }
-      if (file.size > 5 * 1024 * 1024) { uploadMsg.textContent = '图片大小不能超过 5MB'; return null; }
-
+      if (!user) return null;
+      
       const ext = file.name.split('.').pop().toLowerCase();
       const fileName = `${user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-      uploadMsg.textContent = '正在上传...';
-
-      const { data, error } = await sb.storage.from('story-images').upload(fileName, file, { contentType: file.type });
-      if (error) { uploadMsg.textContent = '上传失败：' + error.message; return null; }
-
-      const { data: urlData } = sb.storage.from('story-images').getPublicUrl(fileName);
-      uploadMsg.textContent = '上传成功';
-      return urlData.publicUrl;
+      
+      const { error } = await sb.storage.from('story-images').upload(fileName, file);
+      if (error) return null;
+      
+      const { data } = sb.storage.from('story-images').getPublicUrl(fileName);
+      return data.publicUrl;
     }
 
     document.getElementById('imageInput').onchange = async (e) => {
@@ -193,131 +638,94 @@
         const url = await uploadImage(file);
         if (url) {
           uploadedImages.push(url);
-          const img = document.createElement('img');
-          img.src = url;
-          img.style.maxWidth = '100%';
-          editor.appendChild(img);
-          editor.appendChild(document.createElement('br'));
+          showToast('图片已上传');
         }
       }
+      renderMediaGrid();
       e.target.value = '';
-      renderMediaPreview();
     };
 
-    window.removeImage = function(idx) {
-      uploadedImages.splice(idx, 1);
-      renderMediaPreview();
-    };
-
-    window.removeVideo = function(idx) {
-      videoLinks.splice(idx, 1);
-      renderMediaPreview();
-    };
-
-    function renderMediaPreview() {
-      const preview = document.getElementById('mediaPreview');
+    function renderMediaGrid() {
+      const grid = document.getElementById('mediaGrid');
       let html = '';
       
       uploadedImages.forEach((url, idx) => {
-        html += `<div class="thumb"><img src="${url}"/><button onclick="removeImage(${idx})">×</button></div>`;
+        html += `
+          <div class="upload-item">
+            <img src="${url}" alt="">
+            <button class="remove" onclick="removeImage(${idx})">×</button>
+          </div>
+        `;
       });
       
       videoLinks.forEach((v, idx) => {
-        html += `<div class="thumb video"><button onclick="removeVideo(${idx})">×</button></div>`;
-      });
-      
-      preview.innerHTML = html;
-    }
-
-    function editorToContent() {
-      const clone = editor.cloneNode(true);
-      // Replace video placeholders with markers
-      clone.querySelectorAll('.video-placeholder').forEach(el => {
-        const idx = el.dataset.videoIndex;
-        const marker = document.createElement('span');
-        marker.textContent = `[VIDEO:${idx}]`;
-        el.parentNode.replaceChild(marker, el);
-      });
-      return clone.innerHTML;
-    }
-
-    function contentToEditor(html, images, videos) {
-      uploadedImages = images || [];
-      videoLinks = videos || [];
-      
-      // Restore video placeholders
-      html = html.replace(/\[VIDEO:(\d+)\]/g, (match, idx) => {
-        const v = videoLinks[idx];
-        if (!v) return '';
-        const name = v.type === 'youtube' ? 'YouTube' : 'Bilibili';
-        return `<div class="video-placeholder" data-video-index="${idx}" style="background:#1f2937;color:#fff;padding:12px 16px;border-radius:8px;text-align:center;margin:8px 0">🎬 ${name} 视频: ${v.url}</div>`;
-      });
-      
-      editor.innerHTML = html;
-      renderMediaPreview();
-    }
-
-    async function loadMyPost() {
-      const user = await getUser();
-      if (!user) { msg.textContent = '请先登录再投稿'; return; }
-      msg.textContent = '已登录：' + user.email;
-
-      const { data, error } = await sb
-        .from('stories')
-        .select('id,title,content,status,created_at,images,videos')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (error) { console.log('读取投稿失败：', error.message); return; }
-
-      if (data) {
-        document.getElementById('title').value = data.title || '';
-        contentToEditor(data.content || '', data.images || [], data.videos || []);
-        
-        const box = document.getElementById('myPost');
-        const contentDiv = document.getElementById('postContent');
-        box.style.display = 'block';
-        
-        const statusText = { pending: '待审核', approved: '已通过', rejected: '已驳回' };
-        const statusClass = 'status ' + (data.status || 'pending');
-        
-        contentDiv.innerHTML = `
-          <div><strong>${(data.title || '').replace(/</g, '&lt;')}</strong> <span class="${statusClass}">${statusText[data.status] || data.status}</span></div>
-          <div class="muted">提交时间：${new Date(data.created_at).toLocaleString('zh-CN')}</div>
+        html += `
+          <div class="upload-item video">
+            <button class="remove" onclick="removeVideo(${idx})">×</button>
+          </div>
         `;
-      }
+      });
+      
+      html += `
+        <div class="upload-item upload-add" onclick="insertImage()">
+          <span class="icon">+</span>
+          <span class="text">添加图片</span>
+        </div>
+        <div class="upload-item upload-add" onclick="showVideoModal()">
+          <span class="icon">▶</span>
+          <span class="text">添加视频</span>
+        </div>
+      `;
+      
+      grid.innerHTML = html;
     }
 
-    document.getElementById('submit').onclick = async () => {
+    function removeImage(idx) {
+      uploadedImages.splice(idx, 1);
+      renderMediaGrid();
+    }
+
+    function removeVideo(idx) {
+      videoLinks.splice(idx, 1);
+      renderMediaGrid();
+    }
+
+    document.getElementById('submitBtn').onclick = async () => {
       const user = await getUser();
-      if (!user) { msg.textContent = '请先登录再投稿'; return; }
+      if (!user) return;
       
       const title = document.getElementById('title').value.trim();
-      const content = editorToContent();
+      const content = document.getElementById('content').value.trim();
       
-      if (!title || !content.replace(/<[^>]*>/g, '').trim()) { 
-        msg.textContent = '请填写标题和内容'; 
-        return; 
+      if (!title || !content) {
+        showToast('请填写标题和内容', 'error');
+        return;
       }
       
-      const payload = { 
-        title, 
-        content, 
-        status: 'pending', 
-        user_id: user.id, 
-        user_email: user.email,
-        images: uploadedImages,
-        videos: videoLinks
-      };
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = '提交中...';
       
-      const { error } = await sb.from('stories').upsert(payload, { onConflict: 'user_id' });
+      const { error } = await sb.from('stories').upsert({
+        title, content, status: 'pending',
+        user_id: user.id, user_email: user.email,
+        images: uploadedImages, videos: videoLinks
+      }, { onConflict: 'user_id' });
+      
+      btn.disabled = false;
+      btn.textContent = '提交投稿';
       
       if (error) {
-        msg.textContent = '提交失败：' + error.message;
+        showToast('提交失败：' + error.message, 'error');
       } else {
-        msg.textContent = '提交成功（如已有旧稿，已自动覆盖并重置为待审）。';
+        showToast('提交成功！', 'success');
         await loadMyPost();
       }
+    };
+
+    // Close modal on overlay click
+    document.getElementById('videoModal').onclick = (e) => {
+      if (e.target.id === 'videoModal') hideVideoModal();
     };
 
     loadMyPost();

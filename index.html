@@ -1,257 +1,658 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>洛杉矶米线烧烤｜学生时代米线烧烤信息公示与评价截图</title>
-
-  <meta name="description" content="洛杉矶米线烧烤相关信息公示页，包含学生时代米线烧烤店铺信息与Google评价截图归档。关键词：洛杉矶米线烧烤、米线烧烤受害人、东北烧烤、学生时代。" />
-  <meta name="keywords" content="洛杉矶米线烧烤,米线烧烤受害人,东北烧烤,学生时代,学生时代米线烧烤,Alhambra 米线烧烤" />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://xssdreck.github.io/restaurant-evidence/" />
-
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="洛杉矶米线烧烤｜学生时代米线烧烤信息公示与评价截图" />
-  <meta property="og:description" content="店铺信息、公示说明与Google评价截图归档页面。" />
-  <meta property="og:url" content="https://xssdreck.github.io/restaurant-evidence/" />
-  <meta property="og:image" content="https://xssdreck.github.io/restaurant-evidence/assets/cover-search.jpg" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="https://xssdreck.github.io/restaurant-evidence/assets/cover-search.jpg" />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>洛杉矶米线烧烤｜学生时代米线烧烤信息公示</title>
+  <meta name="description" content="洛杉矶米线烧烤相关信息公示页，包含学生时代米线烧烤店铺信息与顾客评价截图归档。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b1020;
-      --panel: #ffffff;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --brand: #1d4ed8;
-      --brand-soft: #eff6ff;
+      --primary: #0f172a;
+      --primary-light: #1e293b;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-secondary: #64748b;
+      --text-tertiary: #94a3b8;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --radius-sm: 6px;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    * { box-sizing: border-box; }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
-      background: linear-gradient(180deg, #f8fafc 0%, #f3f4f6 100%);
-      color: #111827;
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    
+    /* Header */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+      background: rgba(255,255,255,0.95);
+    }
+    
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+    }
+    
+    .logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .nav-link {
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+    
+    .nav-link:hover {
+      color: var(--text);
+      background: var(--bg);
+    }
+    
+    .nav-link.primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .nav-link.primary:hover {
+      background: var(--primary-light);
+    }
+    
+    /* Hero Section */
     .hero {
-      background: radial-gradient(1200px 320px at 20% -20%, #2563eb 0%, #1e293b 50%, #0b1020 100%);
-      color: #fff;
-      padding: 28px 16px;
-      border-bottom: 1px solid rgba(255,255,255,.12);
+      padding: 64px 0 48px;
+      text-align: center;
     }
-    .hero-wrap { max-width: 1080px; margin: 0 auto; }
-    .hero h1 { margin: 0 0 8px; font-size: clamp(24px, 3.2vw, 38px); line-height: 1.2; }
-    .hero .sub { margin: 0; color: #dbeafe; }
-
-    .wrap { max-width: 1080px; margin: 16px auto 28px; padding: 0 16px; }
-    .card {
-      background: var(--panel);
+    
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    
+    .hero p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 24px;
+    }
+    
+    .tag {
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      margin: 12px 0;
-      box-shadow: 0 6px 18px rgba(16,24,40,.04);
+      border-radius: 999px;
     }
-    .muted { color: var(--muted); font-size: 14px; }
-    .chips { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 2px; }
-    .chip { background: var(--brand-soft); color: #1e40af; border: 1px solid #bfdbfe; font-size: 12px; padding: 4px 10px; border-radius: 999px; }
-    a { color: var(--brand); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    .cover { width: 100%; max-width: 740px; border: 1px solid var(--border); border-radius: 12px; display:block; }
-
-    .shop-row { display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
-    .shop-left { flex: 0 0 300px; }
-    .shop-left img { width:100%; border-radius: 12px; border:1px solid var(--border); }
-    .shop-right { flex: 1 1 500px; min-width: 280px; }
-    .shop-right ul { margin: 0; padding-left: 18px; }
-    .shop-right li { margin: 7px 0; }
-
-    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
+    
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    
+    .card:hover {
+      box-shadow: var(--shadow);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      border-radius: var(--radius);
+      font-size: 20px;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    /* Shop Info */
+    .shop-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 32px;
+    }
+    
+    .shop-image {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    
+    .shop-info h3 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .shop-address {
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .info-list {
+      list-style: none;
+      display: grid;
+      gap: 12px;
+    }
+    
+    .info-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .info-list strong {
+      color: var(--text);
+      font-weight: 500;
+      min-width: 60px;
+    }
+    
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    
     .btn {
-      display:inline-block; background:#111827; color:#fff; border-radius:10px;
-      padding:8px 12px; font-size:14px; text-decoration:none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: var(--transition);
+      border: none;
+      cursor: pointer;
     }
-    .btn.secondary { background:#fff; color:#111827; border:1px solid var(--border); }
-
-    iframe { width: 100%; height: 1200px; border: 1px solid var(--border); border-radius: 12px; background:#fff; }
-
-    @media (max-width: 760px) {
-      .shop-left { flex: 1 1 100%; }
-      iframe { height: 900px; }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-light);
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--bg);
+      border-color: var(--text-tertiary);
+    }
+    
+    /* Stories Section */
+    .stories-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .section-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    
+    .story-item {
+      padding: 24px 0;
+      border-top: 1px solid var(--border);
+    }
+    
+    .story-item:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+    
+    .story-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .story-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    
+    .story-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin-bottom: 12px;
+    }
+    
+    .story-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .story-images {
+      display: flex;
+      gap: 8px;
+      margin: 16px 0;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    
+    .story-images img {
+      width: 120px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+    
+    .story-images img:hover {
+      transform: scale(1.02);
+    }
+    
+    .story-video {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: #000;
+      margin: 16px 0;
+    }
+    
+    .story-video iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    
+    .story-content {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+    
+    .story-content.collapsed {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .expand-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 12px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+    
+    .expand-btn:hover {
+      background: rgba(59, 130, 246, 0.1);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-tertiary);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+      margin-top: 48px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .shop-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .shop-image {
+        max-width: 300px;
+      }
+      
+      .card {
+        padding: 24px;
+      }
+      
+      .nav-links {
+        display: none;
+      }
+      
+      .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        padding: 12px 24px;
+        justify-content: space-around;
+        z-index: 100;
+      }
+      
+      .mobile-nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        color: var(--text-secondary);
+        text-decoration: none;
+      }
+      
+      .mobile-nav a.active {
+        color: var(--accent);
+      }
+    }
+    
+    @media (min-width: 769px) {
+      .mobile-nav {
+        display: none;
+      }
+    }
+    
+    /* Loading */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg) 25%, #f1f5f9 50%, var(--bg) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--radius-sm);
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
   </style>
 </head>
 <body>
-  <header class="hero">
-    <div class="hero-wrap">
-      <h1>洛杉矶米线烧烤｜学生时代米线烧烤信息公示页</h1>
-      <p class="sub">发布人：Admin · 最后更新：2026-03-16</p>
-      <div class="chips">
-        <span class="chip">洛杉矶米线烧烤</span>
-        <span class="chip">米线烧烤受害人</span>
-        <span class="chip">东北烧烤</span>
-        <span class="chip">学生时代</span>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">洛杉矶米线烧烤公示</div>
+        <nav class="nav-links">
+          <a href="./" class="nav-link">首页</a>
+          <a href="./reviews.html" class="nav-link">评价</a>
+          <a href="./experience.html" class="nav-link primary">我要投稿</a>
+        </nav>
       </div>
     </div>
   </header>
 
-  <main class="wrap">
-    
+  <main class="container">
+    <section class="hero">
+      <h1>学生时代米线烧烤<br>信息公示页</h1>
+      <p>汇集真实顾客经历与评价截图，为公众提供透明、客观的信息参考。</p>
+      <div class="tags">
+        <span class="tag">洛杉矶</span>
+        <span class="tag">Alhambra</span>
+        <span class="tag">真实评价</span>
+        <span class="tag">顾客投稿</span>
+      </div>
+    </section>
 
     <section class="card">
-      <h3>店铺信息</h3>
-      <div class="shop-row">
-        <div class="shop-left">
-          <img src="./assets/storefront-info.jpg" alt="店铺信息截图" />
+      <div class="card-header">
+        <div class="card-icon">🏪</div>
+        <div>
+          <div class="card-title">店铺信息</div>
         </div>
-        <div class="shop-right">
-          <ul>
-            <li><strong>店铺名称</strong>：学生时代米线烧烤</li>
-            <li><strong>店铺地址</strong>：640 W Valley Blvd, Alhambra, CA 91803</li>
-            <li><strong>店铺电话</strong>：<a href="tel:+16269316986">(626) 931-6986</a></li>
-            <li><strong>店主</strong>：石敬琳</li>
-            <li><strong>老板娘</strong>：吕雪娇</li>
-            <li><strong>事件时间</strong>：2025-10-31</li>
-            <li><strong>网络大事件</strong>：<a href="https://www.google.com/search?q=%E6%B4%9B%E6%9D%89%E7%9F%B6%E7%B1%B3%E7%BA%BF%E7%83%A7%E7%83%A4%E5%8F%97%E5%AE%B3%E4%BA%BA" target="_blank">自动跳转 Google 搜索「洛杉矶米线烧烤受害人」</a></li>
+      </div>
+      <div class="shop-grid">
+        <img src="./assets/storefront-info.jpg" alt="店铺照片" class="shop-image">
+        <div class="shop-info">
+          <h3>学生时代米线烧烤</h3>
+          <p class="shop-address">📍 640 W Valley Blvd, Alhambra, CA 91803</p>
+          <ul class="info-list">
+            <li><strong>店主</strong> 石敬琳</li>
+            <li><strong>电话</strong> (626) 931-6986</li>
+            <li><strong>事件</strong> 2025年10月31日</li>
           </ul>
-          <div class="actions">
-            <a class="btn" href="./reviews.html" target="_blank">打开独立公示页</a>
-            <a class="btn secondary" href="./auth.html" target="_blank">注册/登录</a>
-            <a class="btn secondary" href="./experience.html" target="_blank">我要投稿</a>
-            <a class="btn secondary" href="tel:+16269316986">一键拨号</a>
+          <div class="btn-group">
+            <a href="tel:+16269316986" class="btn btn-primary">📞 一键拨号</a>
+            <a href="./reviews.html" class="btn btn-secondary">查看评价截图</a>
           </div>
         </div>
       </div>
     </section>
 
-
-    
-    <section class="card" id="approvedStoriesSection">
-      <h3>审核通过故事（自动显示）</h3>
-      <p class="muted">投稿人登录提交后，管理员审核通过（approved）即自动显示在这里。</p>
-      <div id="approvedStories" class="muted">加载中...</div>
-      <div class="actions" style="margin-top:10px;"><a class="btn" href="./experience.html" target="_blank">进入投稿中心</a></div>
-    </section>
-
-    <section>
-      <iframe src="./reviews.html" title="Google评论截图公示" style="border:none; box-shadow:none; border-radius:0;"></iframe>
+    <section class="card">
+      <div class="stories-header">
+        <div>
+          <div class="section-title">审核通过故事</div>
+          <div class="section-subtitle">来自真实顾客的投稿分享</div>
+        </div>
+        <a href="./experience.html" class="btn btn-secondary" style="font-size: 13px; padding: 8px 16px;">我要投稿 →</a>
+      </div>
+      <div id="approvedStories">
+        <div class="empty-state">
+          <div class="empty-state-icon">⏳</div>
+          <p>正在加载...</p>
+        </div>
+      </div>
     </section>
   </main>
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "洛杉矶米线烧烤｜学生时代米线烧烤信息公示与评价截图",
-    "url": "https://xssdreck.github.io/restaurant-evidence/",
-    "description": "包含学生时代米线烧烤店铺信息与Google评价截图归档。",
-    "keywords": ["洛杉矶米线烧烤", "米线烧烤受害人", "东北烧烤", "学生时代"],
-    "image": "https://xssdreck.github.io/restaurant-evidence/assets/cover-search.jpg"
-  }
-  </script>
+  <nav class="mobile-nav">
+    <a href="./" class="active">🏠<span>首页</span></a>
+    <a href="./reviews.html">📸<span>评价</span></a>
+    <a href="./experience.html">✏️<span>投稿</span></a>
+  </nav>
 
+  <footer>
+    <p>© 2026 洛杉矶米线烧烤信息公示页 · 信息仅供参考</p>
+  </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./supabase-config.js"></script>
-<script>
-window.loadApprovedStories = async function () {
-  var box = document.getElementById('approvedStories');
-  if (!box) return;
-  box.textContent = '正在加载...';
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase-config.js"></script>
+  <script>
+    async function loadStories() {
+      const container = document.getElementById('approvedStories');
+      try {
+        const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+        const { data, error } = await sb
+          .from('stories')
+          .select('id,title,content,user_email,created_at,images,videos')
+          .eq('status', 'approved')
+          .order('created_at', { ascending: false })
+          .limit(20);
 
-  try {
-    var sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-    var resp = await sb
-      .from('stories')
-      .select('id,title,content,user_email,created_at,status,images,videos')
-      .eq('status', 'approved')
-      .order('created_at', { ascending: false })
-      .limit(20);
+        if (error) throw error;
 
-    if (resp.error) {
-      box.textContent = '加载失败：' + resp.error.message;
-      return;
-    }
-
-    var data = resp.data || [];
-    if (!data.length) {
-      box.textContent = '暂无审核通过内容。';
-      return;
-    }
-
-    var html = '';
-    for (var i = 0; i < data.length; i++) {
-      var it = data[i] || {};
-      var title = String(it.title || '').replace(/</g, '&lt;');
-      var email = String(it.user_email || '匿名').replace(/</g, '&lt;');
-      var fullContent = String(it.content || '');
-      
-      // Process video placeholders in content
-      var videoHtml = '';
-      var videos = it.videos || [];
-      if (videos.length > 0) {
-        videoHtml = '<div style="margin:10px 0">';
-        for (var v = 0; v < videos.length; v++) {
-          var vid = videos[v];
-          if (vid.embed) {
-            videoHtml += '<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;margin:8px 0;background:#000">'
-              + '<iframe src="' + vid.embed + '" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen></iframe>'
-              + '</div>';
-          }
+        if (!data?.length) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">📝</div>
+              <p>暂无审核通过的内容</p>
+              <a href="./experience.html" class="btn btn-primary" style="margin-top: 16px;">成为第一个投稿者</a>
+            </div>`;
+          return;
         }
-        videoHtml += '</div>';
+
+        container.innerHTML = data.map((item, idx) => {
+          const textContent = (item.content || '').replace(/<[^>]*>/g, '').replace(/\[VIDEO:\d+\]/g, '');
+          const isLong = textContent.length > 150;
+          const imagesHtml = item.images?.length ? `
+            <div class="story-images">
+              ${item.images.map(img => `<img src="${img}" alt="" loading="lazy">`).join('')}
+            </div>
+          ` : '';
+          
+          const videosHtml = item.videos?.map(v => v.embed ? `
+            <div class="story-video">
+              <iframe src="${v.embed}" allowfullscreen loading="lazy"></iframe>
+            </div>
+          ` : '').join('') || '';
+
+          return `
+            <article class="story-item" data-id="${item.id}">
+              <div class="story-header">
+                <h3 class="story-title">${(item.title || '未命名').replace(/</g, '&lt;')}</h3>
+              </div>
+              <div class="story-meta">
+                <span>👤 ${(item.user_email || '匿名').replace(/</g, '&lt;')}</span>
+                <span>•</span>
+                <span>🕐 ${new Date(item.created_at).toLocaleDateString('zh-CN')}</span>
+              </div>
+              ${imagesHtml}
+              ${videosHtml}
+              <div class="story-content ${isLong ? 'collapsed' : ''}" id="content-${idx}">
+                ${textContent.slice(0, 500)}
+              </div>
+              ${isLong ? `<button class="expand-btn" onclick="toggleExpand(${idx})">展开全文 ↓</button>` : ''}
+            </article>
+          `;
+        }).join('');
+
+      } catch (e) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">⚠️</div>
+            <p>加载失败，请刷新重试</p>
+          </div>`;
       }
-      
-      // Remove video placeholders from text content
-      var textContent = fullContent.replace(/\[VIDEO:\d+\]/g, '').replace(/<[^>]*>/g, '');
-      var full = textContent.replace(/\n/g, '<br>');
-      var content = full.slice(0, 260);
-      var time = new Date(it.created_at).toLocaleString('zh-CN');
-      var sid = 'story-full-' + (it.id || i);
-      
-      var imagesHtml = '';
-      if (it.images && Array.isArray(it.images) && it.images.length) {
-        imagesHtml = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">' 
-          + it.images.map(function(img) { return '<img src="' + img + '" style="width:100px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb"/>'; }).join('') 
-          + '</div>';
-      }
-      
-      html += '<article style="border-top:1px dashed #d1d5db;padding-top:10px;margin-top:10px;">'
-        + '<div><strong>' + (i + 1) + '. ' + title + '</strong></div>'
-        + '<div class="muted">作者：' + email + ' · 时间：' + time + '</div>'
-        + imagesHtml
-        + videoHtml
-        + '<p style="margin:8px 0;">' + content + '...</p>'
-        + '<div id="' + sid + '" style="display:none;margin:8px 0;white-space:normal;line-height:1.65;">' + full + '</div>'
-        + '<button type="button" class="btn secondary" data-toggle-full="' + sid + '">显示全文</button>'
-        + '</article>';
     }
-    box.innerHTML = html;
 
-    box.onclick = function(ev){
-      var btn = ev.target.closest('button[data-toggle-full]');
-      if(!btn) return;
-      var id = btn.getAttribute('data-toggle-full');
-      var el = document.getElementById(id);
-      if(!el) return;
-      var open = el.style.display !== 'none';
-      el.style.display = open ? 'none' : 'block';
-      btn.textContent = open ? '显示全文' : '收起全文';
-    };
-  } catch (e) {
-    box.textContent = '暂时无法加载，请稍后刷新。';
-  }
-};
+    function toggleExpand(idx) {
+      const content = document.getElementById(`content-${idx}`);
+      const btn = content.nextElementSibling;
+      const isCollapsed = content.classList.contains('collapsed');
+      
+      if (isCollapsed) {
+        content.classList.remove('collapsed');
+        btn.textContent = '收起全文 ↑';
+      } else {
+        content.classList.add('collapsed');
+        btn.textContent = '展开全文 ↓';
+      }
+    }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function(){ window.loadApprovedStories(); });
-} else {
-  window.loadApprovedStories();
-}
-</script>
-
+    loadStories();
+  </script>
 </body>
 </html>
