@@ -43,29 +43,99 @@
       position: relative;
       overflow: hidden;
     }
-    .hero::before {
+    /* Realistic bullet CCTV camera */
+    .camera-lens {
+      position: absolute;
+      top: 24px;
+      right: 60px;
+      width: 80px;
+      height: 36px;
+      background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%);
+      border-radius: 18px;
+      border: 2px solid #3a3a3a;
+      box-shadow: 
+        0 4px 15px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+      transform: rotate(-15deg);
+    }
+    .camera-lens::before {
       content: '';
       position: absolute;
-      top: 20px;
-      right: 40px;
+      left: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      background: radial-gradient(circle at 30% 30%, #1a3a5a 0%, #0a1a2a 40%, #000 100%);
+      border-radius: 50%;
+      border: 2px solid #1a1a1a;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+    }
+    .camera-lens::after {
+      content: '';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      background: #ff3333;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #ff0000;
+      animation: record-pulse 1.5s infinite;
+    }
+    .camera-mount {
+      position: absolute;
+      top: 48px;
+      right: 100px;
+      width: 30px;
+      height: 20px;
+      background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+      border-radius: 4px;
+      transform: rotate(-15deg);
+    }
+    @keyframes record-pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px #ff0000; }
+      50% { opacity: 0.4; box-shadow: 0 0 4px #ff0000; }
+    }
+    /* Second smaller camera */
+    .camera-lens-2 {
+      position: absolute;
+      top: 60px;
+      right: 140px;
       width: 60px;
-      height: 60px;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='1.5'%3E%3Cpath d='M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z'/%3E%3Ccircle cx='12' cy='13' r='4'/%3E%3C/svg%3E") center/contain no-repeat;
-      animation: blink 2s infinite;
+      height: 28px;
+      background: linear-gradient(180deg, #333 0%, #222 50%, #111 100%);
+      border-radius: 14px;
+      border: 1px solid #444;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+      transform: rotate(10deg);
+      opacity: 0.7;
     }
-    .hero::after {
+    .camera-lens-2::before {
       content: '';
       position: absolute;
-      top: 30px;
-      right: 110px;
-      width: 40px;
-      height: 40px;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='1.5'%3E%3Cpath d='M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z'/%3E%3Ccircle cx='12' cy='13' r='4'/%3E%3C/svg%3E") center/contain no-repeat;
-      animation: blink 3s infinite 0.5s;
+      left: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle at 30% 30%, #2a4a6a 0%, #1a2a3a 50%, #0a0a0a 100%);
+      border-radius: 50%;
+      border: 1px solid #222;
     }
-    @keyframes blink {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 0.8; }
+    .camera-lens-2::after {
+      content: '';
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 5px;
+      height: 5px;
+      background: #ff4444;
+      border-radius: 50%;
+      box-shadow: 0 0 5px #ff0000;
+      animation: record-pulse 2s infinite 0.5s;
     }
     .hero-wrap { max-width: 1080px; margin: 0 auto; }
     .hero h1 { margin: 0 0 8px; font-size: clamp(24px, 3.2vw, 38px); line-height: 1.2; }
@@ -112,6 +182,9 @@
 </head>
 <body>
   <header class="hero">
+    <div class="camera-lens"></div>
+    <div class="camera-mount"></div>
+    <div class="camera-lens-2"></div>
     <div class="hero-wrap">
       <h1>洛杉矶米线烧烤｜学生时代米线烧烤信息公示页</h1>
       <p class="sub">发布人：Admin · 最后更新：2026-03-16</p>
