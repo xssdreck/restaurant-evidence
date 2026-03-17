@@ -48,16 +48,29 @@ async function load(){
   if(error){ say('读取失败：'+error.message,true); return; }
 
   say('共 '+(data?.length||0)+' 条投稿');
-  list.innerHTML=(data||[]).map(x=>`<div class='card'><div><b>${x.title}</b> <span class='muted'>[${x.status}]</span></div><div class='muted'>${x.user_email||''} · ${new Date(x.created_at).toLocaleString('zh-CN')}</div><p>${(x.content||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</p><button onclick="setStatus('${x.id}','approved')">通过</button><button onclick="setStatus('${x.id}','rejected')">驳回</button><button onclick="setStatus('${x.id}','pending')">待审</button></div>`).join('');
+  list.innerHTML=(data||[]).map(x=>`<div class='card'><div><b>${x.title}</b> <span class='muted'>[${x.status}]</span></div><div class='muted'>${x.user_email||''} · ${new Date(x.created_at).toLocaleString('zh-CN')}</div><p>${(x.content||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</p><button data-id="${x.id}" data-status="approved">通过</button><button data-id="${x.id}" data-status="rejected">驳回</button><button data-id="${x.id}" data-status="pending">待审</button></div>`).join('');
 }
 
-window.setStatus = async (id,status)=>{
+async function setStatus(id,status){
   const user = await getCurrentUser();
-  if(!user || !isAdmin(user)){ alert('无管理员权限'); return; }
+  if(!user || !isAdmin(user)){ say('无管理员权限', true); return; }
+  say('正在更新状态…');
   const {error} = await sb.from('stories').update({status}).eq('id', id);
-  if(error){ alert('操作失败：'+error.message+'（请检查 RLS 策略 / 管理员邮箱）'); return; }
-  load();
+  if(error){ say('操作失败：'+error.message+'（请检查 RLS 策略 / 管理员邮箱）', true); return; }
+  say('更新成功：'+status);
+  await load();
 }
+
+list.addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-id][data-status]');
+  if(!btn) return;
+  btn.disabled = true;
+  try {
+    await setStatus(btn.dataset.id, btn.dataset.status);
+  } finally {
+    btn.disabled = false;
+  }
+});
 
 load();
 </script></body></html>
