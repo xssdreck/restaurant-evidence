@@ -1,24 +1,114 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>投稿</title>
-<style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;max-width:860px;margin:24px auto;padding:0 16px}input,textarea,button{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:8px 0}button{background:#111;color:#fff}.muted{color:#666}</style></head><body>
-<h2>投稿（登录后）</h2><p class="muted">每个账号仅允许 1 篇投稿。再次提交会覆盖你之前的投稿，并重置为 pending。</p>
-<input id="title" placeholder="标题" />
-<textarea id="content" rows="8" placeholder="内容（只写可核验事实）"></textarea>
-<button id="submit">提交投稿</button>
-<p id="msg" class="muted"></p>
-<p><a href="./auth.html">登录/注册</a> · <a href="./">回首页</a></p>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./supabase-config.js"></script>
-<script>
-const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-const msg=document.getElementById('msg'); const say=t=>msg.textContent=t;
-async function requireUser(){ const {data}=await sb.auth.getUser(); return data?.user; }
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>投稿</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;max-width:860px;margin:24px auto;padding:0 16px}
+    input,textarea,button{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:8px 0}
+    button{background:#111;color:#fff}
+    .muted{color:#666}
+    .card{border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin:12px 0;background:#fff}
+    .status{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
+    .pending{background:#fff7ed;color:#9a3412}
+    .approved{background:#ecfdf5;color:#065f46}
+    .rejected{background:#fef2f2;color:#991b1b}
+  </style>
+</head>
+<body>
+  <h2>投稿（登录后）</h2>
+  <p class="muted">每个账号仅允许 1 篇投稿。再次提交会覆盖你之前的投稿，并重置为 pending。</p>
 
-document.getElementById('submit').onclick = async ()=>{
- const user = await requireUser(); if(!user){ say('请先登录再投稿'); return; }
- const title=document.getElementById('title').value.trim(); const content=document.getElementById('content').value.trim();
- if(!title||!content){ say('请填写标题和内容'); return; }
- const payload={title,content,status:'pending',user_id:user.id,user_email:user.email};
- const {error}=await sb.from('stories').upsert(payload,{onConflict:'user_id'});
- say(error?('提交失败：'+error.message):'提交成功（如已有旧稿，已自动覆盖并重置为待审）。');
-};
-(async()=>{ const u=await requireUser(); say(u?('已登录：'+u.email):'未登录');})();
-</script></body></html>
+  <div id="myPost" class="card" style="display:none;">
+    <h3>我的投稿</h3>
+    <div id="postContent"></div>
+  </div>
+
+  <input id="title" placeholder="标题" />
+  <textarea id="content" rows="8" placeholder="内容（只写可核验事实）"></textarea>
+  <button id="submit">提交投稿</button>
+  <p id="msg" class="muted"></p>
+  <p><a href="./auth.html">登录/注册</a> · <a href="./">回首页</a></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase-config.js"></script>
+  <script>
+    const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    const msg = document.getElementById('msg');
+    const say = t => msg.textContent = t;
+
+    async function getUser() {
+      const { data } = await sb.auth.getUser();
+      return data?.user || null;
+    }
+
+    function statusClass(s) {
+      return 'status ' + (s || 'pending');
+    }
+
+    async function loadMyPost() {
+      const user = await getUser();
+      if (!user) {
+        say('请先登录再投稿');
+        return;
+      }
+      say('已登录：' + user.email);
+
+      const { data, error } = await sb
+        .from('stories')
+        .select('id,title,content,status,created_at')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.log('读取投稿失败：', error.message);
+        return;
+      }
+
+      if (data) {
+        document.getElementById('title').value = data.title || '';
+        document.getElementById('content').value = data.content || '';
+        
+        const box = document.getElementById('myPost');
+        const content = document.getElementById('postContent');
+        box.style.display = 'block';
+        
+        const statusText = {
+          'pending': '待审核',
+          'approved': '已通过',
+          'rejected': '已驳回'
+        };
+        
+        content.innerHTML = `
+          <div><strong>${(data.title || '').replace(/</g, '&lt;')}</strong> <span class="${statusClass(data.status)}">${statusText[data.status] || data.status}</span></div>
+          <div class="muted">提交时间：${new Date(data.created_at).toLocaleString('zh-CN')}</div>
+          <div style="margin-top:8px;white-space:pre-wrap;">${(data.content || '').slice(0,200).replace(/</g, '&lt;')}${(data.content||'').length > 200 ? '...' : ''}</div>
+        `;
+      }
+    }
+
+    document.getElementById('submit').onclick = async () => {
+      const user = await getUser();
+      if (!user) { say('请先登录再投稿'); return; }
+      
+      const title = document.getElementById('title').value.trim();
+      const content = document.getElementById('content').value.trim();
+      
+      if (!title || !content) { say('请填写标题和内容'); return; }
+      
+      const payload = { title, content, status: 'pending', user_id: user.id, user_email: user.email };
+      const { error } = await sb.from('stories').upsert(payload, { onConflict: 'user_id' });
+      
+      if (error) {
+        say('提交失败：' + error.message);
+      } else {
+        say('提交成功（如已有旧稿，已自动覆盖并重置为待审）。');
+        await loadMyPost();
+      }
+    };
+
+    loadMyPost();
+  </script>
+</body>
+</html>
