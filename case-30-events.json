@@ -1,0 +1,304 @@
+[
+  {
+    "title": "案件一：餐厅食物中毒事件",
+    "description": "多名顾客在餐厅用餐后出现腹泻、呕吐等症状，疑似食物中毒。",
+    "date": "2025-01-05T12:30:00",
+    "tags": ["关键证据", "物证"],
+    "evidence": [
+      {"name": "现场照片1.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=现场照片1"},
+      {"name": "医疗报告.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "案件二：顾客投诉记录",
+    "description": "顾客A在社交媒体上发布长文投诉餐厅食品卫生问题，引发广泛关注。",
+    "date": "2025-01-06T09:00:00",
+    "tags": ["证人证言", "书面材料"],
+    "evidence": [
+      {"name": "社交媒体截图.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=社交媒体截图"},
+      {"name": "投诉记录.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "案件三：卫生监督部门检查",
+    "description": "卫生监督部门接到投诉后对餐厅进行现场检查，发现多项卫生违规问题。",
+    "date": "2025-01-07T14:00:00",
+    "tags": ["关键证据", "书面材料"],
+    "evidence": [
+      {"name": "检查报告.pdf", "type": "application/pdf"},
+      {"name": "违规通知书.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=违规通知书"}
+    ]
+  },
+  {
+    "title": "案件四：厨房监控录像",
+    "description": "调取餐厅后厨监控录像，发现厨师在操作过程中存在严重卫生违规行为。",
+    "date": "2025-01-08T10:30:00",
+    "tags": ["视频证据", "关键证据"],
+    "evidence": [
+      {"name": "监控录像1.mp4", "type": "video/mp4"},
+      {"name": "监控截图1.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=监控截图1"},
+      {"name": "监控截图2.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=监控截图2"}
+    ]
+  },
+  {
+    "title": "案件五：食材供应商调查",
+    "description": "调查发现餐厅食材供应商存在资质不全、过期食材等问题。",
+    "date": "2025-01-09T16:00:00",
+    "tags": ["书面材料", "物证"],
+    "evidence": [
+      {"name": "供应商资质.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=供应商资质"},
+      {"name": "过期食材照片.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=过期食材"}
+    ]
+  },
+  {
+    "title": "案件六：厨师A询问笔录",
+    "description": "对涉事厨师进行询问，其承认在操作过程中未严格遵守卫生规范。",
+    "date": "2025-01-10T11:00:00",
+    "tags": ["证人证言"],
+    "evidence": [
+      {"name": "询问笔录.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "案件七：顾客B、C、D证言",
+    "description": "其他三位出现症状的顾客提供证言，详细描述了用餐经过和症状。",
+    "date": "2025-01-11T13:30:00",
+    "tags": ["证人证言"],
+    "evidence": [
+      {"name": "顾客B证言.pdf", "type": "application/pdf"},
+      {"name": "顾客C证言.pdf", "type": "application/pdf"},
+      {"name": "顾客D证言.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "案件八：医院诊断证明",
+    "description": "多家医院出具的患者诊断证明，确认为急性肠胃炎，疑似食物中毒。",
+    "date": "2025-01-12T08:30:00",
+    "tags": ["关键证据", "书面材料"],
+    "evidence": [
+      {"name": "诊断证明1.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=诊断证明1"},
+      {"name": "诊断证明2.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=诊断证明2"},
+      {"name": "诊断证明3.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=诊断证明3"}
+    ]
+  },
+  {
+    "title": "案件九：食品留样检测报告",
+    "description": "对餐厅食品留样进行实验室检测，检测出大肠杆菌超标。",
+    "date": "2025-01-13T15:00:00",
+    "tags": ["关键证据", "书面材料"],
+    "evidence": [
+      {"name": "检测报告.pdf", "type": "application/pdf"},
+      {"name": "检测过程照片.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=检测照片"}
+    ]
+  },
+  {
+    "title": "案件十：餐厅营业执照核查",
+    "description": "核查发现餐厅食品经营许可证存在过期未续期问题。",
+    "date": "2025-01-14T09:30:00",
+    "tags": ["书面材料"],
+    "evidence": [
+      {"name": "营业执照.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=营业执照"},
+      {"name": "许可证核查记录.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "案件十一：后厨环境照片",
+    "description": "检查人员拍摄的后厨环境照片，显示存在脏乱差现象。",
+    "date": "2025-01-15T10:00:00",
+    "tags": ["物证", "关键证据"],
+    "evidence": [
+      {"name": "后厨照片1.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=后厨照片1"},
+      {"name": "后厨照片2.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=后厨照片2"},
+      {"name": "后厨照片3.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=后厨照片3"}
+    ]
+  },
+  {
+    "title": "案件十二：冰箱存储检查",
+    "description": "检查冰箱发现生熟食品混放，部分食材未加盖保存。",
+    "date": "2025-01-16T11:30:00",
+    "tags": ["物证", "视频证据"],
+    "evidence": [
+      {"name": "冰箱检查视频.mp4", "type": "video/mp4"},
+      {"name": "冰箱内部照片.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=冰箱照片"}
+    ]
+  },
+  {
+    "title": "案件十三：餐具消毒记录",
+    "description": "餐厅未能提供完整的餐具消毒记录，消毒设备也未正常使用。",
+    "date": "2025-01-17T14:30:00",
+    "tags": ["书面材料"],
+    "evidence": [
+      {"name": "消毒记录缺失说明.pdf", "type": "application/pdf"},
+      {"name": "消毒设备照片.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=消毒设备"}
+    ]
+  },
+  {
+    "title": "案件十四：员工健康证检查",
+    "description": "抽查发现部分员工健康证已过期，未按规定进行体检。",
+    "date": "2025-01-18T09:00:00",
+    "tags": ["书面材料"],
+    "evidence": [
+      {"name": "员工健康证核查表.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "案件十五：洗菜池使用不当",
+    "description": "现场发现洗菜池被用于清洗拖把等清洁工具，严重违反卫生规范。",
+    "date": "2025-01-19T10:30:00",
+    "tags": ["物证", "视频证据"],
+    "evidence": [
+      {"name": "洗菜池使用视频.mp4", "type": "video/mp4"},
+      {"name": "洗菜池照片.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=洗菜池照片"}
+    ]
+  },
+  {
+    "title": "案件十六：垃圾桶管理混乱",
+    "description": "垃圾桶未加盖，垃圾满溢未及时清理，招引蚊虫。",
+    "date": "2025-01-20T16:00:00",
+    "tags": ["物证"],
+    "evidence": [
+      {"name": "垃圾桶照片1.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=垃圾桶1"},
+      {"name": "垃圾桶照片2.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=垃圾桶2"}
+    ]
+  },
+  {
+    "title": "案件十七：食材进货台账",
+    "description": "核查进货台账发现部分食材来源不明，未履行索证索票义务。",
+    "date": "2025-01-21T11:00:00",
+    "tags": ["书面材料", "关键证据"],
+    "evidence": [
+      {"name": "进货台账.pdf", "type": "application/pdf"},
+      {"name": "缺失票据清单.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "案件十八：就餐区域卫生",
+    "description": "就餐区域桌椅油腻，地面有油渍，整体环境卫生状况差。",
+    "date": "2025-01-22T12:30:00",
+    "tags": ["物证"],
+    "evidence": [
+      {"name": "就餐区照片1.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=就餐区1"},
+      {"name": "就餐区照片2.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=就餐区2"}
+    ]
+  },
+  {
+    "title": "案件十九：餐厅负责人约谈",
+    "description": "约谈餐厅负责人石敬琳，其对存在的问题表示承认并承诺整改。",
+    "date": "2025-01-23T15:30:00",
+    "tags": ["证人证言", "视频证据"],
+    "evidence": [
+      {"name": "约谈视频.mp4", "type": "video/mp4"},
+      {"name": "约谈记录.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "案件二十：整改通知书送达",
+    "description": "向餐厅送达责令整改通知书，要求限期整改存在问题。",
+    "date": "2025-01-24T10:00:00",
+    "tags": ["书面材料", "关键证据"],
+    "evidence": [
+      {"name": "整改通知书.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=整改通知书"},
+      {"name": "送达回证.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "案件二十一：限期整改复查",
+    "description": "整改期限到期后进行复查，发现部分问题仍未整改到位。",
+    "date": "2025-01-31T14:00:00",
+    "tags": ["物证", "书面材料"],
+    "evidence": [
+      {"name": "复查照片.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=复查照片"},
+      {"name": "复查报告.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "案件二十二：顾客投诉汇总",
+    "description": "整理汇总了2024年10月至2025年1月期间的所有顾客投诉记录。",
+    "date": "2025-02-01T09:00:00",
+    "tags": ["书面材料"],
+    "evidence": [
+      {"name": "投诉汇总表.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "案件二十三：网络舆情监测",
+    "description": "监测到该餐厅在多个平台存在负面评价，涉及食品安全问题。",
+    "date": "2025-02-02T11:30:00",
+    "tags": ["书面材料"],
+    "evidence": [
+      {"name": "舆情截图1.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=舆情1"},
+      {"name": "舆情截图2.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=舆情2"},
+      {"name": "舆情截图3.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=舆情3"}
+    ]
+  },
+  {
+    "title": "案件二十四：行政处罚决定",
+    "description": "根据调查情况，对餐厅作出罚款并责令停业整顿的行政处罚决定。",
+    "date": "2025-02-05T10:00:00",
+    "tags": ["关键证据", "书面材料"],
+    "evidence": [
+      {"name": "处罚决定书.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=处罚决定书"}
+    ]
+  },
+  {
+    "title": "案件二十五：停业整顿现场",
+    "description": "对餐厅执行停业整顿，张贴封条并公告。",
+    "date": "2025-02-06T14:30:00",
+    "tags": ["物证", "视频证据"],
+    "evidence": [
+      {"name": "停业公告.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=停业公告"},
+      {"name": "封条照片.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=封条照片"},
+      {"name": "现场执法视频.mp4", "type": "video/mp4"}
+    ]
+  },
+  {
+    "title": "案件二十六：受害者赔偿协商",
+    "description": "组织餐厅与受害顾客进行赔偿协商，达成赔偿协议。",
+    "date": "2025-02-10T09:30:00",
+    "tags": ["证人证言", "书面材料"],
+    "evidence": [
+      {"name": "赔偿协议.pdf", "type": "application/pdf"},
+      {"name": "协商现场照片.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=协商现场"}
+    ]
+  },
+  {
+    "title": "案件二十七：整改完成后验收",
+    "description": "餐厅完成整改后申请验收，经验收基本合格。",
+    "date": "2025-02-20T10:00:00",
+    "tags": ["物证", "书面材料"],
+    "evidence": [
+      {"name": "整改后照片1.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=整改后1"},
+      {"name": "整改后照片2.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=整改后2"},
+      {"name": "验收报告.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "案件二十八：恢复营业许可",
+    "description": "经验收合格后，批准餐厅恢复营业。",
+    "date": "2025-02-25T14:00:00",
+    "tags": ["书面材料"],
+    "evidence": [
+      {"name": "恢复营业通知.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=恢复营业"}
+    ]
+  },
+  {
+    "title": "案件二十九：后续跟踪检查",
+    "description": "恢复营业后一个月内进行3次跟踪检查，未再发现问题。",
+    "date": "2025-03-20T11:00:00",
+    "tags": ["物证", "书面材料"],
+    "evidence": [
+      {"name": "跟踪检查记录.pdf", "type": "application/pdf"},
+      {"name": "跟踪检查照片.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=跟踪检查"}
+    ]
+  },
+  {
+    "title": "案件三十：案件结案报告",
+    "description": "整理全部材料，形成完整案卷并结案。",
+    "date": "2025-03-25T16:00:00",
+    "tags": ["关键证据", "书面材料"],
+    "evidence": [
+      {"name": "结案报告.pdf", "type": "application/pdf"},
+      {"name": "案卷封面.jpg", "type": "image/jpeg", "url": "https://via.placeholder.com/400x300?text=案卷封面"}
+    ]
+  }
+]

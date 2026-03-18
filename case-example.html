@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>示例案例：餐厅食品安全事件</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <nav class="bg-gradient-to-r from-red-700 to-red-900 text-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-book-open text-white text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">示例案例</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="./index.html" class="px-4 py-2 text-white hover:text-gray-200 transition">返回首页</a>
+                    <a href="./timeline.html" class="px-4 py-2 text-white hover:text-gray-200 transition">时间线工具</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 案例介绍 -->
+        <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+            <div class="flex items-center mb-4">
+                <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">食品安全案例</span>
+                <span class="ml-3 text-gray-500 text-sm">30个事件 | 50+证据文件</span>
+            </div>
+            
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">餐厅食品安全事件调查案例</h1>
+            
+            <p class="text-gray-600 text-lg leading-relaxed mb-6">
+                本案例展示了一个完整的餐厅食品安全事件调查处理过程。从2025年1月初顾客投诉开始，
+                到3月底案件结案，历时近3个月。案例包含30个关键事件节点，涵盖现场检查、证据收集、
+                证人询问、行政处罚、整改落实等全过程。
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-blue-50 rounded-lg p-4 text-center">
+                    <div class="text-3xl font-bold text-blue-600">30</div>
+                    <div class="text-gray-600">事件总数</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4 text-center">
+                    <div class="text-3xl font-bold text-green-600">50+</div>
+                    <div class="text-gray-600">证据文件</div>
+                </div>
+                <div class="bg-purple-50 rounded-lg p-4 text-center">
+                    <div class="text-3xl font-bold text-purple-600">5</div>
+                    <div class="text-gray-600">证据类型</div>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-2">
+                <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">关键证据</span>
+                <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">证人证言</span>
+                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">视频证据</span>
+                <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">书面材料</span>
+                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">物证</span>
+            </div>
+        </div>
+
+        <!-- 案例大纲 -->
+        <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">📋 案例大纲</h2>
+            
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-red-600 font-bold text-sm">1</div>
+                    <div class="ml-4">
+                        <h3 class="font-semibold text-gray-900">事件发现阶段（事件1-5）</h3>
+                        <p class="text-gray-600 text-sm">顾客食物中毒投诉、社交媒体曝光、监管部门介入调查</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-sm">2</div>
+                    <div class="ml-4">
+                        <h3 class="font-semibold text-gray-900">调查取证阶段（事件6-20）</h3>
+                        <p class="text-gray-600 text-sm">现场检查、证人询问、证据收集、检测报告、监控调取</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 font-bold text-sm">3</div>
+                    <div class="ml-4">
+                        <h3 class="font-semibold text-gray-900">处罚整改阶段（事件21-25）</h3>
+                        <p class="text-gray-600 text-sm">行政处罚、停业整顿、整改要求、赔偿协商</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-sm">4</div>
+                    <div class="ml-4">
+                        <h3 class="font-semibold text-gray-900">验收结案阶段（事件26-30）</h3>
+                        <p class="text-gray-600 text-sm">整改验收、恢复营业、跟踪检查、案件结案</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 证据类型说明 -->
+        <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">📎 证据类型说明</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="border rounded-lg p-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-image text-blue-500 text-xl mr-2"></i>
+                        <h3 class="font-semibold">图片证据</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">现场照片、医疗报告、诊断证明、资质证书、处罚决定书等</p>
+                </div>
+                
+                <div class="border rounded-lg p-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-video text-green-500 text-xl mr-2"></i>
+                        <h3 class="font-semibold">视频证据</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">后厨监控录像、现场执法视频、约谈视频、整改前后对比视频</p>
+                </div>
+                
+                <div class="border rounded-lg p-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-file-alt text-yellow-500 text-xl mr-2"></i>
+                        <h3 class="font-semibold">书面材料</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">检查报告、询问笔录、投诉记录、检测报告、处罚决定书、结案报告</p>
+                </div>
+                
+                <div class="border rounded-lg p-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-user-check text-purple-500 text-xl mr-2"></i>
+                        <h3 class="font-semibold">证人证言</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">顾客证言、厨师询问笔录、负责人约谈记录、赔偿协商记录</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 下载按钮 -->
+        <div class="bg-white rounded-xl shadow-md p-8 text-center">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">📥 使用案例</h2>
+            
+            <p class="text-gray-600 mb-6">下载以下JSON文件，导入到时间线工具中即可查看完整案例</p>
+            
+            <a href="./case-30-events.json" download class="inline-block px-8 py-4 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition">
+                <i class="fas fa-download mr-2"></i>下载案例数据 (JSON)
+            </a>
+            
+            <div class="mt-6 text-sm text-gray-500">
+                <p>导入方法：打开时间线工具 → 点击"导入数据" → 选择下载的JSON文件</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-100 border-t mt-12">
+        <div class="max-w-4xl mx-auto px-4 py-6 text-center text-gray-600">
+            <p>事件时间线 & 证据整理工具 | 示例案例</p>
+        </div>
+    </footer>
+</body>
+</html>
