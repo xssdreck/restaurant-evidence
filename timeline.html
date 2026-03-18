@@ -39,240 +39,438 @@
         .gh-nav {
             background: radial-gradient(1200px 320px at 20% -20%, #dc2626 0%, #991b1b 50%, #7f1d1d 100%);
         }
+        .login-box {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #dc2626;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <nav class="gh-nav text-white shadow-sm border-b sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center">
-                    <i class="fas fa-scale-balanced text-white text-2xl mr-3"></i>
-                    <h1 class="text-xl font-bold">事件时间线 & 证据整理</h1>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <a href="./index.html" class="px-4 py-2 text-white hover:text-gray-200 transition">
-                        <i class="fas fa-arrow-left mr-2"></i>返回首页
-                    </a>
-                    <button onclick="showImportExport()" class="px-4 py-2 text-white hover:text-gray-200 transition">
-                        <i class="fas fa-file-import mr-2"></i>导入/导出
-                    </button>
-                    <button onclick="generatePDF()" class="px-4 py-2 bg-white text-red-700 rounded-lg hover:bg-gray-100 transition shadow-md">
-                        <i class="fas fa-file-pdf mr-2"></i>导出PDF
-                    </button>
-                </div>
-            </div>
+    <!-- 加载中 -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="spinner"></div>
+            <p class="text-gray-600">正在检查登录状态...</p>
         </div>
-    </nav>
+    </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- 左侧：添加事件表单 -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-xl shadow-md p-6 sticky top-24">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-plus-circle text-red-600 mr-2"></i>
-                        添加事件
-                    </h2>
-                    
-                    <form id="eventForm" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">日期时间</label>
-                            <input type="datetime-local" id="eventDate" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">事件标题</label>
-                            <input type="text" id="eventTitle" placeholder="简要描述事件" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">详细描述</label>
-                            <textarea id="eventDesc" rows="4" placeholder="详细描述事件经过..."
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"></textarea>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-paperclip mr-1"></i>证据附件
-                            </label>
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-red-500 transition cursor-pointer"
-                                 onclick="document.getElementById('evidenceFiles').click()">
-                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                                <p class="text-sm text-gray-600">点击上传图片或文件</p>
-                                <p class="text-xs text-gray-400 mt-1">支持 JPG, PNG, PDF, DOC 等</p>
-                            </div>
-                            <input type="file" id="evidenceFiles" multiple accept="image/*,.pdf,.doc,.docx,.txt"
-                                class="hidden" onchange="handleFileSelect(event)">
-                            <div id="fileList" class="mt-2 space-y-1"></div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-tag mr-1"></i>标签
-                            </label>
-                            <div class="flex flex-wrap gap-2">
-                                <button type="button" onclick="toggleTag(this, '关键证据')" 
-                                    class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-600 transition">关键证据</button>
-                                <button type="button" onclick="toggleTag(this, '证人证言')" 
-                                    class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-600 transition">证人证言</button>
-                                <button type="button" onclick="toggleTag(this, '视频证据')" 
-                                    class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-600 transition">视频证据</button>
-                                <button type="button" onclick="toggleTag(this, '书面材料')" 
-                                    class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-600 transition">书面材料</button>
-                                <button type="button" onclick="toggleTag(this, '物证')" 
-                                    class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-600 transition">物证</button>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" 
-                            class="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition shadow-md">
-                            <i class="fas fa-save mr-2"></i>保存事件
-                        </button>
-                    </form>
-                    
-                    <div class="mt-6 pt-6 border-t border-gray-200">
-                        <h3 class="text-sm font-medium text-gray-700 mb-3">统计信息</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-red-50 rounded-lg p-3 text-center">
-                                <div class="text-2xl font-bold text-red-600" id="totalEvents">0</div>
-                                <div class="text-xs text-gray-600">事件总数</div>
-                            </div>
-                            <div class="bg-orange-50 rounded-lg p-3 text-center">
-                                <div class="text-2xl font-bold text-orange-600" id="totalEvidence">0</div>
-                                <div class="text-xs text-gray-600">证据数量</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 右侧：时间线展示 -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-xl shadow-md p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
-                    <div class="flex items-center space-x-4">
-                        <span class="text-sm font-medium text-gray-700">筛选：</span>
-                        <select id="filterTag" onchange="renderTimeline()" 
-                            class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500">
-                            <option value="">全部标签</option>
-                            <option value="关键证据">关键证据</option>
-                            <option value="证人证言">证人证言</option>
-                            <option value="视频证据">视频证据</option>
-                            <option value="书面材料">书面材料</option>
-                            <option value="物证">物证</option>
-                        </select>
-                        <input type="text" id="searchText" placeholder="搜索事件..." onkeyup="renderTimeline()"
-                            class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500">
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="clearAllData()" class="px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg text-sm transition">
-                            <i class="fas fa-trash-alt mr-1"></i>清空
-                        </button>
-                        <button onclick="sortEvents()" class="px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg text-sm transition">
-                            <i class="fas fa-sort mr-1"></i>排序
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="timelineContainer" class="relative">
-                    <div class="timeline-line"></div>
-                </div>
-                
-                <div id="emptyState" class="text-center py-16">
-                    <i class="fas fa-clipboard-list text-6xl text-gray-200 mb-4"></i>
-                    <h3 class="text-lg font-medium text-gray-600 mb-2">暂无事件记录</h3>
-                    <p class="text-gray-400">点击左侧表单添加第一个事件</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <footer class="text-center py-6 text-gray-500 text-sm border-t">
-        <p>事件时间线 & 证据整理工具 | <a href="./index.html" class="text-red-600 hover:underline">返回首页</a></p>
-    </footer>
-    
-    <!-- 图片预览 -->
-    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
-        <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300">
-            <i class="fas fa-times"></i>
-        </button>
-        <img id="modalImage" src="" alt="预览" class="max-w-full max-h-full rounded-lg shadow-2xl">
-    </div>
-    
-    <!-- 导入导出 -->
-    <div id="importExportModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full">
-            <div class="px-6 py-4 border-b">
-                <h3 class="text-lg font-semibold">导入/导出数据</h3>
-            </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">导出数据 (JSON)</label>
-                    <button onclick="exportData()" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                        <i class="fas fa-download mr-2"></i>下载数据文件
-                    </button>
-                </div>
-                <div class="border-t pt-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">导入数据</label>
-                    <input type="file" id="importFile" accept=".json" onchange="importData(event)"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                </div>
-            </div>
-            <div class="px-6 py-4 border-t bg-gray-50 rounded-b-xl text-right">
-                <button onclick="closeImportExport()" class="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg">关闭</button>
+    <!-- 未登录提示 -->
+    <div id="loginScreen" class="hidden min-h-screen bg-gray-50">
+        <div class="login-box">
+            <i class="fas fa-lock text-5xl text-red-600 mb-4"></i>
+            <h2 class="text-2xl font-bold mb-2">请先登录</h2>
+            <p class="text-gray-600 mb-6">事件时间线功能需要登录后才能使用，您的数据将安全保存在云端。</p>
+            <a href="./auth.html" class="inline-block px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition">
+                <i class="fas fa-sign-in-alt mr-2"></i>前往登录
+            </a>
+            <div class="mt-4">
+                <a href="./index.html" class="text-gray-500 hover:text-gray-700 text-sm">← 返回首页</a>
             </div>
         </div>
     </div>
 
+    <!-- 主应用界面 -->
+    <div id="appScreen" class="hidden">
+        <nav class="gh-nav text-white shadow-sm border-b sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16 items-center">
+                    <div class="flex items-center">
+                        <i class="fas fa-scale-balanced text-white text-2xl mr-3"></i>
+                        <h1 class="text-xl font-bold">事件时间线 & 证据整理</h1>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span id="userEmail" class="text-sm opacity-80 hidden md:inline"></span>
+                        <a href="./index.html" class="px-4 py-2 text-white hover:text-gray-200 transition">
+                            <i class="fas fa-arrow-left mr-2"></i>返回首页
+                        </a>
+                        <button onclick="showImportExport()" class="px-4 py-2 text-white hover:text-gray-200 transition">
+                            <i class="fas fa-file-import mr-2"></i>导入/导出
+                        </button>
+                        <button onclick="generatePDF()" class="px-4 py-2 bg-white text-red-700 rounded-lg hover:bg-gray-100 transition shadow-md">
+                            <i class="fas fa-file-pdf mr-2"></i>导出PDF
+                        </button>
+                        <button onclick="logout()" class="px-4 py-2 text-white hover:text-gray-200 transition" title="退出登录">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- 左侧：添加事件表单 -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl shadow-md p-6 sticky top-24">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-plus-circle text-red-600 mr-2"></i>
+                            添加事件
+                        </h2>
+                        
+                        <form id="eventForm" class="space-y-4">
+                            <input type="hidden" id="editingEventId">
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">日期时间 *</label>
+                                <input type="datetime-local" id="eventDate" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">事件标题 *</label>
+                                <input type="text" id="eventTitle" placeholder="简要描述事件" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">详细描述</label>
+                                <textarea id="eventDesc" rows="4" placeholder="详细描述事件经过..."
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    <i class="fas fa-paperclip mr-1"></i>证据附件
+                                </label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-red-500 transition cursor-pointer"
+                                     onclick="document.getElementById('evidenceFiles').click()">
+                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                    <p class="text-sm text-gray-600">点击上传图片或文件</p>
+                                    <p class="text-xs text-gray-400 mt-1">支持 JPG, PNG, PDF (最大 10MB)</p>
+                                </div>
+                                <input type="file" id="evidenceFiles" multiple accept="image/*,.pdf"
+                                    class="hidden" onchange="handleFileSelect(event)">
+                                <div id="fileList" class="mt-2 space-y-1"></div>
+                                <div id="uploadProgress" class="hidden mt-2">
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div id="uploadProgressBar" class="bg-red-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">正在上传...</p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    <i class="fas fa-tag mr-1"></i>标签
+                                </label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" onclick="toggleTag(this, '关键证据')" 
+                                        class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-600 transition">关键证据</button>
+                                    <button type="button" onclick="toggleTag(this, '证人证言')" 
+                                        class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-600 transition">证人证言</button>
+                                    <button type="button" onclick="toggleTag(this, '视频证据')" 
+                                        class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-600 transition">视频证据</button>
+                                    <button type="button" onclick="toggleTag(this, '书面材料')" 
+                                        class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-600 transition">书面材料</button>
+                                    <button type="button" onclick="toggleTag(this, '物证')" 
+                                        class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-600 transition">物证</button>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <button type="button" id="cancelEditBtn" onclick="cancelEdit()" 
+                                    class="hidden flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition">取消</button>
+                                <button type="submit" id="submitBtn"
+                                    class="flex-1 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition shadow-md">
+                                    <i class="fas fa-save mr-2"></i>保存事件
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <h3 class="text-sm font-medium text-gray-700 mb-3">统计信息</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-red-50 rounded-lg p-3 text-center">
+                                    <div class="text-2xl font-bold text-red-600" id="totalEvents">0</div>
+                                    <div class="text-xs text-gray-600">事件总数</div>
+                                </div>
+                                <div class="bg-orange-50 rounded-lg p-3 text-center">
+                                    <div class="text-2xl font-bold text-orange-600" id="totalEvidence">0</div>
+                                    <div class="text-xs text-gray-600">证据数量</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧：时间线展示 -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-md p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-sm font-medium text-gray-700">筛选：</span>
+                            <select id="filterTag" onchange="renderTimeline()" 
+                                class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500">
+                                <option value="">全部标签</option>
+                                <option value="关键证据">关键证据</option>
+                                <option value="证人证言">证人证言</option>
+                                <option value="视频证据">视频证据</option>
+                                <option value="书面材料">书面材料</option>
+                                <option value="物证">物证</option>
+                            </select>
+                            <input type="text" id="searchText" placeholder="搜索事件..." onkeyup="renderTimeline()"
+                                class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500">
+                        </div>
+                    </div>
+                    
+                    <div id="timelineContainer" class="relative">
+                        <div class="timeline-line"></div>
+                    </div>
+                    
+                    <div id="emptyState" class="text-center py-16">
+                        <i class="fas fa-clipboard-list text-6xl text-gray-200 mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-600 mb-2">暂无事件记录</h3>
+                        <p class="text-gray-400">点击左侧表单添加第一个事件</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="text-center py-6 text-gray-500 text-sm border-t">
+            <p>事件时间线 & 证据整理工具 | 数据云端存储 | <span id="footerUser"></span></p>
+        </footer>
+        
+        <!-- 图片预览 -->
+        <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
+            <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300">
+                <i class="fas fa-times"></i>
+            </button>
+            <img id="modalImage" src="" alt="预览" class="max-w-full max-h-full rounded-lg shadow-2xl">
+        </div>
+        
+        <!-- 导入导出 -->
+        <div id="importExportModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full">
+                <div class="px-6 py-4 border-b">
+                    <h3 class="text-lg font-semibold">导入/导出数据</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">导出数据 (JSON)</label>
+                        <button onclick="exportData()" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-download mr-2"></i>下载数据文件
+                        </button>
+                    </div>
+                    <div class="border-t pt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">导入数据</label>
+                        <input type="file" id="importFile" accept=".json" onchange="importData(event)"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                    </div>
+                </div>
+                <div class="px-6 py-4 border-t bg-gray-50 rounded-b-xl text-right">
+                    <button onclick="closeImportExport()" class="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./supabase-config.js"></script>
+    
     <script>
-        let events = JSON.parse(localStorage.getItem('timelineEvents') || '[]');
+        // 全局变量
+        let sb = null;
+        let currentUser = null;
+        let events = [];
         let currentFiles = [];
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            renderTimeline();
-            updateStats();
+        let existingEvidence = []; // 编辑时保留的已有证据
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', async function() {
+            sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+            
+            // 检查登录状态
+            const { data: { user } } = await sb.auth.getUser();
+            
+            if (!user) {
+                // 未登录
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                return;
+            }
+            
+            // 已登录
+            currentUser = user;
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('footerUser').textContent = '当前用户：' + user.email;
+            
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+            
+            // 加载数据
+            await loadEvents();
+            
+            // 绑定表单提交
+            document.getElementById('eventForm').addEventListener('submit', handleSubmit);
         });
-        
-        document.getElementById('eventForm').addEventListener('submit', function(e) {
+
+        // 加载事件列表
+        async function loadEvents() {
+            try {
+                const { data, error } = await sb
+                    .from('timeline_events')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('event_date', { ascending: true });
+                
+                if (error) throw error;
+                
+                events = data || [];
+                renderTimeline();
+                updateStats();
+            } catch (err) {
+                showToast('加载数据失败: ' + err.message, 'error');
+            }
+        }
+
+        // 处理表单提交
+        async function handleSubmit(e) {
             e.preventDefault();
-            addEvent();
-        });
-        
-        function addEvent() {
+            
+            const editingId = document.getElementById('editingEventId').value;
             const date = document.getElementById('eventDate').value;
-            const title = document.getElementById('eventTitle').value;
-            const desc = document.getElementById('eventDesc').value;
+            const title = document.getElementById('eventTitle').value.trim();
+            const desc = document.getElementById('eventDesc').value.trim();
             const tags = Array.from(document.querySelectorAll('.tag-btn.active')).map(btn => btn.textContent.trim());
             
-            const event = {
-                id: Date.now(),
-                date: date,
-                title: title,
-                description: desc,
-                tags: tags,
-                evidence: currentFiles,
-                createdAt: new Date().toISOString()
-            };
+            if (!date || !title) {
+                showToast('请填写日期和标题', 'error');
+                return;
+            }
             
-            events.push(event);
-            events.sort((a, b) => new Date(a.date) - new Date(b.date));
+            // 显示上传进度
+            const progressDiv = document.getElementById('uploadProgress');
+            const progressBar = document.getElementById('uploadProgressBar');
+            progressDiv.classList.remove('hidden');
+            progressBar.style.width = '0%';
             
-            saveData();
-            renderTimeline();
-            updateStats();
-            
-            document.getElementById('eventForm').reset();
-            currentFiles = [];
-            document.getElementById('fileList').innerHTML = '';
-            document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active', 'bg-red-100', 'border-red-500', 'text-red-600'));
-            
-            showToast('事件已添加成功', 'success');
+            try {
+                // 上传新文件到Storage
+                const uploadedEvidence = [...existingEvidence];
+                
+                for (let i = 0; i < currentFiles.length; i++) {
+                    const file = currentFiles[i];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${currentUser.id}/${Date.now()}_${i}.${fileExt}`;
+                    
+                    progressBar.style.width = `${(i / currentFiles.length) * 50}%`;
+                    
+                    // 如果是base64图片，需要转换为blob
+                    let fileData = file.data;
+                    if (fileData.startsWith('data:')) {
+                        const response = await fetch(fileData);
+                        fileData = await response.blob();
+                    }
+                    
+                    const { data: uploadData, error: uploadError } = await sb.storage
+                        .from('timeline-evidence')
+                        .upload(fileName, fileData, {
+                            contentType: file.type,
+                            upsert: false
+                        });
+                    
+                    if (uploadError) throw uploadError;
+                    
+                    // 获取公开URL
+                    const { data: { publicUrl } } = sb.storage
+                        .from('timeline-evidence')
+                        .getPublicUrl(fileName);
+                    
+                    uploadedEvidence.push({
+                        name: file.name,
+                        type: file.type,
+                        url: publicUrl,
+                        path: fileName
+                    });
+                    
+                    progressBar.style.width = `${50 + ((i + 1) / currentFiles.length) * 50}%`;
+                }
+                
+                // 保存事件数据
+                const eventData = {
+                    user_id: currentUser.id,
+                    user_email: currentUser.email,
+                    title: title,
+                    description: desc,
+                    event_date: new Date(date).toISOString(),
+                    tags: tags,
+                    evidence: uploadedEvidence
+                };
+                
+                if (editingId) {
+                    // 更新
+                    const { error } = await sb
+                        .from('timeline_events')
+                        .update(eventData)
+                        .eq('id', editingId)
+                        .eq('user_id', currentUser.id);
+                    
+                    if (error) throw error;
+                    showToast('事件已更新', 'success');
+                } else {
+                    // 新建
+                    const { error } = await sb
+                        .from('timeline_events')
+                        .insert(eventData);
+                    
+                    if (error) throw error;
+                    showToast('事件已添加', 'success');
+                }
+                
+                // 重置表单
+                resetForm();
+                
+                // 重新加载数据
+                await loadEvents();
+                
+            } catch (err) {
+                showToast('保存失败: ' + err.message, 'error');
+            } finally {
+                progressDiv.classList.add('hidden');
+                progressBar.style.width = '0%';
+            }
         }
-        
+
+        // 重置表单
+        function resetForm() {
+            document.getElementById('eventForm').reset();
+            document.getElementById('editingEventId').value = '';
+            currentFiles = [];
+            existingEvidence = [];
+            document.getElementById('fileList').innerHTML = '';
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-red-100', 'border-red-500', 'text-red-600');
+            });
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save mr-2"></i>保存事件';
+        }
+
+        // 处理文件选择
         function handleFileSelect(event) {
             const files = Array.from(event.target.files);
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            
             files.forEach(file => {
+                if (file.size > maxSize) {
+                    showToast(`文件 ${file.name} 超过10MB限制`, 'error');
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     currentFiles.push({
@@ -285,52 +483,87 @@
                 };
                 reader.readAsDataURL(file);
             });
+            
+            // 清空input，允许重复选择相同文件
+            event.target.value = '';
         }
-        
+
+        // 渲染文件列表
         function renderFileList() {
             const container = document.getElementById('fileList');
-            container.innerHTML = currentFiles.map((file, index) => `
+            let html = '';
+            
+            // 显示已有证据（编辑模式）
+            existingEvidence.forEach((file, index) => {
+                html += `
+                    <div class="flex items-center justify-between bg-green-50 px-3 py-2 rounded-lg text-sm border border-green-200">
+                        <div class="flex items-center overflow-hidden">
+                            <i class="fas ${getFileIcon(file.type)} text-green-600 mr-2"></i>
+                            <span class="truncate">${file.name} (已上传)</span>
+                        </div>
+                        <button onclick="removeExistingEvidence(${index})" class="text-red-500 hover:text-red-700 ml-2">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            // 显示待上传文件
+            html += currentFiles.map((file, index) => `
                 <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg text-sm">
                     <div class="flex items-center overflow-hidden">
                         <i class="fas ${getFileIcon(file.type)} text-gray-500 mr-2"></i>
-                        <span class="truncate">${file.name}</span>
+                        <span class="truncate">${file.name} (待上传)</span>
                     </div>
                     <button onclick="removeFile(${index})" class="text-red-500 hover:text-red-700 ml-2">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
             `).join('');
+            
+            container.innerHTML = html;
         }
-        
+
+        // 获取文件图标
         function getFileIcon(type) {
+            if (!type) return 'fa-file';
             if (type.startsWith('image/')) return 'fa-image';
             if (type.includes('pdf')) return 'fa-file-pdf';
-            if (type.includes('word') || type.includes('document')) return 'fa-file-word';
             return 'fa-file';
         }
-        
+
+        // 删除待上传文件
         function removeFile(index) {
             currentFiles.splice(index, 1);
             renderFileList();
         }
-        
+
+        // 删除已有证据
+        function removeExistingEvidence(index) {
+            if (!confirm('确定要删除这个证据文件吗？')) return;
+            existingEvidence.splice(index, 1);
+            renderFileList();
+        }
+
+        // 切换标签
         function toggleTag(btn, tag) {
             btn.classList.toggle('active');
             btn.classList.toggle('bg-red-100');
             btn.classList.toggle('border-red-500');
             btn.classList.toggle('text-red-600');
         }
-        
+
+        // 渲染时间线
         function renderTimeline() {
             const container = document.getElementById('timelineContainer');
             const filterTag = document.getElementById('filterTag').value;
             const searchText = document.getElementById('searchText').value.toLowerCase();
             
             let filteredEvents = events.filter(event => {
-                const matchTag = !filterTag || event.tags.includes(filterTag);
+                const matchTag = !filterTag || (event.tags && event.tags.includes(filterTag));
                 const matchSearch = !searchText || 
-                    event.title.toLowerCase().includes(searchText) || 
-                    event.description.toLowerCase().includes(searchText);
+                    (event.title && event.title.toLowerCase().includes(searchText)) || 
+                    (event.description && event.description.toLowerCase().includes(searchText));
                 return matchTag && matchSearch;
             });
             
@@ -343,7 +576,9 @@
             document.getElementById('emptyState').style.display = 'none';
             
             container.innerHTML = '<div class="timeline-line"></div>' + 
-                filteredEvents.map((event, index) => `
+                filteredEvents.map((event, index) => {
+                    const evidence = event.evidence || [];
+                    return `
                     <div class="relative pl-16 pb-8">
                         <div class="timeline-dot" style="top: 8px;"></div>
                         <div class="evidence-card bg-white rounded-xl shadow-md p-6">
@@ -351,15 +586,15 @@
                                 <div>
                                     <span class="text-sm text-red-600 font-medium">
                                         <i class="far fa-clock mr-1"></i>
-                                        ${formatDate(event.date)}
+                                        ${formatDate(event.event_date)}
                                     </span>
                                     <h3 class="text-lg font-semibold text-gray-900 mt-1">${escapeHtml(event.title)}</h3>
                                 </div>
                                 <div class="flex space-x-2">
-                                    <button onclick="editEvent(${event.id})" class="text-gray-400 hover:text-red-600 transition">
+                                    <button onclick="editEvent('${event.id}')" class="text-gray-400 hover:text-red-600 transition" title="编辑">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button onclick="deleteEvent(${event.id})" class="text-gray-400 hover:text-red-600 transition">
+                                    <button onclick="deleteEvent('${event.id}')" class="text-gray-400 hover:text-red-600 transition" title="删除">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
@@ -367,7 +602,7 @@
                             
                             ${event.description ? `<p class="text-gray-600 mb-4 whitespace-pre-wrap">${escapeHtml(event.description)}</p>` : ''}
                             
-                            ${event.tags.length > 0 ? `
+                            ${event.tags && event.tags.length > 0 ? `
                                 <div class="flex flex-wrap gap-2 mb-4">
                                     ${event.tags.map(tag => `
                                         <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">${tag}</span>
@@ -375,16 +610,16 @@
                                 </div>
                             ` : ''}
                             
-                            ${event.evidence.length > 0 ? `
+                            ${evidence.length > 0 ? `
                                 <div class="border-t pt-4">
                                     <p class="text-sm font-medium text-gray-700 mb-2">
-                                        <i class="fas fa-paperclip mr-1"></i>证据附件 (${event.evidence.length})
+                                        <i class="fas fa-paperclip mr-1"></i>证据附件 (${evidence.length})
                                     </p>
                                     <div class="grid grid-cols-4 gap-2">
-                                        ${event.evidence.map((file, fileIndex) => `
-                                            <div class="relative group cursor-pointer" onclick="previewFile('${file.data}', '${file.type}')">
-                                                ${file.type.startsWith('image/') ? `
-                                                    <img src="${file.data}" alt="${file.name}" 
+                                        ${evidence.map((file) => `
+                                            <div class="relative group cursor-pointer" onclick="previewFile('${file.url || file.data}', '${file.type}')">
+                                                ${file.type && file.type.startsWith('image/') ? `
+                                                    <img src="${file.url || file.data}" alt="${file.name}" 
                                                         class="w-full h-20 object-cover rounded-lg border hover:border-red-500 transition">
                                                 ` : `
                                                     <div class="w-full h-20 bg-gray-100 rounded-lg border flex flex-col items-center justify-center hover:border-red-500 transition">
@@ -399,65 +634,129 @@
                             ` : ''}
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
         }
-        
+
+        // 格式化日期
         function formatDate(dateStr) {
+            if (!dateStr) return '';
             const date = new Date(dateStr);
             return date.toLocaleDateString('zh-CN', { 
                 year: 'numeric', month: 'long', day: 'numeric', 
                 hour: '2-digit', minute: '2-digit', weekday: 'long' 
             });
         }
-        
+
+        // 转义HTML
         function escapeHtml(text) {
+            if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-        
-        function editEvent(id) {
+
+        // 编辑事件
+        async function editEvent(id) {
             const event = events.find(e => e.id === id);
             if (!event) return;
             
-            document.getElementById('eventDate').value = event.date;
+            // 填充表单
+            document.getElementById('editingEventId').value = event.id;
+            
+            // 格式化日期时间用于input
+            const eventDate = new Date(event.event_date);
+            const dateStr = eventDate.toISOString().slice(0, 16);
+            document.getElementById('eventDate').value = dateStr;
+            
             document.getElementById('eventTitle').value = event.title;
-            document.getElementById('eventDesc').value = event.description;
-            currentFiles = [...event.evidence];
+            document.getElementById('eventDesc').value = event.description || '';
+            
+            // 设置标签
+            existingEvidence = event.evidence || [];
+            currentFiles = [];
             renderFileList();
             
             document.querySelectorAll('.tag-btn').forEach(btn => {
-                if (event.tags.includes(btn.textContent.trim())) {
+                btn.classList.remove('active', 'bg-red-100', 'border-red-500', 'text-red-600');
+                if (event.tags && event.tags.includes(btn.textContent.trim())) {
                     btn.classList.add('active', 'bg-red-100', 'border-red-500', 'text-red-600');
                 }
             });
             
-            deleteEvent(id, false);
+            // 显示取消按钮，修改保存按钮文字
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save mr-2"></i>更新事件';
+            
+            // 滚动到顶部
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        
-        function deleteEvent(id, confirm = true) {
-            if (confirm && !window.confirm('确定要删除这个事件吗？')) return;
-            events = events.filter(e => e.id !== id);
-            saveData();
-            renderTimeline();
-            updateStats();
-            if (confirm) showToast('事件已删除', 'info');
+
+        // 取消编辑
+        function cancelEdit() {
+            resetForm();
         }
-        
-        function previewFile(data, type) {
-            if (type.startsWith('image/')) {
-                document.getElementById('modalImage').src = data;
-                document.getElementById('imageModal').classList.remove('hidden');
-            } else {
-                window.open(data, '_blank');
+
+        // 删除事件
+        async function deleteEvent(id) {
+            if (!confirm('确定要删除这个事件吗？相关的证据文件也会被删除。')) return;
+            
+            try {
+                // 先删除关联的文件
+                const event = events.find(e => e.id === id);
+                if (event && event.evidence) {
+                    for (const file of event.evidence) {
+                        if (file.path) {
+                            await sb.storage.from('timeline-evidence').remove([file.path]);
+                        }
+                    }
+                }
+                
+                // 删除事件记录
+                const { error } = await sb
+                    .from('timeline_events')
+                    .delete()
+                    .eq('id', id)
+                    .eq('user_id', currentUser.id);
+                
+                if (error) throw error;
+                
+                showToast('事件已删除', 'success');
+                await loadEvents();
+            } catch (err) {
+                showToast('删除失败: ' + err.message, 'error');
             }
         }
-        
+
+        // 预览文件
+        function previewFile(url, type) {
+            if (!url) return;
+            if (type && type.startsWith('image/')) {
+                document.getElementById('modalImage').src = url;
+                document.getElementById('imageModal').classList.remove('hidden');
+            } else {
+                window.open(url, '_blank');
+            }
+        }
+
+        // 关闭图片预览
         function closeImageModal() {
             document.getElementById('imageModal').classList.add('hidden');
         }
-        
+
+        // 更新统计
+        function updateStats() {
+            document.getElementById('totalEvents').textContent = events.length;
+            const totalEvidence = events.reduce((sum, e) => sum + (e.evidence && e.evidence.length ? e.evidence.length : 0), 0);
+            document.getElementById('totalEvidence').textContent = totalEvidence;
+        }
+
+        // 退出登录
+        async function logout() {
+            await sb.auth.signOut();
+            window.location.reload();
+        }
+
+        // 生成PDF
         async function generatePDF() {
             if (events.length === 0) {
                 showToast('没有可导出的事件', 'error');
@@ -484,31 +783,39 @@
                     <div style="text-align:center;margin-bottom:30px;padding-bottom:20px;border-bottom:2px solid #dc2626;">
                         <h1 style="font-size:28px;margin:0 0 15px 0;font-weight:700;color:#dc2626;">事件时间线及证据清单</h1>
                         <p style="font-size:14px;color:#333;margin:0;"><strong>生成日期：</strong>${new Date().toLocaleDateString('zh-CN')}</p>
+                        <p style="font-size:12px;color:#666;margin:5px 0 0 0;">制作者：${currentUser.email}</p>
                     </div>
-                    ${events.map((event, i) => `
+                    ${events.map((event, i) => {
+                        const evidence = event.evidence || [];
+                        return `
                         <div style="margin-bottom:25px;padding-bottom:20px;border-bottom:1px solid #ccc;">
                             <div style="font-size:18px;font-weight:700;margin-bottom:10px;color:#000;">${i+1}. ${event.title}</div>
-                            <div style="font-size:14px;color:#dc2626;margin-bottom:8px;"><strong>时间：</strong>${formatDate(event.date)}</div>
+                            <div style="font-size:14px;color:#dc2626;margin-bottom:8px;"><strong>时间：</strong>${formatDate(event.event_date)}</div>
                             ${event.description ? `<div style="font-size:14px;margin-bottom:8px;white-space:pre-wrap;"><strong>详情：</strong>${event.description}</div>` : ''}
-                            ${event.tags.length ? `<div style="font-size:13px;margin-bottom:8px;"><strong>标签：</strong>${event.tags.join('、')}</div>` : ''}
-                            ${event.evidence.length ? `
+                            ${event.tags && event.tags.length ? `<div style="font-size:13px;margin-bottom:8px;"><strong>标签：</strong>${event.tags.join('、')}</div>` : ''}
+                            ${evidence.length ? `
                                 <div style="margin-top:15px;">
-                                    <div style="font-size:14px;font-weight:700;margin-bottom:10px;">证据附件（${event.evidence.length}个）</div>
+                                    <div style="font-size:14px;font-weight:700;margin-bottom:10px;">证据附件（${evidence.length}个）</div>
                                     <div style="display:flex;flex-wrap:wrap;gap:15px;">
-                                        ${event.evidence.map(f => `
+                                        ${evidence.map(f => `
                                             <div style="border:1px solid #999;padding:8px;text-align:center;max-width:200px;">
-                                                ${f.type.startsWith('image/') ? `<img src="${f.data}" style="max-width:180px;max-height:120px;object-fit:contain;display:block;">` : '<div style="font-size:32px;padding:20px;">📄</div>'}
+                                                ${f.type && f.type.startsWith('image/') ? `
+                                                    <img src="${f.url || f.data}" style="max-width:180px;max-height:120px;object-fit:contain;display:block;"
+                                                    onerror="this.style.display='none';this.nextElementSibling.style.display='block';"
+                                                    >
+                                                    <div style="display:none;font-size:32px;padding:20px;">🖼️</div>
+                                                ` : '<div style="font-size:32px;padding:20px;">📄</div>'}
                                                 <div style="font-size:11px;margin-top:5px;word-break:break-all;">${f.name}</div>
                                             </div>
                                         `).join('')}
                                     </div>
                                 </div>
                             ` : ''}
-                        </div>
-                    `).join('')}
+                        </div>`;
+                    }).join('')}
                     <div style="margin-top:40px;padding-top:20px;border-top:2px solid #dc2626;font-size:12px;color:#666;">
                         <p><strong>声明：</strong>本文件由事件时间线系统生成，仅供法律参考使用。</p>
-                        <p>共计 ${events.length} 个事件，${events.reduce((s,e)=>s+e.evidence.length,0)} 个证据附件。</p>
+                        <p>共计 ${events.length} 个事件，${events.reduce((s,e)=>s+(e.evidence?e.evidence.length:0),0)} 个证据附件。</p>
                     </div>
                 </div>
             `;
@@ -549,40 +856,16 @@
                 printContainer.remove();
             }
         }
-        
-        function updateStats() {
-            document.getElementById('totalEvents').textContent = events.length;
-            document.getElementById('totalEvidence').textContent = events.reduce((sum, e) => sum + e.evidence.length, 0);
-        }
-        
-        function saveData() {
-            localStorage.setItem('timelineEvents', JSON.stringify(events));
-        }
-        
-        function clearAllData() {
-            if (!window.confirm('确定要清空所有事件吗？此操作不可恢复。')) return;
-            events = [];
-            saveData();
-            renderTimeline();
-            updateStats();
-            showToast('所有数据已清空', 'info');
-        }
-        
-        function sortEvents() {
-            events.reverse();
-            saveData();
-            renderTimeline();
-            showToast('时间线已倒序排列', 'success');
-        }
-        
+
+        // 导入导出功能
         function showImportExport() {
             document.getElementById('importExportModal').classList.remove('hidden');
         }
-        
+
         function closeImportExport() {
             document.getElementById('importExportModal').classList.add('hidden');
         }
-        
+
         function exportData() {
             const dataStr = JSON.stringify(events, null, 2);
             const blob = new Blob([dataStr], { type: 'application/json' });
@@ -594,29 +877,44 @@
             URL.revokeObjectURL(url);
             showToast('数据导出成功', 'success');
         }
-        
-        function importData(event) {
+
+        async function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
+            
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) {
-                        events = imported;
-                        saveData();
-                        renderTimeline();
-                        updateStats();
-                        showToast('数据导入成功', 'success');
-                        closeImportExport();
-                    } else throw new Error('格式错误');
+                    if (!Array.isArray(imported)) throw new Error('格式错误');
+                    
+                    // 导入到数据库
+                    for (const item of imported) {
+                        const eventData = {
+                            user_id: currentUser.id,
+                            user_email: currentUser.email,
+                            title: item.title,
+                            description: item.description || '',
+                            event_date: item.date || item.event_date || new Date().toISOString(),
+                            tags: item.tags || [],
+                            evidence: item.evidence || []
+                        };
+                        
+                        const { error } = await sb.from('timeline_events').insert(eventData);
+                        if (error) throw error;
+                    }
+                    
+                    showToast(`成功导入 ${imported.length} 个事件`, 'success');
+                    closeImportExport();
+                    await loadEvents();
                 } catch (err) {
                     showToast('导入失败: ' + err.message, 'error');
                 }
             };
             reader.readAsText(file);
         }
-        
+
+        // Toast提示
         function showToast(message, type = 'info') {
             const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500' };
             const toast = document.createElement('div');
@@ -625,7 +923,8 @@
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
-        
+
+        // 键盘快捷键
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeImageModal();
