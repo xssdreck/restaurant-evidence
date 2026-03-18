@@ -5,40 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>事件时间线 & 证据整理</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
         body { font-family: 'Noto Sans SC', sans-serif; }
-        .timeline-line {
-            position: absolute;
-            left: 24px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: linear-gradient(to bottom, #dc2626, #991b1b);
-        }
-        .timeline-dot {
-            position: absolute;
-            left: 16px;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: white;
-            border: 3px solid #dc2626;
-            z-index: 10;
-        }
-        .evidence-card {
-            transition: all 0.3s ease;
-        }
-        .evidence-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        }
-        .gh-nav {
-            background: radial-gradient(1200px 320px at 20% -20%, #dc2626 0%, #991b1b 50%, #7f1d1d 100%);
-        }
+        .timeline-line { position: absolute; left: 24px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, #dc2626, #991b1b); }
+        .timeline-dot { position: absolute; left: 16px; width: 18px; height: 18px; border-radius: 50%; background: white; border: 3px solid #dc2626; z-index: 10; }
+        .evidence-card { transition: all 0.3s ease; }
+        .evidence-card:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .gh-nav { background: radial-gradient(1200px 320px at 20% -20%, #dc2626 0%, #991b1b 50%, #7f1d1d 100%); }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -50,15 +25,11 @@
                     <h1 class="text-xl font-bold">事件时间线 & 证据整理</h1>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <a href="./index.html" class="px-4 py-2 text-white hover:text-gray-200 transition">
-                        <i class="fas fa-arrow-left mr-2"></i>返回首页
-                    </a>
-                    <button onclick="showImportExport()" class="px-4 py-2 text-white hover:text-gray-200 transition">
-                        <i class="fas fa-file-import mr-2"></i>导入/导出
-                    </button>
-                    <button onclick="generatePDF()" class="px-4 py-2 bg-white text-red-700 rounded-lg hover:bg-gray-100 transition shadow-md">
-                        <i class="fas fa-file-pdf mr-2"></i>导出PDF
-                    </button>
+                    <a href="./index.html" class="px-4 py-2 text-white hover:text-gray-200 transition"><i class="fas fa-arrow-left mr-2"></i>返回首页</a>
+                    <button onclick="exportData()" class="px-4 py-2 text-white hover:text-gray-200 transition"><i class="fas fa-download mr-2"></i>导出数据</button>
+                    <button onclick="document.getElementById('importFile').click()" class="px-4 py-2 text-white hover:text-gray-200 transition"><i class="fas fa-upload mr-2"></i>导入数据</button>
+                    <input type="file" id="importFile" accept=".json" onchange="importData(event)" class="hidden">
+                    <button onclick="generatePDF()" class="px-4 py-2 bg-white text-red-700 rounded-lg hover:bg-gray-100 transition shadow-md"><i class="fas fa-file-pdf mr-2"></i>导出PDF</button>
                 </div>
             </div>
         </div>
@@ -66,33 +37,26 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- 左侧：添加事件表单 -->
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-xl shadow-md p-6 sticky top-24">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <i class="fas fa-plus-circle text-red-600 mr-2"></i>
-                        添加事件
+                        <i class="fas fa-plus-circle text-red-600 mr-2"></i>添加事件
                     </h2>
                     
                     <form id="eventForm" class="space-y-4">
-                        <input type="hidden" id="editingEventId">
-                        
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">日期时间 *</label>
-                            <input type="datetime-local" id="eventDate" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                            <input type="datetime-local" id="eventDate" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">事件标题 *</label>
-                            <input type="text" id="eventTitle" placeholder="简要描述事件" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="eventTitle" placeholder="简要描述事件" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">详细描述</label>
-                            <textarea id="eventDesc" rows="4" placeholder="详细描述事件经过..."
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
+                            <textarea id="eventDesc" rows="4" placeholder="详细描述事件经过..." class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
                         </div>
                         
                         <div>
@@ -106,24 +70,19 @@
                             </div>
                         </div>
                         
-                        <button type="submit" class="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition">
-                            <i class="fas fa-save mr-2"></i>保存事件
-                        </button>
+                        <button type="submit" class="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition"><i class="fas fa-save mr-2"></i>保存事件</button>
                     </form>
                     
                     <div class="mt-6 pt-6 border-t">
                         <h3 class="text-sm font-medium text-gray-700 mb-3">统计信息</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-red-50 rounded-lg p-3 text-center">
-                                <div class="text-2xl font-bold text-red-600" id="totalEvents">0</div>
-                                <div class="text-xs text-gray-600">事件总数</div>
-                            </div>
+                        <div class="bg-red-50 rounded-lg p-3 text-center">
+                            <div class="text-2xl font-bold text-red-600" id="totalEvents">0</div>
+                            <div class="text-xs text-gray-600">事件总数</div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- 右侧：时间线展示 -->
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-xl shadow-md p-4 mb-6">
                     <div class="flex items-center space-x-4">
@@ -150,34 +109,9 @@
             </div>
         </div>
     </div>
-    
-    <!-- 导入导出模态框 -->
-    <div id="importExportModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full">
-            <div class="px-6 py-4 border-b">
-                <h3 class="text-lg font-semibold">导入/导出数据</h3>
-            </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">导出数据 (JSON)</label>
-                    <button onclick="exportData()" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                        <i class="fas fa-download mr-2"></i>下载数据文件
-                    </button>
-                </div>
-                <div class="border-t pt-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">导入数据</label>
-                    <input type="file" id="importFile" accept=".json" onchange="importData(event)" class="w-full px-3 py-2 border rounded-lg">
-                </div>
-            </div>
-            <div class="px-6 py-4 border-t bg-gray-50 rounded-b-xl text-right">
-                <button onclick="closeImportExport()" class="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg">关闭</button>
-            </div>
-        </div>
-    </div>
 
     <script>
         let events = JSON.parse(localStorage.getItem('timelineEvents') || '[]');
-        let currentFiles = [];
 
         document.addEventListener('DOMContentLoaded', function() {
             renderTimeline();
@@ -187,7 +121,6 @@
 
         function addEvent(e) {
             e.preventDefault();
-            
             const event = {
                 id: Date.now(),
                 date: document.getElementById('eventDate').value,
@@ -196,14 +129,11 @@
                 tags: Array.from(document.querySelectorAll('.tag-btn.active')).map(btn => btn.textContent.trim()),
                 createdAt: new Date().toISOString()
             };
-            
             events.push(event);
             events.sort((a, b) => new Date(a.date) - new Date(b.date));
-            
             localStorage.setItem('timelineEvents', JSON.stringify(events));
             renderTimeline();
             updateStats();
-            
             document.getElementById('eventForm').reset();
             document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active', 'bg-red-100', 'border-red-500', 'text-red-600'));
             showToast('事件已添加', 'success');
@@ -220,48 +150,33 @@
             const container = document.getElementById('timelineContainer');
             const filterTag = document.getElementById('filterTag').value;
             const searchText = document.getElementById('searchText').value.toLowerCase();
-            
             let filteredEvents = events.filter(event => {
                 const matchTag = !filterTag || event.tags.includes(filterTag);
-                const matchSearch = !searchText || 
-                    event.title.toLowerCase().includes(searchText) || 
-                    event.description.toLowerCase().includes(searchText);
+                const matchSearch = !searchText || event.title.toLowerCase().includes(searchText) || (event.description || '').toLowerCase().includes(searchText);
                 return matchTag && matchSearch;
             });
-            
             if (filteredEvents.length === 0) {
                 document.getElementById('emptyState').style.display = 'block';
                 container.innerHTML = '<div class="timeline-line"></div>';
                 return;
             }
-            
             document.getElementById('emptyState').style.display = 'none';
-            
-            container.innerHTML = '<div class="timeline-line"></div>' + 
-                filteredEvents.map((event, index) => `
-                    <div class="relative pl-16 pb-8">
-                        <div class="timeline-dot" style="top: 8px;"></div>
-                        <div class="evidence-card bg-white rounded-xl shadow-md p-6">
-                            <div class="flex justify-between items-start mb-3">
-                                <div>
-                                    <span class="text-sm text-red-600 font-medium">
-                                        <i class="far fa-clock mr-1"></i>${formatDate(event.date)}
-                                    </span>
-                                    <h3 class="text-lg font-semibold text-gray-900 mt-1">${event.title}</h3>
-                                </div>
-                                <div class="flex space-x-2">
-                                    <button onclick="deleteEvent(${event.id})" class="text-gray-400 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
-                                </div>
+            container.innerHTML = '<div class="timeline-line"></div>' + filteredEvents.map((event, index) => `
+                <div class="relative pl-16 pb-8">
+                    <div class="timeline-dot" style="top: 8px;"></div>
+                    <div class="evidence-card bg-white rounded-xl shadow-md p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="text-sm text-red-600 font-medium"><i class="far fa-clock mr-1"></i>${formatDate(event.date)}</span>
+                                <h3 class="text-lg font-semibold text-gray-900 mt-1">${event.title}</h3>
                             </div>
-                            <p class="text-gray-600 mb-4 whitespace-pre-wrap">${event.description || ''}</p>
-                            ${event.tags.length > 0 ? `
-                                <div class="flex flex-wrap gap-2">
-                                    ${event.tags.map(tag => `<span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">${tag}</span>`).join('')}
-                                </div>
-                            ` : ''}
+                            <button onclick="deleteEvent(${event.id})" class="text-gray-400 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
                         </div>
+                        <p class="text-gray-600 mb-4 whitespace-pre-wrap">${event.description || ''}</p>
+                        ${event.tags.length > 0 ? `<div class="flex flex-wrap gap-2">${event.tags.map(tag => `<span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">${tag}</span>`).join('')}</div>` : ''}
                     </div>
-                `).join('');
+                </div>
+            `).join('');
         }
 
         function formatDate(dateStr) {
@@ -282,21 +197,13 @@
             document.getElementById('totalEvents').textContent = events.length;
         }
 
-        function showImportExport() {
-            document.getElementById('importExportModal').classList.remove('hidden');
-        }
-
-        function closeImportExport() {
-            document.getElementById('importExportModal').classList.add('hidden');
-        }
-
         function exportData() {
             const dataStr = JSON.stringify(events, null, 2);
             const blob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `事件数据_${new Date().toISOString().split('T')[0]}.json`;
+            a.download = '事件数据_' + new Date().toISOString().split('T')[0] + '.json';
             a.click();
             URL.revokeObjectURL(url);
             showToast('数据导出成功', 'success');
@@ -305,7 +212,6 @@
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
@@ -316,7 +222,6 @@
                         renderTimeline();
                         updateStats();
                         showToast('数据导入成功', 'success');
-                        closeImportExport();
                     } else throw new Error('格式错误');
                 } catch (err) {
                     showToast('导入失败: ' + err.message, 'error');
@@ -325,58 +230,48 @@
             reader.readAsText(file);
         }
 
-        async function generatePDF() {
-            if (events.length === 0) {
-                showToast('没有可导出的事件', 'error');
-                return;
-            }
-            showToast('正在生成PDF...', 'info');
-            
+        function generatePDF() {
+            if (events.length === 0) { showToast('没有可导出的事件', 'error'); return; }
             const printWindow = window.open('', '_blank');
-            if (!printWindow) {
-                showToast('请允许弹出窗口', 'error');
-                return;
-            }
+            if (!printWindow) { showToast('请允许弹出窗口', 'error'); return; }
             
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html><head><meta charset="UTF-8">
-                <style>
-                    body { font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
-                    h1 { color: #dc2626; text-align: center; border-bottom: 2px solid #dc2626; padding-bottom: 10px; }
-                    .event { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-                    .title { font-size: 18px; font-weight: bold; color: #000; }
-                    .date { color: #dc2626; font-size: 14px; }
-                    .desc { color: #333; margin: 8px 0; white-space: pre-wrap; }
-                    .tags { color: #666; font-size: 12px; }
-                    .footer { margin-top: 30px; padding-top: 15px; border-top: 2px solid #dc2626; color: #999; text-align: center; font-size: 12px; }
-                </style></head><body>
-                    <h1>事件时间线及证据清单</h1>
-                    <p style="text-align:center;color:#666;">生成日期：${new Date().toLocaleDateString('zh-CN')}</p>
-                    ${events.map((e,i) => `
-                        <div class="event">
-                            <div class="title">${i+1}. ${e.title}</div>
-                            <div class="date">时间：${formatDate(e.date)}</div>
-                            ${e.description ? `<div class="desc">${e.description}</div>` : ''}
-                            ${e.tags.length ? `<div class="tags">标签：${e.tags.join('、')}</div>` : ''}
-                        </div>
-                    `).join('')}
-                    <div class="footer">
-                        <p>本文件由事件时间线系统生成</p>
-                        <p>共计 ${events.length} 个事件</p>
-                    </div>
-                    <script>window.onload=function(){setTimeout(function(){window.print()},500)};</script>
-                </body></html>
-            `);
+            let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>事件时间线</title>';
+            html += '<style>body{font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;padding:40px;max-width:800px;margin:0 auto}';
+            html += 'h1{color:#dc2626;text-align:center;border-bottom:2px solid #dc2626;padding-bottom:10px}';
+            html += '.event{margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:15px}';
+            html += '.title{font-size:18px;font-weight:bold;color:#000}';
+            html += '.date{color:#dc2626;font-size:14px}';
+            html += '.desc{color:#333;margin:8px 0;white-space:pre-wrap}';
+            html += '.tags{color:#666;font-size:12px}';
+            html += '.footer{margin-top:30px;padding-top:15px;border-top:2px solid #dc2626;color:#999;text-align:center;font-size:12px}';
+            html += '</style></head><body>';
+            html += '<h1>事件时间线及证据清单</h1>';
+            html += '<p style="text-align:center;color:#666">生成日期：' + new Date().toLocaleDateString('zh-CN') + '</p>';
+            
+            events.forEach((e, i) => {
+                html += '<div class="event">';
+                html += '<div class="title">' + (i + 1) + '. ' + e.title + '</div>';
+                html += '<div class="date">时间：' + formatDate(e.date) + '</div>';
+                if (e.description) html += '<div class="desc">' + e.description + '</div>';
+                if (e.tags.length) html += '<div class="tags">标签：' + e.tags.join('、') + '</div>';
+                html += '</div>';
+            });
+            
+            html += '<div class="footer"><p>本文件由事件时间线系统生成</p>';
+            html += '<p>共计 ' + events.length + ' 个事件</p></div>';
+            html += '<script>window.onload=function(){setTimeout(function(){window.print()},500)};</script>';
+            html += '</body></html>';
+            
+            printWindow.document.write(html);
             printWindow.document.close();
             showToast('PDF打印窗口已打开', 'success');
         }
 
-        function showToast(message, type = 'info') {
+        function showToast(message, type) {
             const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500' };
             const toast = document.createElement('div');
-            toast.className = `fixed bottom-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
-            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check' : type === 'error' ? 'fa-exclamation' : 'fa-info'} mr-2"></i>${message}`;
+            toast.className = 'fixed bottom-4 right-4 ' + colors[type] + ' text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            toast.textContent = message;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
