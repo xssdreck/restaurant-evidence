@@ -95,6 +95,17 @@
                                 </div>
                             </div>
                             
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fas fa-paperclip mr-1"></i>照片/视频证据</label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-red-500 transition cursor-pointer" onclick="document.getElementById('mediaFiles').click()">
+                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                    <p class="text-sm text-gray-600">点击上传照片或视频</p>
+                                    <p class="text-xs text-gray-400 mt-1">支持 JPG, PNG, MP4, MOV (最大 50MB)</p>
+                                </div>
+                                <input type="file" id="mediaFiles" multiple accept="image/*,video/*" class="hidden" onchange="handleMediaSelect(event)">
+                                <div id="mediaPreview" class="mt-2 grid grid-cols-3 gap-2"></div>
+                            </div>
+                            
                             <button type="submit" id="saveBtn" class="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition">
                                 <i class="fas fa-save mr-2"></i>保存事件
                             </button>
@@ -146,6 +157,8 @@
         var supabaseClient = null;
         var currentUser = null;
         var events = [];
+        var selectedFiles = []; // 存储选中的媒体文件
+        var uploadedMedia = []; // 存储已上传的媒体URL
         
         // 初始化
         document.addEventListener('DOMContentLoaded', async function() {
@@ -216,6 +229,108 @@
             }
         }
         
+        // 处理媒体文件选择
+        function handleMediaSelect(event) {
+            var files = Array.from(event.target.files);
+            var maxSize = 50 * 1024 * 1024; // 50MB
+            
+            files.forEach(function(file) {
+                if (file.size > maxSize) {
+                    showToast('文件 ' + file.name + ' 超过50MB限制', 'error');
+                    return;
+                }
+                
+                selectedFiles.push(file);
+                
+                // 创建预览
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var div = document.createElement('div');
+                    div.className = 'relative group';
+                    div.id = 'media-' + selectedFiles.length;
+                    
+                    if (file.type.startsWith('image/')) {
+                        div.innerHTML = '<img src="' + e.target.result + '" class="w-full h-20 object-cover rounded-lg border"><button type="button" onclick="removeMedia(' + (selectedFiles.length - 1) + ')" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>';
+                    } else {
+                        div.innerHTML = '<div class="w-full h-20 bg-gray-100 rounded-lg border flex flex-col items-center justify-center"><i class="fas fa-video text-2xl text-gray-400"></i><span class="text-xs text-gray-500 mt-1 truncate w-full text-center px-1">' + file.name + '</span></div><button type="button" onclick="removeMedia(' + (selectedFiles.length - 1) + ')" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>';
+                    }
+                    
+                    document.getElementById('mediaPreview').appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            event.target.value = '';
+        }
+        
+        // 移除媒体文件
+        function removeMedia(index) {
+            selectedFiles.splice(index, 1);
+            renderMediaPreview();
+        }
+        
+        // 重新渲染媒体预览
+        function renderMediaPreview() {
+            var container = document.getElementById('mediaPreview');
+            container.innerHTML = '';
+            
+            selectedFiles.forEach(function(file, index) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var div = document.createElement('div');
+                    div.className = 'relative group';
+                    
+                    if (file.type.startsWith('image/')) {
+                        div.innerHTML = '<img src="' + e.target.result + '" class="w-full h-20 object-cover rounded-lg border"><button type="button" onclick="removeMedia(' + index + ')" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>';
+                    } else {
+                        div.innerHTML = '<div class="w-full h-20 bg-gray-100 rounded-lg border flex flex-col items-center justify-center"><i class="fas fa-video text-2xl text-gray-400"></i><span class="text-xs text-gray-500 mt-1 truncate w-full text-center px-1">' + file.name + '</span></div><button type="button" onclick="removeMedia(' + index + ')" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>';
+                    }
+                    
+                    container.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // 上传媒体文件到 Supabase Storage
+        async function uploadMediaFiles() {
+            uploadedMedia = [];
+            
+            for (var i = 0; i < selectedFiles.length; i++) {
+                var file = selectedFiles[i];
+                var fileExt = file.name.split('.').pop();
+                var fileName = currentUser.id + '/' + Date.now() + '_' + i + '.' + fileExt;
+                
+                try {
+                    var result = await supabaseClient.storage
+                        .from('timeline-evidence')
+                        .upload(fileName, file, {
+                            contentType: file.type,
+                            upsert: false
+                        });
+                    
+                    if (result.error) throw result.error;
+                    
+                    // 获取公开URL
+                    var urlResult = supabaseClient.storage
+                        .from('timeline-evidence')
+                        .getPublicUrl(fileName);
+                    
+                    uploadedMedia.push({
+                        name: file.name,
+                        type: file.type,
+                        url: urlResult.data.publicUrl,
+                        path: fileName
+                    });
+                } catch (err) {
+                    console.error('上传失败:', err);
+                    showToast('上传文件失败: ' + file.name, 'error');
+                }
+            }
+            
+            return uploadedMedia;
+        }
+        
         // 保存事件
         async function saveEvent(e) {
             e.preventDefault();
@@ -240,6 +355,13 @@
                     evidence: []
                 };
                 
+                // 上传媒体文件
+                if (selectedFiles.length > 0) {
+                    showToast('正在上传 ' + selectedFiles.length + ' 个文件...', 'info');
+                    var uploadedFiles = await uploadMediaFiles();
+                    eventData.evidence = uploadedFiles;
+                }
+                
                 var result = await supabaseClient.from('timeline_events').insert(eventData);
                 if (result.error) throw result.error;
                 
@@ -248,6 +370,9 @@
                 document.querySelectorAll('.tag-btn').forEach(function(btn) {
                     btn.classList.remove('active', 'bg-red-100', 'border-red-500', 'text-red-600');
                 });
+                selectedFiles = [];
+                uploadedMedia = [];
+                document.getElementById('mediaPreview').innerHTML = '';
                 
                 showToast('事件已保存', 'success');
                 await loadEvents();
@@ -307,6 +432,22 @@
                     });
                     html += '</div>';
                 }
+                
+                // 显示媒体文件
+                if (event.evidence && event.evidence.length > 0) {
+                    html += '<div class="mt-4 pt-4 border-t">';
+                    html += '<p class="text-sm font-medium text-gray-700 mb-2"><i class="fas fa-paperclip mr-1"></i>附件 (' + event.evidence.length + ')</p>';
+                    html += '<div class="grid grid-cols-4 gap-2">';
+                    event.evidence.forEach(function(file) {
+                        if (file.type && file.type.startsWith('image/')) {
+                            html += '<a href="' + file.url + '" target="_blank" class="block"><img src="' + file.url + '" class="w-full h-20 object-cover rounded-lg border hover:border-red-500 transition"></a>';
+                        } else if (file.type && file.type.startsWith('video/')) {
+                            html += '<a href="' + file.url + '" target="_blank" class="block"><div class="w-full h-20 bg-gray-100 rounded-lg border flex flex-col items-center justify-center hover:border-red-500 transition"><i class="fas fa-video text-2xl text-gray-400"></i><span class="text-xs text-gray-500 mt-1 truncate w-full text-center px-1">' + escapeHtml(file.name) + '</span></div></a>';
+                        }
+                    });
+                    html += '</div></div>';
+                }
+                
                 html += '</div></div>';
             });
             container.innerHTML = html;
