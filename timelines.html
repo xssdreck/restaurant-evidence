@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间线管理系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; }
+        .timeline-line { position: absolute; left: 24px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, #dc2626, #991b1b); }
+        .timeline-dot { position: absolute; left: 16px; width: 18px; height: 18px; border-radius: 50%; background: white; border: 3px solid #dc2626; z-index: 10; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 加载界面 -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">正在加载...</p>
+        </div>
+    </div>
+
+    <!-- 未登录界面 -->
+    <div id="loginScreen" class="hidden min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+            <i class="fas fa-clock text-5xl text-red-600 mb-4"></i>
+            <h2 class="text-2xl font-bold mb-2">时间线管理系统</h2>
+            <p class="text-gray-600 mb-6">请登录以管理您的时间线</p>
+            <a href="./auth.html" class="inline-block px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition w-full">
+                <i class="fas fa-sign-in-alt mr-2"></i>前往登录
+            </a>
+            <div class="mt-4">
+                <a href="./index.html" class="text-gray-500 hover:text-gray-700 text-sm">← 返回首页</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主应用界面 -->
+    <div id="appScreen" class="hidden">
+        <nav class="bg-gradient-to-r from-red-700 to-red-900 text-white shadow-sm sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16 items-center">
+                    <div class="flex items-center">
+                        <i class="fas fa-clock text-white text-2xl mr-3"></i>
+                        <h1 class="text-xl font-bold" id="pageTitle">我的时间线</h1>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span id="userEmail" class="text-sm opacity-80 hidden sm:inline"></span>
+                        <button onclick="showTimelineList()" class="px-4 py-2 text-white hover:text-gray-200 transition">
+                            <i class="fas fa-list mr-1"></i>时间线列表
+                        </button>
+                        <button onclick="logout()" class="px-4 py-2 text-white hover:text-gray-200 transition">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <!-- 时间线列表视图 -->
+            <div id="timelineListView">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">我的时间线</h2>
+                    <button onclick="showCreateTimelineModal()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                        <i class="fas fa-plus mr-2"></i>创建时间线
+                    </button>
+                </div>
+                
+                <div id="timelineGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- 动态生成时间线卡片 -->
+                </div>
+                
+                <div id="emptyTimelineList" class="hidden text-center py-16">
+                    <i class="fas fa-folder-open text-6xl text-gray-200 mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-600 mb-2">暂无时间线</h3>
+                    <p class="text-gray-400 mb-4">点击上方按钮创建您的时间线</p>
+                </div>
+            </div>
+
+            <!-- 时间线详情视图 -->
+            <div id="timelineDetailView" class="hidden">
+                <!-- 时间线头部信息 -->
+                <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span id="currentTimelineCategory" class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"></span>
+                                <span id="currentTimelineStatus" class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"></span>
+                            </div>
+                            <h2 id="currentTimelineTitle" class="text-2xl font-bold text-gray-900"></h2>
+                            <p id="currentTimelineDesc" class="text-gray-600 mt-2"></p>
+                            
+                            <div class="flex items-center gap-4 mt-4 text-sm text-gray-500">
+                                <span><i class="fas fa-calendar mr-1"></i>创建: <span id="currentTimelineCreated"></span></span>
+                                <span><i class="fas fa-list mr-1"></i>事件: <span id="currentTimelineEventCount">0</span></span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <button onclick="showAddEventModal()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                                <i class="fas fa-plus mr-1"></i>添加事件
+                            </button>
+                            
+                            <button onclick="exportTimeline()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+                                <i class="fas fa-download mr-1"></i>导出
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 事件筛选 -->
+                <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <select id="eventFilterType" onchange="renderEvents()" class="px-3 py-2 border rounded-lg">
+                            <option value="">全部类型</option>
+                            <option value="关键证据">关键证据</option>
+                            <option value="证人证言">证人证言</option>
+                            <option value="视频证据">视频证据</option>
+                            <option value="书面材料">书面材料</option>
+                            <option value="物证">物证</option>
+                        </select>
+                        
+                        <select id="eventFilterImportance" onchange="renderEvents()" class="px-3 py-2 border rounded-lg">
+                            <option value="">全部重要性</option>
+                            <option value="critical">Critical</option>
+                            <option value="high">High</option>
+                            <option value="normal">Normal</option>
+                            <option value="low">Low</option>
+                        </select>
+                        
+                        <input type="text" id="eventSearchText" placeholder="搜索事件..." onkeyup="renderEvents()" class="px-3 py-2 border rounded-lg flex-1 min-w-[200px]">
+                    </div>
+                </div>
+
+                <!-- 事件列表 -->
+                <div id="eventsContainer" class="relative">
+                    <div class="timeline-line"></div>
+                </div>
+                
+                <div id="emptyEvents" class="hidden text-center py-16">
+                    <i class="fas fa-clipboard-list text-6xl text-gray-200 mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-600 mb-2">暂无事件</h3>
+                    <p class="text-gray-400">点击"添加事件"按钮创建第一个事件</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建时间线模态框 -->
+    <div id="createTimelineModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6">
+            <h3 class="text-xl font-bold mb-4">创建新时间线</h3>
+            
+            <form id="createTimelineForm" onsubmit="return createTimeline(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">时间线名称 *</label>
+                    <input type="text" id="newTimelineTitle" required class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <textarea id="newTimelineDesc" rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">分类</label>
+                    <select id="newTimelineCategory" class="w-full px-3 py-2 border rounded-lg">
+                        <option value="案件">案件</option>
+                        <option value="项目">项目</option>
+                        <option value="个人">个人</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('createTimelineModal')" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">创建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加事件模态框 -->
+    <div id="addEventModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4">添加事件</h3>
+            
+            <form id="addEventForm" onsubmit="return addEvent(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">事件标题 *</label>
+                    <input type="text" id="newEventTitle" required class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">日期时间 *</label>
+                    <input type="datetime-local" id="newEventDate" required class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <textarea id="newEventDesc" rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">地点</label>
+                    <input type="text" id="newEventLocation" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">重要性</label>
+                    <select id="newEventImportance" class="w-full px-3 py-2 border rounded-lg">
+                        <option value="low">低</option>
+                        <option value="normal" selected>普通</option>
+                        <option value="high">高</option>
+                        <option value="critical">关键</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">标签</label>
+                    <div class="flex flex-wrap gap-2" id="eventTagContainer">
+                        <button type="button" class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300">关键证据</button>
+                        <button type="button" class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300">证人证言</button>
+                        <button type="button" class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300">视频证据</button>
+                        <button type="button" class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300">书面材料</button>
+                        <button type="button" class="tag-btn px-3 py-1 text-xs rounded-full border border-gray-300">物证</button>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">照片/视频</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-red-500" onclick="document.getElementById('eventMediaFiles').click()">
+                        <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-600">点击上传</p>
+                    </div>
+                    <input type="file" id="eventMediaFiles" multiple accept="image/*,video/*" class="hidden" onchange="handleEventMediaSelect(event)">
+                    <div id="eventMediaPreview" class="mt-2 grid grid-cols-4 gap-2"></div>
+                </div>
+                
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('addEventModal')" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./supabase-config.js"></script>
+    
+    <script>
+        // 全局变量
+        var supabaseClient = null;
+        var currentUser = null;
+        var timelines = [];
+        var currentTimeline = null;
+        var events = [];
+        var selectedMediaFiles = [];
+        var uploadedMedia = [];
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                    showError('配置未加载');
+                    return;
+                }
+
+                supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+                
+                var result = await supabaseClient.auth.getUser();
+                var user = result.data.user;
+                
+                if (!user) {
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                    return;
+                }
+                
+                currentUser = user;
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('appScreen').classList.remove('hidden');
+                
+                // 加载时间线列表
+                await loadTimelines();
+                
+            } catch (err) {
+                console.error('初始化错误:', err);
+                showError(err.message);
+            }
+        });
+
+        // 加载时间线列表
+        async function loadTimelines() {
+            try {
+                var result = await supabaseClient
+                    .from('timelines')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+                
+                if (result.error) throw result.error;
+                
+                timelines = result.data || [];
+                renderTimelineList();
+                
+            } catch (err) {
+                console.error('加载时间线失败:', err);
+                alert('加载失败: ' + err.message);
+            }
+        }
+
+        // 渲染时间线列表
+        function renderTimelineList() {
+            var container = document.getElementById('timelineGrid');
+            var emptyView = document.getElementById('emptyTimelineList');
+            
+            if (timelines.length === 0) {
+                container.innerHTML = '';
+                emptyView.classList.remove('hidden');
+                return;
+            }
+            
+            emptyView.classList.add('hidden');
+            
+            container.innerHTML = timelines.map(function(tl) {
+                var categoryColors = {
+                    '案件': 'bg-red-100 text-red-700',
+                    '项目': 'bg-blue-100 text-blue-700',
+                    '个人': 'bg-green-100 text-green-700',
+                    '其他': 'bg-gray-100 text-gray-700'
+                };
+                var colorClass = categoryColors[tl.category] || categoryColors['其他'];
+                
+                return '<div class="bg-white rounded-xl shadow-md p-6 cursor-pointer hover:shadow-lg transition" onclick="openTimeline(\'' + tl.id + '\')">' +
+                    '<div class="flex justify-between items-start mb-3">' +
+                    '<span class="px-2 py-1 ' + colorClass + ' text-xs rounded-full">' + tl.category + '</span>' +
+                    '<button onclick="event.stopPropagation(); deleteTimeline(\'' + tl.id + '\')" class="text-gray-400 hover:text-red-600"><i class="fas fa-trash"></i></button>' +
+                    '</div>' +
+                    '<h3 class="text-lg font-bold text-gray-900 mb-2">' + escapeHtml(tl.title) + '</h3>' +
+                    '<p class="text-gray-600 text-sm mb-4 line-clamp-2">' + escapeHtml(tl.description || '') + '</p>' +
+                    '<div class="flex items-center justify-between text-sm text-gray-500">' +
+                    '<span><i class="fas fa-list mr-1"></i>' + (tl.event_count || 0) + ' 事件</span>' +
+                    '<span>' + formatDate(tl.created_at) + '</span>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        // 创建时间线
+        async function createTimeline(e) {
+            e.preventDefault();
+            
+            try {
+                var timelineData = {
+                    user_id: currentUser.id,
+                    user_email: currentUser.email,
+                    title: document.getElementById('newTimelineTitle').value,
+                    description: document.getElementById('newTimelineDesc').value,
+                    category: document.getElementById('newTimelineCategory').value
+                };
+                
+                var result = await supabaseClient.from('timelines').insert(timelineData).select();
+                if (result.error) throw result.error;
+                
+                closeModal('createTimelineModal');
+                document.getElementById('createTimelineForm').reset();
+                
+                await loadTimelines();
+                
+                // 自动打开新创建的时间线
+                if (result.data && result.data[0]) {
+                    openTimeline(result.data[0].id);
+                }
+                
+            } catch (err) {
+                alert('创建失败: ' + err.message);
+            }
+            
+            return false;
+        }
+
+        // 打开时间线详情
+        async function openTimeline(timelineId) {
+            currentTimeline = timelines.find(function(t) { return t.id === timelineId; });
+            if (!currentTimeline) return;
+            
+            // 更新UI
+            document.getElementById('timelineListView').classList.add('hidden');
+            document.getElementById('timelineDetailView').classList.remove('hidden');
+            document.getElementById('pageTitle').textContent = currentTimeline.title;
+            
+            document.getElementById('currentTimelineTitle').textContent = currentTimeline.title;
+            document.getElementById('currentTimelineDesc').textContent = currentTimeline.description || '';
+            document.getElementById('currentTimelineCategory').textContent = currentTimeline.category;
+            document.getElementById('currentTimelineStatus').textContent = currentTimeline.status;
+            document.getElementById('currentTimelineCreated').textContent = formatDate(currentTimeline.created_at);
+            document.getElementById('currentTimelineEventCount').textContent = currentTimeline.event_count || 0;
+            
+            // 加载事件
+            await loadEvents(timelineId);
+        }
+
+        // 返回时间线列表
+        function showTimelineList() {
+            document.getElementById('timelineDetailView').classList.add('hidden');
+            document.getElementById('timelineListView').classList.remove('hidden');
+            document.getElementById('pageTitle').textContent = '我的时间线';
+            currentTimeline = null;
+            loadTimelines();
+        }
+
+        // 加载事件
+        async function loadEvents(timelineId) {
+            try {
+                var result = await supabaseClient
+                    .from('timeline_events')
+                    .select('*')
+                    .eq('timeline_id', timelineId)
+                    .order('event_date', { ascending: true });
+                
+                if (result.error) throw result.error;
+                
+                events = result.data || [];
+                renderEvents();
+                
+            } catch (err) {
+                console.error('加载事件失败:', err);
+            }
+        }
+
+        // 渲染事件
+        function renderEvents() {
+            var container = document.getElementById('eventsContainer');
+            var filterType = document.getElementById('eventFilterType').value;
+            var filterImportance = document.getElementById('eventFilterImportance').value;
+            var searchText = document.getElementById('eventSearchText').value.toLowerCase();
+            
+            var filteredEvents = events.filter(function(evt) {
+                var matchType = !filterType || (evt.tags && evt.tags.indexOf(filterType) !== -1);
+                var matchImportance = !filterImportance || evt.importance === filterImportance;
+                var matchSearch = !searchText || 
+                    evt.title.toLowerCase().indexOf(searchText) !== -1 ||
+                    (evt.description && evt.description.toLowerCase().indexOf(searchText) !== -1);
+                return matchType && matchImportance && matchSearch;
+            });
+            
+            if (filteredEvents.length === 0) {
+                document.getElementById('emptyEvents').classList.remove('hidden');
+                container.innerHTML = '<div class="timeline-line"></div>';
+                return;
+            }
+            
+            document.getElementById('emptyEvents').classList.add('hidden');
+            
+            var html = '<div class="timeline-line"></div>';
+            filteredEvents.forEach(function(evt) {
+                var importanceColors = {
+                    'critical': 'bg-red-100 border-red-500',
+                    'high': 'bg-orange-100 border-orange-500',
+                    'normal': 'bg-white',
+                    'low': 'bg-gray-50'
+                };
+                var borderClass = importanceColors[evt.importance] || importanceColors['normal'];
+                
+                html += '<div class="relative pl-16 pb-8">';
+                html += '<div class="timeline-dot" style="top: 8px;"></div>';
+                html += '<div class="' + borderClass + ' rounded-xl shadow-md p-6 border">';
+                html += '<div class="flex justify-between items-start mb-3">';
+                html += '<div>';
+                html += '<span class="text-sm text-red-600 font-medium"><i class="far fa-clock mr-1"></i>' + formatDateTime(evt.event_date) + '</span>';
+                html += '<h3 class="text-lg font-semibold text-gray-900 mt-1">' + escapeHtml(evt.title) + '</h3>';
+                if (evt.event_location) {
+                    html += '<p class="text-sm text-gray-500 mt-1"><i class="fas fa-map-marker-alt mr-1"></i>' + escapeHtml(evt.event_location) + '</p>';
+                }
+                html += '</div>';
+                html += '<button onclick="deleteEvent(\'' + evt.id + '\')" class="text-gray-400 hover:text-red-600"><i class="fas fa-trash"></i></button>';
+                html += '</div>';
+                
+                if (evt.description) {
+                    html += '<p class="text-gray-600 mb-4 whitespace-pre-wrap">' + escapeHtml(evt.description) + '</p>';
+                }
+                
+                if (evt.tags && evt.tags.length > 0) {
+                    html += '<div class="flex flex-wrap gap-2 mb-4">';
+                    evt.tags.forEach(function(tag) {
+                        html += '<span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">' + escapeHtml(tag) + '</span>';
+                    });
+                    html += '</div>';
+                }
+                
+                if (evt.evidence && evt.evidence.length > 0) {
+                    html += '<div class="grid grid-cols-4 gap-2">';
+                    evt.evidence.forEach(function(file) {
+                        if (file.type && file.type.startsWith('image/')) {
+                            html += '<a href="' + file.url + '" target="_blank" class="block"><img src="' + file.url + '" class="w-full h-20 object-cover rounded-lg border"></a>';
+                        } else if (file.type && file.type.startsWith('video/')) {
+                            html += '<a href="' + file.url + '" target="_blank" class="block"><div class="w-full h-20 bg-gray-100 rounded-lg border flex flex-col items-center justify-center"><i class="fas fa-video text-2xl text-gray-400"></i><span class="text-xs text-gray-500 truncate w-full text-center px-1">' + escapeHtml(file.name) + '</span></div></a>';
+                        }
+                    });
+                    html += '</div>';
+                }
+                
+                html += '</div></div>';
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // 添加事件
+        async function addEvent(e) {
+            e.preventDefault();
+            if (!currentTimeline) return;
+            
+            try {
+                // 获取选中的标签
+                var tags = [];
+                document.querySelectorAll('#eventTagContainer .tag-btn.active').forEach(function(btn) {
+                    tags.push(btn.textContent);
+                });
+                
+                // 上传媒体文件
+                var evidence = [];
+                if (selectedMediaFiles.length > 0) {
+                    for (var i = 0; i < selectedMediaFiles.length; i++) {
+                        var file = selectedMediaFiles[i];
+                        var fileName = currentUser.id + '/' + Date.now() + '_' + i + '.' + file.name.split('.').pop();
+                        
+                        var uploadResult = await supabaseClient.storage
+                            .from('timeline-evidence')
+                            .upload(fileName, file, { contentType: file.type });
+                        
+                        if (!uploadResult.error) {
+                            var urlResult = supabaseClient.storage.from('timeline-evidence').getPublicUrl(fileName);
+                            evidence.push({
+                                name: file.name,
+                                type: file.type,
+                                url: urlResult.data.publicUrl,
+                                path: fileName
+                            });
+                        }
+                    }
+                }
+                
+                var eventData = {
+                    timeline_id: currentTimeline.id,
+                    user_id: currentUser.id,
+                    title: document.getElementById('newEventTitle').value,
+                    description: document.getElementById('newEventDesc').value,
+                    event_date: document.getElementById('newEventDate').value,
+                    event_location: document.getElementById('newEventLocation').value,
+                    importance: document.getElementById('newEventImportance').value,
+                    tags: tags,
+                    evidence: evidence
+                };
+                
+                var result = await supabaseClient.from('timeline_events').insert(eventData);
+                if (result.error) throw result.error;
+                
+                closeModal('addEventModal');
+                document.getElementById('addEventForm').reset();
+                selectedMediaFiles = [];
+                document.getElementById('eventMediaPreview').innerHTML = '';
+                document.querySelectorAll('#eventTagContainer .tag-btn').forEach(function(btn) {
+                    btn.classList.remove('active', 'bg-red-100', 'border-red-500', 'text-red-600');
+                });
+                
+                await loadEvents(currentTimeline.id);
+                await loadTimelines(); // 更新事件数量
+                
+            } catch (err) {
+                alert('添加失败: ' + err.message);
+            }
+            
+            return false;
+        }
+
+        // 处理媒体选择
+        function handleEventMediaSelect(event) {
+            var files = Array.from(event.target.files);
+            var maxSize = 50 * 1024 * 1024;
+            
+            files.forEach(function(file) {
+                if (file.size > maxSize) {
+                    alert('文件超过50MB: ' + file.name);
+                    return;
+                }
+                selectedMediaFiles.push(file);
+            });
+            
+            renderEventMediaPreview();
+            event.target.value = '';
+        }
+
+        // 渲染媒体预览
+        function renderEventMediaPreview() {
+            var container = document.getElementById('eventMediaPreview');
+            container.innerHTML = '';
+            
+            selectedMediaFiles.forEach(function(file, index) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var div = document.createElement('div');
+                    div.className = 'relative';
+                    
+                    if (file.type.startsWith('image/')) {
+                        div.innerHTML = '<img src="' + e.target.result + '" class="w-full h-16 object-cover rounded border"><button type="button" onclick="removeEventMedia(' + index + ')" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>';
+                    } else {
+                        div.innerHTML = '<div class="w-full h-16 bg-gray-100 rounded border flex items-center justify-center"><i class="fas fa-video"></i></div><button type="button" onclick="removeEventMedia(' + index + ')" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>';
+                    }
+                    
+                    container.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 移除媒体
+        function removeEventMedia(index) {
+            selectedMediaFiles.splice(index, 1);
+            renderEventMediaPreview();
+        }
+
+        // 删除事件
+        async function deleteEvent(eventId) {
+            if (!confirm('确定要删除这个事件吗？')) return;
+            
+            try {
+                var result = await supabaseClient
+                    .from('timeline_events')
+                    .delete()
+                    .eq('id', eventId);
+                
+                if (result.error) throw result.error;
+                
+                await loadEvents(currentTimeline.id);
+                await loadTimelines();
+                
+            } catch (err) {
+                alert('删除失败: ' + err.message);
+            }
+        }
+
+        // 删除时间线
+        async function deleteTimeline(timelineId) {
+            if (!confirm('确定要删除这个时间线吗？所有事件也会被删除！')) return;
+            
+            try {
+                var result = await supabaseClient
+                    .from('timelines')
+                    .delete()
+                    .eq('id', timelineId);
+                
+                if (result.error) throw result.error;
+                
+                await loadTimelines();
+                
+            } catch (err) {
+                alert('删除失败: ' + err.message);
+            }
+        }
+
+        // 导出时间线
+        function exportTimeline() {
+            if (!currentTimeline) return;
+            
+            var exportData = {
+                timeline: currentTimeline,
+                events: events,
+                exportDate: new Date().toISOString()
+            };
+            
+            var dataStr = JSON.stringify(exportData, null, 2);
+            var blob = new Blob([dataStr], {type: 'application/json'});
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = currentTimeline.title + '_导出_' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // UI 辅助函数
+        function showCreateTimelineModal() {
+            document.getElementById('createTimelineModal').classList.remove('hidden');
+        }
+
+        function showAddEventModal() {
+            document.getElementById('addEventModal').classList.remove('hidden');
+            // 绑定标签按钮
+            document.querySelectorAll('#eventTagContainer .tag-btn').forEach(function(btn) {
+                btn.onclick = function() {
+                    this.classList.toggle('active');
+                    this.classList.toggle('bg-red-100');
+                    this.classList.toggle('border-red-500');
+                    this.classList.toggle('text-red-600');
+                };
+            });
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateStr) {
+            var date = new Date(dateStr);
+            return date.toLocaleDateString('zh-CN');
+        }
+
+        function formatDateTime(dateStr) {
+            var date = new Date(dateStr);
+            return date.toLocaleDateString('zh-CN', {year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'});
+        }
+
+        function showError(msg) {
+            document.getElementById('loadingScreen').innerHTML = '<div class="text-center"><i class="fas fa-exclamation-circle text-5xl text-red-500 mb-4"></i><p>' + msg + '</p></div>';
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
