@@ -759,105 +759,167 @@
             window.location.reload();
         }
 
-        // 生成PDF
+        // 生成PDF - 使用浏览器打印功能，支持中文
         async function generatePDF() {
             if (events.length === 0) {
                 showToast('没有可导出的事件', 'error');
                 return;
             }
-            showToast('正在生成PDF...', 'info');
             
-            let printContainer = document.getElementById('printContainer');
-            if (printContainer) printContainer.remove();
+            showToast('正在准备打印页面...', 'info');
             
-            printContainer = document.createElement('div');
-            printContainer.id = 'printContainer';
-            printContainer.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:white;padding:40px;';
-            document.body.appendChild(printContainer);
+            // 创建打印窗口
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                showToast('请允许弹出窗口以导出PDF', 'error');
+                return;
+            }
             
-            const fontLink = document.createElement('link');
-            fontLink.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap';
-            fontLink.rel = 'stylesheet';
-            document.head.appendChild(fontLink);
-            await new Promise(r => setTimeout(r, 1000));
-            
-            printContainer.innerHTML = `
-                <div style="font-family:'Noto Sans SC','Microsoft YaHei',sans-serif;color:#000;line-height:1.6;font-size:14px;">
-                    <div style="text-align:center;margin-bottom:30px;padding-bottom:20px;border-bottom:2px solid #dc2626;">
-                        <h1 style="font-size:28px;margin:0 0 15px 0;font-weight:700;color:#dc2626;">事件时间线及证据清单</h1>
-                        <p style="font-size:14px;color:#333;margin:0;"><strong>生成日期：</strong>${new Date().toLocaleDateString('zh-CN')}</p>
-                        <p style="font-size:12px;color:#666;margin:5px 0 0 0;">制作者：${currentUser.email}</p>
+            // 构建打印内容
+            const printContent = `
+                <!DOCTYPE html>
+                <html lang="zh-CN">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>事件时间线及证据清单</title>
+                    <style>
+                        @page { size: A4; margin: 15mm; }
+                        body { 
+                            font-family: "Noto Sans SC", "Microsoft YaHei", "SimHei", "PingFang SC", sans-serif; 
+                            color: #333; 
+                            line-height: 1.6;
+                            max-width: 210mm;
+                            margin: 0 auto;
+                            padding: 20px;
+                            font-size: 14px;
+                        }
+                        .header { 
+                            text-align: center; 
+                            margin-bottom: 25px; 
+                            padding-bottom: 15px; 
+                            border-bottom: 2px solid #dc2626; 
+                        }
+                        .header h1 { 
+                            font-size: 24px; 
+                            margin: 0 0 10px 0; 
+                            font-weight: bold;
+                            color: #dc2626;
+                        }
+                        .header p { 
+                            font-size: 12px; 
+                            color: #666; 
+                            margin: 5px 0; 
+                        }
+                        .event { 
+                            margin-bottom: 20px; 
+                            page-break-inside: avoid;
+                            border-bottom: 1px solid #eee;
+                            padding-bottom: 15px;
+                        }
+                        .event:last-child { border-bottom: none; }
+                        .event-title { 
+                            font-size: 16px; 
+                            margin: 0 0 8px 0; 
+                            color: #000;
+                            font-weight: bold;
+                        }
+                        .event-date { 
+                            font-size: 12px; 
+                            color: #dc2626; 
+                            margin: 0 0 8px 0; 
+                        }
+                        .event-desc { 
+                            font-size: 12px; 
+                            margin: 0 0 8px 0; 
+                            text-align: justify;
+                            white-space: pre-wrap;
+                        }
+                        .event-tags { 
+                            font-size: 11px; 
+                            margin: 0 0 8px 0; 
+                            color: #666;
+                        }
+                        .evidence-section { margin-top: 10px; }
+                        .evidence-title { 
+                            font-size: 12px; 
+                            margin: 0 0 8px 0; 
+                            font-weight: bold;
+                        }
+                        .evidence-list { 
+                            font-size: 11px;
+                            color: #666;
+                            padding-left: 15px;
+                        }
+                        .evidence-list li {
+                            margin: 3px 0;
+                        }
+                        .footer { 
+                            margin-top: 30px; 
+                            padding-top: 15px; 
+                            border-top: 2px solid #dc2626; 
+                            font-size: 10px; 
+                            color: #999; 
+                            text-align: center;
+                        }
+                        @media print {
+                            body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>事件时间线及证据清单</h1>
+                        <p><strong>生成日期：</strong>${new Date().toLocaleDateString('zh-CN')}</p>
+                        <p><strong>制作者：</strong>${currentUser ? currentUser.email : ''}</p>
                     </div>
-                    ${events.map((event, i) => {
+                    
+                    ${events.map((event, index) => {
                         const evidence = event.evidence || [];
                         return `
-                        <div style="margin-bottom:25px;padding-bottom:20px;border-bottom:1px solid #ccc;">
-                            <div style="font-size:18px;font-weight:700;margin-bottom:10px;color:#000;">${i+1}. ${event.title}</div>
-                            <div style="font-size:14px;color:#dc2626;margin-bottom:8px;"><strong>时间：</strong>${formatDate(event.event_date)}</div>
-                            ${event.description ? `<div style="font-size:14px;margin-bottom:8px;white-space:pre-wrap;"><strong>详情：</strong>${event.description}</div>` : ''}
-                            ${event.tags && event.tags.length ? `<div style="font-size:13px;margin-bottom:8px;"><strong>标签：</strong>${event.tags.join('、')}</div>` : ''}
-                            ${evidence.length ? `
-                                <div style="margin-top:15px;">
-                                    <div style="font-size:14px;font-weight:700;margin-bottom:10px;">证据附件（${evidence.length}个）</div>
-                                    <div style="display:flex;flex-wrap:wrap;gap:15px;">
-                                        ${evidence.map(f => `
-                                            <div style="border:1px solid #999;padding:8px;text-align:center;max-width:200px;">
-                                                ${f.type && f.type.startsWith('image/') ? `
-                                                    <img src="${f.url || f.data}" style="max-width:180px;max-height:120px;object-fit:contain;display:block;"
-                                                    onerror="this.style.display='none';this.nextElementSibling.style.display='block';"
-                                                    >
-                                                    <div style="display:none;font-size:32px;padding:20px;">🖼️</div>
-                                                ` : '<div style="font-size:32px;padding:20px;">📄</div>'}
-                                                <div style="font-size:11px;margin-top:5px;word-break:break-all;">${f.name}</div>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
+                        <div class="event">
+                            <div class="event-title">${index + 1}. ${escapeHtml(event.title)}</div>
+                            <div class="event-date"><strong>时间：</strong>${formatDate(event.event_date)}</div>
+                            
+                            ${event.description ? `<div class="event-desc"><strong>详情：</strong>${escapeHtml(event.description)}</div>
                             ` : ''}
-                        </div>`;
+                            
+                            ${event.tags && event.tags.length > 0 ? `
+                            <div class="event-tags"><strong>标签：</strong>${event.tags.join('、')}</div>
+                            ` : ''}
+                            
+                            ${evidence.length > 0 ? `
+                            <div class="evidence-section">
+                                <div class="evidence-title">证据附件（${evidence.length}个）：</div>
+                                <ul class="evidence-list">
+                                    ${evidence.map(f => `<li>${escapeHtml(f.name)}</li>`).join('')}
+                                </ul>
+                            </div>
+                            ` : ''}
+                        </div>
+                        `;
                     }).join('')}
-                    <div style="margin-top:40px;padding-top:20px;border-top:2px solid #dc2626;font-size:12px;color:#666;">
+                    
+                    <div class="footer">
                         <p><strong>声明：</strong>本文件由事件时间线系统生成，仅供法律参考使用。</p>
-                        <p>共计 ${events.length} 个事件，${events.reduce((s,e)=>s+(e.evidence?e.evidence.length:0),0)} 个证据附件。</p>
+                        <p>共计 ${events.length} 个事件，${events.reduce((sum, e) => sum + (e.evidence && e.evidence.length ? e.evidence.length : 0), 0)} 个证据附件。</p>
                     </div>
-                </div>
+                    
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                            }, 500);
+                        };
+                    </script>
+                </body>
+                </html>
             `;
             
-            await Promise.all(Array.from(printContainer.querySelectorAll('img')).map(img => 
-                img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })
-            ));
-            await new Promise(r => setTimeout(r, 500));
+            printWindow.document.write(printContent);
+            printWindow.document.close();
             
-            try {
-                const { jsPDF } = window.jspdf;
-                const canvas = await html2canvas(printContainer.firstElementChild, {
-                    scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#fff', logging: false
-                });
-                
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 210, pageHeight = 297;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                
-                const doc = new jsPDF('p', 'mm', 'a4');
-                let heightLeft = imgHeight, position = 0;
-                
-                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-                
-                while (heightLeft > 0) {
-                    position = heightLeft - imgHeight;
-                    doc.addPage();
-                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-                
-                doc.save(`事件时间线_${new Date().toISOString().split('T')[0]}.pdf`);
-                showToast('PDF导出成功！', 'success');
-            } catch (error) {
-                showToast('PDF生成失败: ' + error.message, 'error');
-            } finally {
-                printContainer.remove();
-            }
+            showToast('PDF打印窗口已打开，请选择"另存为PDF"', 'success');
         }
 
         // 导入导出功能
