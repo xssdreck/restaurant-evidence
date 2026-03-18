@@ -295,31 +295,59 @@
 
         // 初始化
         document.addEventListener('DOMContentLoaded', async function() {
-            sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-            
-            // 检查登录状态
-            const { data: { user } } = await sb.auth.getUser();
-            
-            if (!user) {
-                // 未登录
+            try {
+                // 检查 Supabase 配置是否加载
+                if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                    throw new Error('Supabase 配置未加载，请检查 supabase-config.js');
+                }
+                
+                sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+                
+                // 检查登录状态，设置超时
+                const authPromise = sb.auth.getUser();
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('连接超时')), 10000)
+                );
+                
+                const { data: { user } } = await Promise.race([authPromise, timeoutPromise]);
+                
+                if (!user) {
+                    // 未登录
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                    return;
+                }
+                
+                // 已登录
+                currentUser = user;
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('footerUser').textContent = '当前用户：' + user.email;
+                
                 document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('loginScreen').classList.remove('hidden');
-                return;
+                document.getElementById('appScreen').classList.remove('hidden');
+                
+                // 加载数据
+                await loadEvents();
+                
+                // 绑定表单提交
+                document.getElementById('eventForm').addEventListener('submit', handleSubmit);
+                
+            } catch (err) {
+                console.error('初始化错误:', err);
+                document.getElementById('loadingScreen').innerHTML = `
+                    <div class="text-center p-8">
+                        <i class="fas fa-exclamation-circle text-5xl text-red-500 mb-4"></i>
+                        <h2 class="text-xl font-bold text-gray-800 mb-2">加载失败</h2>
+                        <p class="text-gray-600 mb-4">${err.message}</p>
+                        <button onclick="window.location.reload()" class="px-4 py-2 bg-red-600 text-white rounded-lg">
+                            重新加载
+                        </button>
+                        <div class="mt-4">
+                            <a href="./auth.html" class="text-blue-600 hover:underline text-sm">前往登录页</a>
+                        </div>
+                    </div>
+                `;
             }
-            
-            // 已登录
-            currentUser = user;
-            document.getElementById('userEmail').textContent = user.email;
-            document.getElementById('footerUser').textContent = '当前用户：' + user.email;
-            
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('appScreen').classList.remove('hidden');
-            
-            // 加载数据
-            await loadEvents();
-            
-            // 绑定表单提交
-            document.getElementById('eventForm').addEventListener('submit', handleSubmit);
         });
 
         // 加载事件列表
