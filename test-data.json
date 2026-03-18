@@ -1,0 +1,194 @@
+[
+  {
+    "title": "事件一：初次发现异常",
+    "description": "在检查过程中首次发现异常情况，现场记录显示有明显迹象表明存在问题。初步判断需要进一步调查。",
+    "date": "2025-01-15T09:30:00",
+    "tags": ["关键证据", "书面材料"],
+    "evidence": [
+      {"name": "现场照片1.jpg", "type": "image/jpeg"},
+      {"name": "初步报告.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件二：证人A陈述",
+    "description": "证人A提供重要证词，详细描述了事发经过。证词内容与现场证据高度吻合，可信度较高。",
+    "date": "2025-01-20T14:00:00",
+    "tags": ["证人证言"],
+    "evidence": [
+      {"name": "证人A笔录.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件三：监控录像获取",
+    "description": "成功获取事发地点监控录像，录像清晰记录了事发全过程。已备份保存。",
+    "date": "2025-01-22T10:15:00",
+    "tags": ["视频证据", "关键证据"],
+    "evidence": [
+      {"name": "监控录像1.mp4", "type": "video/mp4"},
+      {"name": "监控截图.jpg", "type": "image/jpeg"}
+    ]
+  },
+  {
+    "title": "事件四：专家鉴定",
+    "description": "委托专业机构进行技术鉴定，鉴定结果显示关键物证具有重要价值。",
+    "date": "2025-02-01T16:30:00",
+    "tags": ["物证", "书面材料"],
+    "evidence": [
+      {"name": "鉴定报告.pdf", "type": "application/pdf"},
+      {"name": "物证照片.jpg", "type": "image/jpeg"}
+    ]
+  },
+  {
+    "title": "事件五：第二次现场勘查",
+    "description": "根据新线索进行二次勘查，发现新的痕迹和物证，补充了重要信息。",
+    "date": "2025-02-10T08:45:00",
+    "tags": ["物证", "关键证据"],
+    "evidence": [
+      {"name": "勘查照片1.jpg", "type": "image/jpeg"},
+      {"name": "勘查照片2.jpg", "type": "image/jpeg"}
+    ]
+  },
+  {
+    "title": "事件六：证人B询问",
+    "description": "对证人B进行补充询问，获取了与案件相关的背景信息和细节描述。",
+    "date": "2025-02-15T11:20:00",
+    "tags": ["证人证言"],
+    "evidence": [
+      {"name": "证人B笔录.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件七：书证收集",
+    "description": "收集到相关书面材料，包括合同、票据、通讯记录等，为案件提供了书面证据支撑。",
+    "date": "2025-02-20T09:00:00",
+    "tags": ["书面材料", "关键证据"],
+    "evidence": [
+      {"name": "合同文件.pdf", "type": "application/pdf"},
+      {"name": "票据扫描件.pdf", "type": "application/pdf"},
+      {"name": "通讯记录.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件八：视听资料整理",
+    "description": "整理收集到的音频视频资料，进行剪辑标注，形成完整的证据链。",
+    "date": "2025-03-01T13:30:00",
+    "tags": ["视频证据"],
+    "evidence": [
+      {"name": "录音文件1.mp3", "type": "audio/mpeg"},
+      {"name": "录音文件2.mp3", "type": "audio/mpeg"}
+    ]
+  },
+  {
+    "title": "事件九：电子数据提取",
+    "description": "从电子设备中提取关键数据，包括聊天记录、转账记录等电子证据。",
+    "date": "2025-03-05T15:00:00",
+    "tags": ["关键证据", "书面材料"],
+    "evidence": [
+      {"name": "聊天记录截图.jpg", "type": "image/jpeg"},
+      {"name": "转账记录.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件十：第三次现场勘查",
+    "description": "根据前期调查进展，进行第三次现场勘查，确认并固定关键证据。",
+    "date": "2025-03-10T10:00:00",
+    "tags": ["物证", "关键证据"],
+    "evidence": [
+      {"name": "现场照片3.jpg", "type": "image/jpeg"},
+      {"name": "现场示意图.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件十一：补充证人询问",
+    "description": "对前期证人进行补充询问，核实细节，完善证言内容。",
+    "date": "2025-03-15T14:30:00",
+    "tags": ["证人证言"],
+    "evidence": [
+      {"name": "补充笔录A.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件十二：物证鉴定报告",
+    "description": "收到专业机构出具的物证鉴定报告，报告结论对案件具有重要证明意义。",
+    "date": "2025-03-20T09:30:00",
+    "tags": ["物证", "书面材料", "关键证据"],
+    "evidence": [
+      {"name": "鉴定报告-物证.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件十三：外围调查",
+    "description": "开展外围调查走访，收集旁证材料，进一步印证主要证据。",
+    "date": "2025-03-25T11:00:00",
+    "tags": ["证人证言", "书面材料"],
+    "evidence": [
+      {"name": "走访记录.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件十四：视频资料分析",
+    "description": "对收集到的视频资料进行专业分析，提取关键帧和时间段，形成分析报告。",
+    "date": "2025-04-01T16:00:00",
+    "tags": ["视频证据", "关键证据"],
+    "evidence": [
+      {"name": "视频分析报告.pdf", "type": "application/pdf"},
+      {"name": "关键帧截图.jpg", "type": "image/jpeg"}
+    ]
+  },
+  {
+    "title": "事件十五：财务审计",
+    "description": "委托会计师事务所进行专项审计，查明资金流向和财务状况。",
+    "date": "2025-04-10T10:30:00",
+    "tags": ["书面材料", "关键证据"],
+    "evidence": [
+      {"name": "审计报告.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件十六：现场复勘",
+    "description": "根据新发现的线索，对现场进行复勘，发现新的痕迹物证。",
+    "date": "2025-04-15T09:00:00",
+    "tags": ["物证"],
+    "evidence": [
+      {"name": "复勘照片1.jpg", "type": "image/jpeg"},
+      {"name": "复勘照片2.jpg", "type": "image/jpeg"}
+    ]
+  },
+  {
+    "title": "事件十七：专家咨询",
+    "description": "就专业问题咨询相关领域专家，获取专业意见。",
+    "date": "2025-04-20T14:00:00",
+    "tags": ["书面材料"],
+    "evidence": [
+      {"name": "专家意见书.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件十八：证据整理汇总",
+    "description": "对所有收集到的证据进行整理汇总，分类编号，建立证据清单。",
+    "date": "2025-04-25T11:30:00",
+    "tags": ["书面材料", "关键证据"],
+    "evidence": [
+      {"name": "证据清单.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件十九：证人C询问",
+    "description": "询问新发现的证人C，获取新的证言信息，补充证据链条。",
+    "date": "2025-05-01T10:00:00",
+    "tags": ["证人证言"],
+    "evidence": [
+      {"name": "证人C笔录.pdf", "type": "application/pdf"}
+    ]
+  },
+  {
+    "title": "事件二十：证据移交",
+    "description": "将整理完整的证据材料移交相关部门，完成证据固定和保全工作。",
+    "date": "2025-05-10T15:30:00",
+    "tags": ["关键证据", "书面材料", "物证", "视频证据"],
+    "evidence": [
+      {"name": "移交清单.pdf", "type": "application/pdf"},
+      {"name": "移交照片.jpg", "type": "image/jpeg"}
+    ]
+  }
+]
