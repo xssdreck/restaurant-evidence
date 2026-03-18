@@ -1,0 +1,9 @@
+{
+  "name": "restaurant-evidence-timeline",
+  "version": "1.0.0",
+  "description": "事件时间线及证据整理工具",
+  "scripts": {
+    "deploy": "gh-pages -d ."
+  },
+  "homepage": "https://xssdreck.github.io/restaurant-evidence"
+}
