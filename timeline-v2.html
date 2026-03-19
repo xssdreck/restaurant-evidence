@@ -149,6 +149,13 @@ var selectedImages = [];
 function handleImageSelect(event) {
     var files = Array.from(event.target.files);
     var maxSize = 5 * 1024 * 1024; // 5MB
+    var eventDate = document.getElementById('eventDate').value;
+    
+    if (!eventDate) {
+        showToast('请先选择事件日期', 'error');
+        event.target.value = '';
+        return;
+    }
     
     files.forEach(function(file) {
         if (file.size > maxSize) {
@@ -158,16 +165,64 @@ function handleImageSelect(event) {
         
         var reader = new FileReader();
         reader.onload = function(e) {
-            selectedImages.push({
-                name: file.name,
-                data: e.target.result
+            // 添加水印
+            addWatermarkToImage(e.target.result, eventDate, function(watermarkedImage) {
+                selectedImages.push({
+                    name: file.name,
+                    data: watermarkedImage
+                });
+                renderImagePreview();
             });
-            renderImagePreview();
         };
         reader.readAsDataURL(file);
     });
     
     event.target.value = '';
+}
+
+// 添加水印函数
+function addWatermarkToImage(imageData, dateText, callback) {
+    var img = new Image();
+    img.onload = function() {
+        var canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        var ctx = canvas.getContext('2d');
+        
+        // 绘制原图
+        ctx.drawImage(img, 0, 0);
+        
+        // 格式化日期时间
+        var date = new Date(dateText);
+        var watermarkText = date.toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        // 设置水印样式
+        var fontSize = Math.max(20, Math.min(canvas.width, canvas.height) / 20);
+        ctx.font = 'bold ' + fontSize + 'px "Microsoft YaHei", sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.lineWidth = fontSize / 10;
+        
+        // 计算位置（右下角）
+        var textWidth = ctx.measureText(watermarkText).width;
+        var x = canvas.width - textWidth - 20;
+        var y = canvas.height - 20;
+        
+        // 绘制描边
+        ctx.strokeText(watermarkText, x, y);
+        // 绘制文字
+        ctx.fillText(watermarkText, x, y);
+        
+        // 返回带水印的图片
+        callback(canvas.toDataURL('image/jpeg', 0.9));
+    };
+    img.src = imageData;
 }
 
 // 渲染图片预览
@@ -470,6 +525,13 @@ function editEvent(id) {
 function handleEditImageSelect(event) {
     var files = Array.from(event.target.files);
     var maxSize = 5 * 1024 * 1024;
+    var eventDate = document.getElementById('editEventDate').value;
+    
+    if (!eventDate) {
+        showToast('请先选择事件日期', 'error');
+        event.target.value = '';
+        return;
+    }
     
     files.forEach(function(file) {
         if (file.size > maxSize) {
@@ -479,11 +541,14 @@ function handleEditImageSelect(event) {
         
         var reader = new FileReader();
         reader.onload = function(e) {
-            editSelectedImages.push({
-                name: file.name,
-                data: e.target.result
+            // 添加水印
+            addWatermarkToImage(e.target.result, eventDate, function(watermarkedImage) {
+                editSelectedImages.push({
+                    name: file.name,
+                    data: watermarkedImage
+                });
+                renderEditNewImages();
             });
-            renderEditNewImages();
         };
         reader.readAsDataURL(file);
     });
