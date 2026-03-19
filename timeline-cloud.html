@@ -520,6 +520,10 @@
                 }
                 
                 if (event.images && event.images.length > 0) {
+                    html += '<div class="mb-2 flex justify-between items-center">';
+                    html += '<span class="text-sm text-gray-500"><i class="fas fa-images mr-1"></i>' + event.images.length + ' 张图片</span>';
+                    html += '<button onclick="exportEventImagesToPDF(' + event.id + ')" class="text-sm px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"><i class="fas fa-file-pdf mr-1"></i>导出图片PDF</button>';
+                    html += '</div>';
                     html += '<div class="grid grid-cols-4 gap-2">';
                     event.images.forEach(function(img) {
                         html += '<img src="' + img.data + '" class="w-full h-20 object-cover rounded-lg border cursor-pointer hover:border-red-500 transition" onclick="viewImage(\'' + img.data + '\')">';
@@ -705,6 +709,65 @@ async function deleteEvent(id, showConfirm) {
             printWindow.document.write(html);
             printWindow.document.close();
             showToast('PDF打印窗口已打开', 'success');
+        }
+
+        // 导出单个事件的图片为PDF
+        function exportEventImagesToPDF(eventId) {
+            var event = events.find(function(e) { return e.id === eventId; });
+            if (!event || !event.images || event.images.length === 0) {
+                showToast('该事件没有图片', 'error');
+                return;
+            }
+            
+            var printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                showToast('请允许弹出窗口', 'error');
+                return;
+            }
+            
+            var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>事件图片附件</title>';
+            html += '<style>';
+            html += 'body{font-family:"Microsoft YaHei",sans-serif;padding:30px;max-width:1000px;margin:0 auto;background:#f5f5f5}';
+            html += '.header{background:white;padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}';
+            html += 'h1{color:#dc2626;margin:0 0 10px 0;font-size:24px}';
+            html += '.info{color:#666;font-size:14px;margin:5px 0}';
+            html += '.image-container{background:white;padding:20px;border-radius:10px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);page-break-inside:avoid}';
+            html += '.image-container img{width:100%;max-height:500px;object-fit:contain;border-radius:5px;border:1px solid #eee}';
+            html += '.image-number{display:inline-block;background:#dc2626;color:white;padding:3px 10px;border-radius:15px;font-size:12px;margin-bottom:10px}';
+            html += '.footer{margin-top:30px;padding-top:15px;border-top:2px solid #dc2626;color:#999;text-align:center;font-size:12px}';
+            html += '@media print{body{background:white}.image-container{box-shadow:none;border:1px solid #ddd}}';
+            html += '</style></head><body>';
+            
+            // 头部信息
+            html += '<div class="header">';
+            html += '<h1>📷 事件图片附件</h1>';
+            html += '<div class="info"><strong>事件标题：</strong>' + escapeHtml(event.title) + '</div>';
+            html += '<div class="info"><strong>事件时间：</strong>' + formatDate(event.date) + '</div>';
+            if (event.description) {
+                html += '<div class="info"><strong>事件描述：</strong>' + escapeHtml(event.description) + '</div>';
+            }
+            html += '<div class="info"><strong>图片数量：</strong>' + event.images.length + ' 张</div>';
+            html += '</div>';
+            
+            // 图片列表
+            event.images.forEach(function(img, index) {
+                html += '<div class="image-container">';
+                html += '<span class="image-number">图片 ' + (index + 1) + ' / ' + event.images.length + '</span>';
+                html += '<img src="' + img.data + '" alt="' + escapeHtml(img.name || '图片' + (index + 1)) + '" onload="this.style.display=\'block\'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'">';
+                html += '<div style="display:none;color:#999;text-align:center;padding:20px;">图片加载失败</div>';
+                html += '</div>';
+            });
+            
+            // 页脚
+            html += '<div class="footer">';
+            html += '<p>本文件由事件时间线系统生成</p>';
+            html += '<p>生成日期：' + new Date().toLocaleDateString('zh-CN') + '</p>';
+            html += '</div>';
+            html += '</body></html>';
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+            showToast('图片PDF已生成', 'success');
         }
 
         // 更新统计
