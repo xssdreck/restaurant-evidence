@@ -254,7 +254,7 @@
                     if (eventsResult.data && eventsResult.data.length > 0) {
                         events = eventsResult.data.map(function(evt) {
                             return {
-                                id: evt.id,
+                                id: evt.id,  // 使用云端真实的ID
                                 date: evt.event_date,
                                 title: evt.title,
                                 description: evt.description,
@@ -438,7 +438,11 @@
                         evidence: selectedImages
                     };
                     
-                    await supabaseClient.from('timeline_events').insert(eventData);
+                    var result = await supabaseClient.from('timeline_events').insert(eventData).select();
+                    if (result.data && result.data[0]) {
+                        // 更新本地事件的 ID 为云端返回的 ID
+                        event.id = result.data[0].id;
+                    }
                 }
                 
                 // 重置表单
@@ -576,27 +580,32 @@
             showToast('请修改后保存', 'info');
         }
 
-        // 删除事件
-        async function deleteEvent(id, showConfirm) {
-            if (showConfirm !== false && !confirm('确定要删除这个事件吗？')) return;
-            
-            try {
-                // 从云端删除
-                await supabaseClient.from('timeline_events').delete().eq('id', id);
-                
-                // 从本地删除
-                events = events.filter(function(e) { return e.id !== id; });
-                localStorage.setItem('cloudTimelineEvents', JSON.stringify(events));
-                
-                renderTimeline();
-                updateStats();
-                
-                if (showConfirm !== false) {
-                    showToast('事件已删除', 'success');
-                }
-            } catch (err) {
-                console.error('删除失败:', err);
-            }
+// 删除事件
+async function deleteEvent(id, showConfirm) {
+    if (showConfirm !== false && !confirm('确定要删除这个事件吗？')) return;
+    
+    try {
+        // 从云端删除
+        var result = await supabaseClient.from('timeline_events').delete().eq('id', id);
+        if (result.error) {
+            console.error('云端删除失败:', result.error);
+        }
+        
+        // 从本地删除
+        events = events.filter(function(e) { return e.id !== id; });
+        localStorage.setItem('cloudTimelineEvents', JSON.stringify(events));
+        
+        renderTimeline();
+        updateStats();
+        
+        if (showConfirm !== false) {
+            showToast('事件已删除', 'success');
+        }
+    } catch (err) {
+        console.error('删除失败:', err);
+        showToast('删除失败: ' + err.message, 'error');
+    }
+}            }
         }
 
         // 查看大图
