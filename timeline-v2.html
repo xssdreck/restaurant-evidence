@@ -37,6 +37,8 @@
         .event-tag { display: inline-block; padding: 3px 10px; background: #fee2e2; color: #dc2626; border-radius: 12px; font-size: 12px; margin-right: 5px; }
         .delete-btn { color: #999; cursor: pointer; padding: 5px; }
         .delete-btn:hover { color: #dc2626; }
+        .edit-btn { color: #999; cursor: pointer; padding: 5px; }
+        .edit-btn:hover { color: #2563eb; }
         .empty { text-align: center; padding: 60px; color: #999; }
         .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 24px; border-radius: 5px; color: white; z-index: 1000; }
         .toast.success { background: #22c55e; }
@@ -263,6 +265,7 @@ function renderTimeline() {
         html += '<div class="event-date">' + formatDate(event.date) + '</div>';
         html += '</div>';
         html += '<span class="delete-btn" onclick="deleteEvent(' + event.id + ')">🗑️</span>';
+        html += '<span class="edit-btn" onclick="editEvent(' + event.id + ')" style="color:#999;cursor:pointer;padding:5px;margin-right:5px;">✏️</span>';
         html += '</div>';
         if (event.description) {
             html += '<div class="event-desc">' + escapeHtml(event.description) + '</div>';
@@ -431,6 +434,69 @@ function viewImage(imgData) {
     document.body.appendChild(modal);
 }
 
+// 当前编辑的事件ID
+var editingEventId = null;
+
+// 编辑事件
+function editEvent(id) {
+    var event = events.find(function(e) { return e.id === id; });
+    if (!event) return;
+    
+    editingEventId = id;
+    
+    // 填充表单
+    document.getElementById('editEventDate').value = event.date;
+    document.getElementById('editEventTitle').value = event.title;
+    document.getElementById('editEventDesc').value = event.description || '';
+    
+    // 设置标签
+    document.querySelectorAll('#editTagContainer .tag-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+        if (event.tags && event.tags.indexOf(btn.textContent) !== -1) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // 显示模态框
+    document.getElementById('editModal').style.display = 'flex';
+}
+
+// 关闭编辑模态框
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+    editingEventId = null;
+}
+
+// 保存编辑
+function saveEdit() {
+    if (!editingEventId) return;
+    
+    var event = events.find(function(e) { return e.id === editingEventId; });
+    if (!event) return;
+    
+    // 获取选中的标签
+    var tags = [];
+    document.querySelectorAll('#editTagContainer .tag-btn.active').forEach(function(btn) {
+        tags.push(btn.textContent);
+    });
+    
+    // 更新事件
+    event.date = document.getElementById('editEventDate').value;
+    event.title = document.getElementById('editEventTitle').value;
+    event.description = document.getElementById('editEventDesc').value;
+    event.tags = tags;
+    
+    // 重新排序
+    events.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+    
+    // 保存
+    localStorage.setItem('timelineEvents', JSON.stringify(events));
+    
+    closeEditModal();
+    renderTimeline();
+    showToast('事件已更新', 'success');
+}
+
 // 显示提示
 function showToast(message, type) {
     var toast = document.createElement('div');
@@ -442,5 +508,43 @@ function showToast(message, type) {
     }, 3000);
 }
     </script>
+
+    <!-- 编辑事件模态框 -->
+    <div id="editModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+        <div style="background:white;padding:25px;border-radius:10px;max-width:500px;width:90%;max-height:90vh;overflow-y:auto;">
+            <h3 style="margin-bottom:20px;font-size:20px;font-weight:bold;">✏️ 编辑事件</h3>
+            
+            <div style="margin-bottom:15px;">
+                <label style="display:block;margin-bottom:5px;font-weight:500;">日期时间 *</label>
+                <input type="datetime-local" id="editEventDate" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:5px;">
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label style="display:block;margin-bottom:5px;font-weight:500;">事件标题 *</label>
+                <input type="text" id="editEventTitle" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:5px;">
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label style="display:block;margin-bottom:5px;font-weight:500;">详细描述</label>
+                <textarea id="editEventDesc" rows="3" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:5px;resize:vertical;"></textarea>
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label style="display:block;margin-bottom:5px;font-weight:500;">🏷️ 标签</label>
+                <div id="editTagContainer" style="display:flex;flex-wrap:wrap;gap:8px;">
+                    <span class="tag-btn" onclick="this.classList.toggle('active')">关键证据</span>
+                    <span class="tag-btn" onclick="this.classList.toggle('active')">证人证言</span>
+                    <span class="tag-btn" onclick="this.classList.toggle('active')">视频证据</span>
+                    <span class="tag-btn" onclick="this.classList.toggle('active')">书面材料</span>
+                    <span class="tag-btn" onclick="this.classList.toggle('active')">物证</span>
+                </div>
+            </div>
+            
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button onclick="closeEditModal()" style="padding:10px 20px;border:1px solid #ddd;background:white;border-radius:5px;cursor:pointer;">取消</button>
+                <button onclick="saveEdit()" style="padding:10px 20px;background:#dc2626;color:white;border:none;border-radius:5px;cursor:pointer;">保存</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
