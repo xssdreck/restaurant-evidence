@@ -206,44 +206,68 @@
             var successCount = 0;
             var errorCount = 0;
             
-            // 分批导入，每批5个
-            var batchSize = 5;
-            for (var i = 0; i < caseData.length; i += batchSize) {
-                var batch = caseData.slice(i, i + batchSize);
+            try {
+                // 第1步：创建时间线
+                progressText.textContent = '正在创建时间线...';
+                var timelineResult = await supabaseClient.from('timelines').insert({
+                    user_id: currentUser.id,
+                    user_email: currentUser.email,
+                    title: '餐厅食品安全事件案例',
+                    description: '完整的餐厅食品安全事件调查处理过程示例',
+                    category: '案件'
+                }).select();
                 
-                for (var j = 0; j < batch.length; j++) {
-                    var item = batch[j];
-                    try {
-                        var eventData = {
-                            user_id: currentUser.id,
-                            user_email: currentUser.email,
-                            title: item.title,
-                            description: item.description,
-                            event_date: item.date,
-                            tags: item.tags,
-                            evidence: item.evidence
-                        };
-                        
-                        var result = await supabaseClient.from('timeline_events').insert(eventData);
-                        if (result.error) {
-                            console.error('导入失败:', result.error);
-                            errorCount++;
-                        } else {
-                            successCount++;
-                        }
-                    } catch (err) {
-                        console.error('错误:', err);
-                        errorCount++;
-                    }
-                    
-                    // 更新进度
-                    var percent = ((i + j + 1) / caseData.length) * 100;
-                    progressBar.style.width = percent + '%';
-                    progressText.textContent = '正在导入: ' + (i + j + 1) + '/' + caseData.length;
+                if (timelineResult.error) {
+                    throw new Error('创建时间线失败: ' + timelineResult.error.message);
                 }
                 
-                // 小延迟，避免请求过快
-                await new Promise(function(resolve) { setTimeout(resolve, 300); });
+                var timelineId = timelineResult.data[0].id;
+                progressBar.style.width = '5%';
+                
+                // 第2步：导入事件
+                var batchSize = 3;
+                for (var i = 0; i < caseData.length; i += batchSize) {
+                    var batch = caseData.slice(i, i + batchSize);
+                    
+                    for (var j = 0; j < batch.length; j++) {
+                        var item = batch[j];
+                        try {
+                            var eventData = {
+                                timeline_id: timelineId,
+                                user_id: currentUser.id,
+                                title: item.title,
+                                description: item.description,
+                                event_date: item.date,
+                                tags: item.tags,
+                                evidence: item.evidence,
+                                importance: 'normal'
+                            };
+                            
+                            var result = await supabaseClient.from('timeline_events').insert(eventData);
+                            if (result.error) {
+                                console.error('导入失败:', result.error);
+                                errorCount++;
+                            } else {
+                                successCount++;
+                            }
+                        } catch (err) {
+                            console.error('错误:', err);
+                            errorCount++;
+                        }
+                        
+                        // 更新进度
+                        var percent = 5 + ((i + j + 1) / caseData.length) * 95;
+                        progressBar.style.width = percent + '%';
+                        progressText.textContent = '正在导入事件: ' + (i + j + 1) + '/' + caseData.length;
+                    }
+                    
+                    // 小延迟，避免请求过快
+                    await new Promise(function(resolve) { setTimeout(resolve, 200); });
+                }
+                
+            } catch (err) {
+                console.error('导入过程错误:', err);
+                alert('导入失败: ' + err.message);
             }
             
             // 显示完成界面
