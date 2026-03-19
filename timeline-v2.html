@@ -436,6 +436,7 @@ function viewImage(imgData) {
 
 // 当前编辑的事件ID
 var editingEventId = null;
+var editSelectedImages = []; // 编辑时新添加的图片
 
 // 编辑事件
 function editEvent(id) {
@@ -443,6 +444,7 @@ function editEvent(id) {
     if (!event) return;
     
     editingEventId = id;
+    editSelectedImages = []; // 重置新添加的图片
     
     // 填充表单
     document.getElementById('editEventDate').value = event.date;
@@ -457,14 +459,98 @@ function editEvent(id) {
         }
     });
     
+    // 显示已有图片
+    renderEditImagePreview(event.images || []);
+    
     // 显示模态框
     document.getElementById('editModal').style.display = 'flex';
+}
+
+// 处理编辑时的图片选择
+function handleEditImageSelect(event) {
+    var files = Array.from(event.target.files);
+    var maxSize = 5 * 1024 * 1024;
+    
+    files.forEach(function(file) {
+        if (file.size > maxSize) {
+            showToast('图片超过5MB: ' + file.name, 'error');
+            return;
+        }
+        
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            editSelectedImages.push({
+                name: file.name,
+                data: e.target.result
+            });
+            renderEditNewImages();
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    event.target.value = '';
+}
+
+// 渲染编辑时的已有图片
+function renderEditImagePreview(existingImages) {
+    var container = document.getElementById('editImagePreview');
+    container.innerHTML = '';
+    
+    // 显示已有图片
+    existingImages.forEach(function(img, index) {
+        var div = document.createElement('div');
+        div.style.cssText = 'position:relative;width:60px;height:60px;';
+        div.id = 'edit-img-existing-' + index;
+        div.innerHTML = '<img src="' + img.data + '" style="width:100%;height:100%;object-fit:cover;border-radius:5px;border:1px solid #ddd;">' +
+            '<span onclick="removeEditExistingImage(' + index + ')" style="position:absolute;top:-5px;right:-5px;background:#dc2626;color:white;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;">×</span>';
+        container.appendChild(div);
+    });
+    
+    // 显示新添加的图片
+    renderEditNewImages();
+}
+
+// 渲染新添加的图片
+function renderEditNewImages() {
+    var container = document.getElementById('editImagePreview');
+    
+    // 移除之前的新图片元素
+    document.querySelectorAll('.edit-new-img').forEach(function(el) {
+        el.remove();
+    });
+    
+    editSelectedImages.forEach(function(img, index) {
+        var div = document.createElement('div');
+        div.className = 'edit-new-img';
+        div.style.cssText = 'position:relative;width:60px;height:60px;';
+        div.innerHTML = '<img src="' + img.data + '" style="width:100%;height:100%;object-fit:cover;border-radius:5px;border:2px solid #22c55e;">' +
+            '<span onclick="removeEditNewImage(' + index + ')" style="position:absolute;top:-5px;right:-5px;background:#dc2626;color:white;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;">×</span>';
+        container.appendChild(div);
+    });
+}
+
+// 移除已有图片
+var removedExistingImages = [];
+function removeEditExistingImage(index) {
+    var el = document.getElementById('edit-img-existing-' + index);
+    if (el) {
+        el.style.display = 'none';
+        removedExistingImages.push(index);
+    }
+}
+
+// 移除新添加的图片
+function removeEditNewImage(index) {
+    editSelectedImages.splice(index, 1);
+    renderEditNewImages();
 }
 
 // 关闭编辑模态框
 function closeEditModal() {
     document.getElementById('editModal').style.display = 'none';
     editingEventId = null;
+    editSelectedImages = [];
+    removedExistingImages = [];
 }
 
 // 保存编辑
@@ -480,11 +566,26 @@ function saveEdit() {
         tags.push(btn.textContent);
     });
     
+    // 更新图片：保留未被删除的已有图片 + 新添加的图片
+    var updatedImages = [];
+    if (event.images) {
+        event.images.forEach(function(img, index) {
+            if (removedExistingImages.indexOf(index) === -1) {
+                updatedImages.push(img);
+            }
+        });
+    }
+    // 添加新图片
+    editSelectedImages.forEach(function(img) {
+        updatedImages.push(img);
+    });
+    
     // 更新事件
     event.date = document.getElementById('editEventDate').value;
     event.title = document.getElementById('editEventTitle').value;
     event.description = document.getElementById('editEventDesc').value;
     event.tags = tags;
+    event.images = updatedImages;
     
     // 重新排序
     events.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
@@ -538,6 +639,16 @@ function showToast(message, type) {
                     <span class="tag-btn" onclick="this.classList.toggle('active')">书面材料</span>
                     <span class="tag-btn" onclick="this.classList.toggle('active')">物证</span>
                 </div>
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label style="display:block;margin-bottom:5px;font-weight:500;">📷 图片证据</label>
+                <div style="border:2px dashed #ddd;padding:15px;text-align:center;border-radius:5px;cursor:pointer;" onclick="document.getElementById('editImageFiles').click()">
+                    <span style="font-size:24px;">📷</span>
+                    <p style="margin:5px 0;font-size:14px;color:#666;">点击添加新图片</p>
+                </div>
+                <input type="file" id="editImageFiles" accept="image/*" multiple style="display:none" onchange="handleEditImageSelect(event)">
+                <div id="editImagePreview" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;"></div>
             </div>
             
             <div style="display:flex;gap:10px;justify-content:flex-end;">
