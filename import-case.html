@@ -211,7 +211,6 @@
                 progressText.textContent = '正在创建时间线...';
                 var timelineResult = await supabaseClient.from('timelines').insert({
                     user_id: currentUser.id,
-                    user_email: currentUser.email,
                     title: '餐厅食品安全事件案例',
                     description: '完整的餐厅食品安全事件调查处理过程示例',
                     category: '案件'
@@ -240,7 +239,8 @@
                                 event_date: item.date,
                                 tags: item.tags,
                                 evidence: item.evidence,
-                                importance: 'normal'
+                                importance: 'normal',
+                                event_type: 'default'
                             };
                             
                             var result = await supabaseClient.from('timeline_events').insert(eventData);
