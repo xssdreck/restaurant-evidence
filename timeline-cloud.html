@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>事件时间线 - 云端版</title>
+    <title>时间线 - 云端版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -19,6 +19,7 @@
         <div class="text-center">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
             <p class="text-gray-600">正在加载...</p>
+            <p id="loadingError" class="text-red-500 text-sm mt-2 hidden"></p>
         </div>
     </div>
 
@@ -28,9 +29,7 @@
             <i class="fas fa-clock text-5xl text-red-600 mb-4"></i>
             <h2 class="text-2xl font-bold mb-2">事件时间线</h2>
             <p class="text-gray-600 mb-6">请登录以同步您的时间线到云端</p>
-            <a href="./auth.html" class="inline-block px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition w-full">
-                <i class="fas fa-sign-in-alt mr-2"></i>前往登录
-            </a>
+            <a href="./auth.html" class="inline-block px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition w-full">前往登录</a>
             <div class="mt-4">
                 <a href="./index.html" class="text-gray-500 hover:text-gray-700 text-sm">← 返回首页</a>
             </div>
@@ -44,26 +43,15 @@
                 <div class="flex justify-between h-16 items-center">
                     <div class="flex items-center">
                         <i class="fas fa-clock text-white text-2xl mr-3"></i>
-                        <h1 class="text-xl font-bold">事件时间线</h1>
+                        <h1 class="text-xl font-bold">我的时间线</h1>
                     </div>
-                    <div class="flex items-center space-x-3">
+                    <div class="flex items-center space-x-2">
                         <span id="userEmail" class="text-sm opacity-80 hidden sm:inline"></span>
-                        <button onclick="syncData()" class="px-4 py-2 text-white hover:text-gray-200 transition" title="同步到云端">
-                            <i class="fas fa-sync-alt mr-1"></i>同步
-                        </button>
-                        <button onclick="exportData()" class="px-4 py-2 text-white hover:text-gray-200 transition">
-                            <i class="fas fa-download mr-1"></i>导出
-                        </button>
+                        <button onclick="exportData()" class="px-3 py-2 text-white hover:text-gray-200 transition text-sm"><i class="fas fa-download mr-1"></i>导出</button>
                         <input type="file" id="importFile" accept=".json" onchange="importData(this)" style="display:none">
-                        <button onclick="document.getElementById('importFile').click()" class="px-4 py-2 text-white hover:text-gray-200 transition">
-                            <i class="fas fa-upload mr-1"></i>导入
-                        </button>
-                        <button onclick="generatePDF()" class="px-4 py-2 text-white hover:text-gray-200 transition">
-                            <i class="fas fa-file-pdf mr-1"></i>PDF
-                        </button>
-                        <button onclick="logout()" class="px-4 py-2 text-white hover:text-gray-200 transition">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
+                        <button onclick="document.getElementById('importFile').click()" class="px-3 py-2 text-white hover:text-gray-200 transition text-sm"><i class="fas fa-upload mr-1"></i>导入</button>
+                        <button onclick="generatePDF()" class="px-3 py-2 text-white hover:text-gray-200 transition text-sm"><i class="fas fa-file-pdf mr-1"></i>PDF</button>
+                        <button onclick="logout()" class="px-3 py-2 text-white hover:text-gray-200 transition"><i class="fas fa-sign-out-alt"></i></button>
                     </div>
                 </div>
             </div>
@@ -91,7 +79,7 @@
                             
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">详细描述</label>
-                                <textarea id="eventDesc" rows="4" placeholder="详细描述事件经过..." class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
+                                <textarea id="eventDesc" rows="3" placeholder="详细描述事件经过..." class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
                             </div>
                             
                             <div class="mb-4">
@@ -106,28 +94,24 @@
                             </div>
                             
                             <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">📷 图片证据</label>
-                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-red-500 transition cursor-pointer" onclick="document.getElementById('imageFiles').click()">
-                                    <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
-                                    <p class="text-sm text-gray-600">点击上传图片</p>
-                                    <p class="text-xs text-gray-400 mt-1">支持 JPG, PNG (自动添加时间水印)</p>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">📷 图片</label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center hover:border-red-500 transition cursor-pointer" onclick="document.getElementById('imageFiles').click()">
+                                    <i class="fas fa-cloud-upload-alt text-xl text-gray-400"></i>
+                                    <p class="text-xs text-gray-500 mt-1">点击上传图片</p>
                                 </div>
                                 <input type="file" id="imageFiles" accept="image/*" multiple style="display:none" onchange="handleImageSelect(event)">
                                 <div id="imagePreview" class="mt-2 grid grid-cols-4 gap-2"></div>
                             </div>
                             
-                            <button type="submit" id="saveBtn" class="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition">
-                                <i class="fas fa-save mr-2"></i>保存事件
-                            </button>
+                            <button type="submit" id="saveBtn" class="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition"><i class="fas fa-save mr-2"></i>保存事件</button>
                         </form>
                         
                         <div class="mt-6 pt-6 border-t">
-                            <h3 class="text-sm font-medium text-gray-700 mb-3">统计信息</h3>
                             <div class="bg-red-50 rounded-lg p-3 text-center">
                                 <div class="text-2xl font-bold text-red-600" id="totalCount">0</div>
                                 <div class="text-xs text-gray-600">事件总数</div>
                             </div>
-                            <div class="mt-3 text-center text-xs text-gray-500" id="syncStatus"></div>
+                            <div class="mt-2 text-center text-xs text-gray-400" id="syncStatus"></div>
                         </div>
                     </div>
                 </div>
@@ -136,7 +120,6 @@
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-xl shadow-md p-4 mb-6">
                         <div class="flex items-center space-x-4">
-                            <span class="text-sm font-medium text-gray-700">筛选：</span>
                             <select id="filterTag" onchange="renderTimeline()" class="px-3 py-1.5 border rounded-lg text-sm">
                                 <option value="">全部标签</option>
                                 <option value="关键证据">关键证据</option>
@@ -165,23 +148,22 @@
     <script src="./supabase-config.js"></script>
     
     <script>
-        // 全局变量
         var supabaseClient = null;
         var currentUser = null;
         var events = [];
         var selectedImages = [];
-        var timelineId = null; // 用户的时间线ID
 
         // 初始化
         document.addEventListener('DOMContentLoaded', async function() {
             try {
+                // 检查配置
                 if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
-                    showError('配置未加载');
-                    return;
+                    throw new Error('配置未加载');
                 }
 
                 supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
                 
+                // 获取当前用户
                 var result = await supabaseClient.auth.getUser();
                 var user = result.data.user;
                 
@@ -193,12 +175,13 @@
                 
                 currentUser = user;
                 document.getElementById('userEmail').textContent = user.email;
+                
+                // 加载数据
+                await loadFromCloud();
+                
+                // 显示主界面
                 document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('appScreen').classList.remove('hidden');
-                
-                // 尝试从本地加载，同时从云端同步
-                loadFromLocal();
-                await loadFromCloud();
                 
                 // 绑定标签按钮
                 document.querySelectorAll('.tag-btn').forEach(function(btn) {
@@ -212,36 +195,46 @@
                 
             } catch (err) {
                 console.error('初始化错误:', err);
-                showError(err.message);
+                document.getElementById('loadingError').textContent = '加载失败: ' + err.message;
+                document.getElementById('loadingError').classList.remove('hidden');
             }
         });
-
-        // 从本地加载
-        function loadFromLocal() {
-            var localEvents = localStorage.getItem('cloudTimelineEvents');
-            if (localEvents) {
-                events = JSON.parse(localEvents);
-                renderTimeline();
-                updateStats();
-            }
-        }
 
         // 从云端加载
         async function loadFromCloud() {
             try {
+                // 先加载本地缓存
+                var localEvents = localStorage.getItem('cloudTimelineEvents');
+                if (localEvents) {
+                    events = JSON.parse(localEvents);
+                    renderTimeline();
+                    updateStats();
+                    document.getElementById('syncStatus').textContent = '离线模式';
+                }
+                
                 // 获取或创建时间线
                 var timelineResult = await supabaseClient
                     .from('timelines')
-                    .select('*')
+                    .select('id')
                     .eq('user_id', currentUser.id)
-                    .order('created_at', { ascending: false })
                     .limit(1);
                 
                 if (timelineResult.error) throw timelineResult.error;
                 
+                var timelineId = null;
                 if (timelineResult.data && timelineResult.data.length > 0) {
                     timelineId = timelineResult.data[0].id;
-                    
+                } else {
+                    // 创建新时间线
+                    var newTimeline = await supabaseClient.from('timelines').insert({
+                        user_id: currentUser.id,
+                        title: '我的时间线',
+                        category: '案件'
+                    }).select();
+                    if (newTimeline.data) timelineId = newTimeline.data[0].id;
+                }
+                
+                if (timelineId) {
                     // 加载事件
                     var eventsResult = await supabaseClient
                         .from('timeline_events')
@@ -254,7 +247,7 @@
                     if (eventsResult.data && eventsResult.data.length > 0) {
                         events = eventsResult.data.map(function(evt) {
                             return {
-                                id: evt.id,  // 使用云端真实的ID
+                                id: evt.id,
                                 date: evt.event_date,
                                 title: evt.title,
                                 description: evt.description,
@@ -263,26 +256,11 @@
                             };
                         });
                         
-                        // 保存到本地
                         localStorage.setItem('cloudTimelineEvents', JSON.stringify(events));
-                        
                         renderTimeline();
                         updateStats();
                         document.getElementById('syncStatus').textContent = '已同步到云端';
                     }
-                } else {
-                    // 创建默认时间线
-                    var newTimeline = await supabaseClient.from('timelines').insert({
-                        user_id: currentUser.id,
-                        title: '我的时间线',
-                        description: '默认时间线',
-                        category: '案件'
-                    }).select();
-                    
-                    if (newTimeline.data) {
-                        timelineId = newTimeline.data[0].id;
-                    }
-                    document.getElementById('syncStatus').textContent = '新时间线已创建';
                 }
             } catch (err) {
                 console.error('云端加载失败:', err);
@@ -290,27 +268,9 @@
             }
         }
 
-        // 同步到云端
-        async function syncData() {
-            var btn = document.querySelector('button[onclick="syncData()"] i');
-            btn.classList.add('fa-spin');
-            
-            try {
-                await loadFromCloud();
-                showToast('同步成功', 'success');
-            } catch (err) {
-                showToast('同步失败: ' + err.message, 'error');
-            } finally {
-                setTimeout(function() {
-                    btn.classList.remove('fa-spin');
-                }, 1000);
-            }
-        }
-
         // 处理图片选择
         function handleImageSelect(event) {
             var files = Array.from(event.target.files);
-            var maxSize = 5 * 1024 * 1024;
             var eventDate = document.getElementById('eventDate').value;
             
             if (!eventDate) {
@@ -320,56 +280,48 @@
             }
             
             files.forEach(function(file) {
-                if (file.size > maxSize) {
-                    showToast('图片超过5MB: ' + file.name, 'error');
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('图片超过5MB', 'error');
                     return;
                 }
                 
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    addWatermarkToImage(e.target.result, eventDate, function(watermarkedImage) {
-                        selectedImages.push({
-                            name: file.name,
-                            data: watermarkedImage
-                        });
+                    addWatermark(e.target.result, eventDate, function(watermarked) {
+                        selectedImages.push({ name: file.name, data: watermarked });
                         renderImagePreview();
                     });
                 };
                 reader.readAsDataURL(file);
             });
-            
             event.target.value = '';
         }
 
         // 添加水印
-        function addWatermarkToImage(imageData, dateText, callback) {
+        function addWatermark(imageData, dateText, callback) {
             var img = new Image();
             img.onload = function() {
                 var canvas = document.createElement('canvas');
                 canvas.width = img.width;
                 canvas.height = img.height;
                 var ctx = canvas.getContext('2d');
-                
                 ctx.drawImage(img, 0, 0);
                 
                 var date = new Date(dateText);
-                var watermarkText = date.toLocaleString('zh-CN', {
-                    year: 'numeric', month: '2-digit', day: '2-digit',
-                    hour: '2-digit', minute: '2-digit'
-                });
-                
+                var text = date.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
                 var fontSize = Math.max(20, Math.min(canvas.width, canvas.height) / 20);
+                
                 ctx.font = 'bold ' + fontSize + 'px "Microsoft YaHei", sans-serif';
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
                 ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
                 ctx.lineWidth = fontSize / 10;
                 
-                var textWidth = ctx.measureText(watermarkText).width;
+                var textWidth = ctx.measureText(text).width;
                 var x = canvas.width - textWidth - 20;
                 var y = canvas.height - 20;
                 
-                ctx.strokeText(watermarkText, x, y);
-                ctx.fillText(watermarkText, x, y);
+                ctx.strokeText(text, x, y);
+                ctx.fillText(text, x, y);
                 
                 callback(canvas.toDataURL('image/jpeg', 0.9));
             };
@@ -380,7 +332,6 @@
         function renderImagePreview() {
             var container = document.getElementById('imagePreview');
             container.innerHTML = '';
-            
             selectedImages.forEach(function(img, index) {
                 var div = document.createElement('div');
                 div.className = 'relative';
@@ -389,7 +340,6 @@
             });
         }
 
-        // 移除图片
         function removeImage(index) {
             selectedImages.splice(index, 1);
             renderImagePreview();
@@ -409,53 +359,64 @@
                     tags.push(btn.textContent);
                 });
                 
-                var event = {
-                    id: Date.now(),
-                    date: document.getElementById('eventDate').value,
-                    title: document.getElementById('eventTitle').value,
-                    description: document.getElementById('eventDesc').value,
-                    tags: tags,
-                    images: selectedImages
-                };
+                // 获取时间线ID
+                var timelineResult = await supabaseClient
+                    .from('timelines')
+                    .select('id')
+                    .eq('user_id', currentUser.id)
+                    .limit(1);
                 
-                events.push(event);
-                events.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+                var timelineId = timelineResult.data && timelineResult.data[0] ? timelineResult.data[0].id : null;
                 
-                // 保存到本地
-                localStorage.setItem('cloudTimelineEvents', JSON.stringify(events));
-                
-                // 保存到云端
-                if (timelineId) {
-                    var eventData = {
-                        timeline_id: timelineId,
+                if (!timelineId) {
+                    // 创建时间线
+                    var newTimeline = await supabaseClient.from('timelines').insert({
                         user_id: currentUser.id,
-                        title: event.title,
-                        description: event.description,
-                        event_date: event.date,
-                        event_type: 'default',
-                        importance: 'normal',
-                        tags: tags,
-                        evidence: selectedImages
-                    };
-                    
-                    var result = await supabaseClient.from('timeline_events').insert(eventData).select();
-                    if (result.data && result.data[0]) {
-                        // 更新本地事件的 ID 为云端返回的 ID
-                        event.id = result.data[0].id;
-                    }
+                        title: '我的时间线',
+                        category: '案件'
+                    }).select();
+                    timelineId = newTimeline.data[0].id;
                 }
                 
-                // 重置表单
+                // 保存事件
+                var eventData = {
+                    timeline_id: timelineId,
+                    user_id: currentUser.id,
+                    title: document.getElementById('eventTitle').value,
+                    description: document.getElementById('eventDesc').value,
+                    event_date: document.getElementById('eventDate').value,
+                    event_type: 'default',
+                    importance: 'normal',
+                    tags: tags,
+                    evidence: selectedImages
+                };
+                
+                var result = await supabaseClient.from('timeline_events').insert(eventData).select();
+                
+                if (result.data && result.data[0]) {
+                    events.push({
+                        id: result.data[0].id,
+                        date: eventData.event_date,
+                        title: eventData.title,
+                        description: eventData.description,
+                        tags: tags,
+                        images: selectedImages
+                    });
+                    
+                    events.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+                    localStorage.setItem('cloudTimelineEvents', JSON.stringify(events));
+                }
+                
+                // 重置
                 document.getElementById('eventForm').reset();
                 document.querySelectorAll('.tag-btn').forEach(function(btn) {
                     btn.classList.remove('active', 'bg-red-100', 'border-red-500', 'text-red-600');
                 });
                 selectedImages = [];
                 renderImagePreview();
-                
                 renderTimeline();
                 updateStats();
-                showToast('事件已保存并同步', 'success');
+                showToast('事件已保存', 'success');
                 document.getElementById('syncStatus').textContent = '已同步到云端';
                 
             } catch (err) {
@@ -475,15 +436,13 @@
             var filterTag = document.getElementById('filterTag').value;
             var searchText = document.getElementById('searchText').value.toLowerCase();
             
-            var filteredEvents = events.filter(function(event) {
-                var matchTag = !filterTag || event.tags.indexOf(filterTag) !== -1;
-                var matchSearch = !searchText || 
-                    event.title.toLowerCase().indexOf(searchText) !== -1 ||
-                    (event.description && event.description.toLowerCase().indexOf(searchText) !== -1);
+            var filtered = events.filter(function(evt) {
+                var matchTag = !filterTag || evt.tags.indexOf(filterTag) !== -1;
+                var matchSearch = !searchText || evt.title.toLowerCase().indexOf(searchText) !== -1 || (evt.description && evt.description.toLowerCase().indexOf(searchText) !== -1);
                 return matchTag && matchSearch;
             });
             
-            if (filteredEvents.length === 0) {
+            if (filtered.length === 0) {
                 document.getElementById('emptyState').style.display = 'block';
                 container.innerHTML = '<div class="timeline-line"></div>';
                 return;
@@ -492,7 +451,7 @@
             document.getElementById('emptyState').style.display = 'none';
             
             var html = '<div class="timeline-line"></div>';
-            filteredEvents.forEach(function(event, index) {
+            filtered.forEach(function(event) {
                 html += '<div class="relative pl-16 pb-8">';
                 html += '<div class="timeline-dot" style="top: 8px;"></div>';
                 html += '<div class="bg-white rounded-xl shadow-md p-6">';
@@ -501,10 +460,7 @@
                 html += '<span class="text-sm text-red-600 font-medium"><i class="far fa-clock mr-1"></i>' + formatDate(event.date) + '</span>';
                 html += '<h3 class="text-lg font-semibold text-gray-900 mt-1">' + escapeHtml(event.title) + '</h3>';
                 html += '</div>';
-                html += '<div class="flex">';
-                html += '<button onclick="editEvent(' + event.id + ')" class="text-gray-400 hover:text-blue-600 mr-2" title="编辑"><i class="fas fa-edit"></i></button>';
-                html += '<button onclick="deleteEvent(' + event.id + ')" class="text-gray-400 hover:text-red-600" title="删除"><i class="fas fa-trash"></i></button>';
-                html += '</div>';
+                html += '<button onclick="deleteEvent(\'' + event.id + '\')" class="text-gray-400 hover:text-red-600" title="删除"><i class="fas fa-trash"></i></button>';
                 html += '</div>';
                 
                 if (event.description) {
@@ -521,32 +477,26 @@
                 
                 if (event.images && event.images.length > 0) {
                     html += '<div class="mb-2 flex justify-between items-center">';
-                    html += '<span class="text-sm text-gray-500"><i class="fas fa-images mr-1"></i>' + event.images.length + ' 张图片</span>';
-                    html += '<button onclick="exportEventImagesToPDF(' + event.id + ')" class="text-sm px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"><i class="fas fa-file-pdf mr-1"></i>导出图片PDF</button>';
+                    html += '<span class="text-sm text-gray-500">' + event.images.length + ' 张图片</span>';
+                    html += '<button onclick="exportEventImagesPDF(\'' + event.id + '\')" class="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"><i class="fas fa-file-pdf mr-1"></i>导出图片PDF</button>';
                     html += '</div>';
                     html += '<div class="grid grid-cols-4 gap-2">';
                     event.images.forEach(function(img) {
-                        html += '<img src="' + img.data + '" class="w-full h-20 object-cover rounded-lg border cursor-pointer hover:border-red-500 transition" onclick="viewImage(\'' + img.data + '\')">';
+                        html += '<img src="' + img.data + '" class="w-full h-20 object-cover rounded-lg border cursor-pointer hover:border-red-500" onclick="viewImage(\'' + img.data + '\')">';
                     });
                     html += '</div>';
                 }
                 
                 html += '</div></div>';
             });
-            
             container.innerHTML = html;
         }
 
-        // 格式化日期
         function formatDate(dateStr) {
             var date = new Date(dateStr);
-            return date.toLocaleDateString('zh-CN', { 
-                year: 'numeric', month: 'long', day: 'numeric', 
-                hour: '2-digit', minute: '2-digit', weekday: 'long' 
-            });
+            return date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
 
-        // 转义HTML
         function escapeHtml(text) {
             if (!text) return '';
             var div = document.createElement('div');
@@ -554,62 +504,21 @@
             return div.innerHTML;
         }
 
-        // 编辑事件（简化版，直接删除后重新添加）
-        function editEvent(id) {
-            var event = events.find(function(e) { return e.id === id; });
-            if (!event) return;
+        // 删除事件
+        async function deleteEvent(id) {
+            if (!confirm('确定要删除这个事件吗？')) return;
             
-            // 填充表单
-            document.getElementById('eventDate').value = event.date;
-            document.getElementById('eventTitle').value = event.title;
-            document.getElementById('eventDesc').value = event.description || '';
-            
-            // 设置标签
-            document.querySelectorAll('.tag-btn').forEach(function(btn) {
-                btn.classList.remove('active', 'bg-red-100', 'border-red-500', 'text-red-600');
-                if (event.tags && event.tags.indexOf(btn.textContent) !== -1) {
-                    btn.classList.add('active', 'bg-red-100', 'border-red-500', 'text-red-600');
-                }
-            });
-            
-            // 设置图片
-            selectedImages = event.images || [];
-            renderImagePreview();
-            
-            // 删除原事件
-            deleteEvent(id, false);
-            
-            // 滚动到顶部
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            showToast('请修改后保存', 'info');
-        }
-
-// 删除事件
-async function deleteEvent(id, showConfirm) {
-    if (showConfirm !== false && !confirm('确定要删除这个事件吗？')) return;
-    
-    try {
-        // 从云端删除
-        var result = await supabaseClient.from('timeline_events').delete().eq('id', id);
-        if (result.error) {
-            console.error('云端删除失败:', result.error);
-        }
-        
-        // 从本地删除
-        events = events.filter(function(e) { return e.id !== id; });
-        localStorage.setItem('cloudTimelineEvents', JSON.stringify(events));
-        
-        renderTimeline();
-        updateStats();
-        
-        if (showConfirm !== false) {
-            showToast('事件已删除', 'success');
-        }
-    } catch (err) {
-        console.error('删除失败:', err);
-        showToast('删除失败: ' + err.message, 'error');
-    }
-}            }
+            try {
+                await supabaseClient.from('timeline_events').delete().eq('id', id);
+                events = events.filter(function(e) { return e.id !== id; });
+                localStorage.setItem('cloudTimelineEvents', JSON.stringify(events));
+                renderTimeline();
+                updateStats();
+                showToast('事件已删除', 'success');
+            } catch (err) {
+                console.error('删除失败:', err);
+                showToast('删除失败', 'error');
+            }
         }
 
         // 查看大图
@@ -621,14 +530,64 @@ async function deleteEvent(id, showConfirm) {
             document.body.appendChild(modal);
         }
 
-        // 导出数据
+        // 导出单个事件的图片PDF
+        function exportEventImagesPDF(eventId) {
+            var event = events.find(function(e) { return e.id === eventId; });
+            if (!event || !event.images || event.images.length === 0) {
+                showToast('该事件没有图片', 'error');
+                return;
+            }
+            
+            var printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                showToast('请允许弹出窗口', 'error');
+                return;
+            }
+            
+            var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>事件图片</title>';
+            html += '<style>body{font-family:"Microsoft YaHei",sans-serif;padding:20px;background:#f5f5f5}';
+            html += '.header{background:white;padding:15px;border-radius:8px;margin-bottom:15px}';
+            html += 'h1{color:#dc2626;margin:0;font-size:20px}';
+            html += '.info{color:#666;font-size:13px;margin:5px 0}';
+            html += '.img-box{background:white;padding:15px;border-radius:8px;margin-bottom:10px;text-align:center}';
+            html += '.img-box img{max-width:100%;max-height:400px;border-radius:5px}';
+            html += '.img-num{display:inline-block;background:#dc2626;color:white;padding:2px 10px;border-radius:10px;font-size:12px}';
+            html += '.footer{margin-top:20px;padding-top:10px;border-top:2px solid #dc2626;color:#999;text-align:center;font-size:12px}';
+            html += '</style></head><body>';
+            
+            html += '<div class="header">';
+            html += '<h1>📷 事件图片附件</h1>';
+            html += '<div class="info"><strong>事件：</strong>' + escapeHtml(event.title) + '</div>';
+            html += '<div class="info"><strong>时间：</strong>' + formatDate(event.date) + '</div>';
+            if (event.description) {
+                html += '<div class="info"><strong>描述：</strong>' + escapeHtml(event.description) + '</div>';
+            }
+            html += '</div>';
+            
+            event.images.forEach(function(img, index) {
+                html += '<div class="img-box">';
+                html += '<span class="img-num">' + (index + 1) + ' / ' + event.images.length + '</span>';
+                html += '<br><br>';
+                html += '<img src="' + img.data + '" onerror="this.style.display=\'none\'">';
+                html += '</div>';
+            });
+            
+            html += '<div class="footer">生成日期：' + new Date().toLocaleDateString('zh-CN') + '</div>';
+            html += '</body></html>';
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+            showToast('图片PDF已生成', 'success');
+        }
+
+        // 导出全部数据
         function exportData() {
             var dataStr = JSON.stringify(events, null, 2);
             var blob = new Blob([dataStr], {type: 'application/json'});
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url;
-            a.download = '事件数据_' + new Date().toISOString().split('T')[0] + '.json';
+            a.download = '时间线数据_' + new Date().toISOString().split('T')[0] + '.json';
             a.click();
             URL.revokeObjectURL(url);
             showToast('数据导出成功', 'success');
@@ -648,7 +607,7 @@ async function deleteEvent(id, showConfirm) {
                         localStorage.setItem('cloudTimelineEvents', JSON.stringify(events));
                         renderTimeline();
                         updateStats();
-                        showToast('成功导入 ' + imported.length + ' 个事件', 'success');
+                        showToast('导入成功', 'success');
                     } else {
                         throw new Error('格式错误');
                     }
@@ -660,7 +619,7 @@ async function deleteEvent(id, showConfirm) {
             input.value = '';
         }
 
-        // 生成PDF
+        // 生成全部PDF
         function generatePDF() {
             if (events.length === 0) {
                 showToast('没有可导出的事件', 'error');
@@ -673,124 +632,48 @@ async function deleteEvent(id, showConfirm) {
                 return;
             }
             
-            var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>事件时间线</title>';
-            html += '<style>body{font-family:"Microsoft YaHei",sans-serif;padding:40px;max-width:800px;margin:0 auto}';
+            var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>时间线</title>';
+            html += '<style>body{font-family:"Microsoft YaHei",sans-serif;padding:20px}';
             html += 'h1{color:#dc2626;text-align:center;border-bottom:2px solid #dc2626;padding-bottom:10px}';
-            html += '.event{margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:15px}';
-            html += '.title{font-size:18px;font-weight:bold}';
-            html += '.date{color:#dc2626;font-size:14px;margin:5px 0}';
-            html += '.desc{margin:8px 0;white-space:pre-wrap}';
-            html += '.tags{color:#666;font-size:12px}';
-            html += '.footer{margin-top:30px;padding-top:15px;border-top:2px solid #dc2626;color:#999;text-align:center;font-size:12px}';
+            html += '.event{margin-bottom:15px;border-bottom:1px solid #eee;padding-bottom:10px}';
+            html += '.title{font-weight:bold}';
+            html += '.date{color:#dc2626;font-size:14px}';
+            html += '.footer{margin-top:20px;padding-top:10px;border-top:2px solid #dc2626;color:#999;text-align:center;font-size:12px}';
             html += '</style></head><body>';
-            html += '<h1>事件时间线及证据清单</h1>';
-            html += '<p style="text-align:center;color:#666">生成日期：' + new Date().toLocaleDateString('zh-CN') + '</p>';
+            html += '<h1>事件时间线</h1>';
             
             events.forEach(function(e, i) {
                 html += '<div class="event">';
                 html += '<div class="title">' + (i + 1) + '. ' + e.title + '</div>';
-                html += '<div class="date">时间：' + formatDate(e.date) + '</div>';
-                if (e.description) html += '<div class="desc">' + e.description.replace(/</g, '&lt;') + '</div>';
-                if (e.tags.length) html += '<div class="tags">标签：' + e.tags.join('、') + '</div>';
-                if (e.images && e.images.length > 0) {
-                    html += '<div style="margin-top:10px;">';
-                    e.images.forEach(function(img) {
-                        html += '<img src="' + img.data + '" style="width:100px;height:100px;object-fit:cover;border-radius:5px;margin-right:5px;">';
-                    });
-                    html += '</div>';
+                html += '<div class="date">' + formatDate(e.date) + '</div>';
+                if (e.description) html += '<div>' + e.description + '</div>';
+                if (e.images && e.images.length) {
+                    html += '<div style="margin-top:5px;">图片: ' + e.images.length + ' 张</div>';
                 }
                 html += '</div>';
             });
             
-            html += '<div class="footer"><p>本文件由事件时间线系统生成</p>';
-            html += '<p>共计 ' + events.length + ' 个事件</p></div>';
+            html += '<div class="footer">共计 ' + events.length + ' 个事件</div>';
             html += '</body></html>';
             
             printWindow.document.write(html);
             printWindow.document.close();
-            showToast('PDF打印窗口已打开', 'success');
+            showToast('PDF已生成', 'success');
         }
 
-        // 导出单个事件的图片为PDF
-        function exportEventImagesToPDF(eventId) {
-            var event = events.find(function(e) { return e.id === eventId; });
-            if (!event || !event.images || event.images.length === 0) {
-                showToast('该事件没有图片', 'error');
-                return;
-            }
-            
-            var printWindow = window.open('', '_blank');
-            if (!printWindow) {
-                showToast('请允许弹出窗口', 'error');
-                return;
-            }
-            
-            var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>事件图片附件</title>';
-            html += '<style>';
-            html += 'body{font-family:"Microsoft YaHei",sans-serif;padding:30px;max-width:1000px;margin:0 auto;background:#f5f5f5}';
-            html += '.header{background:white;padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}';
-            html += 'h1{color:#dc2626;margin:0 0 10px 0;font-size:24px}';
-            html += '.info{color:#666;font-size:14px;margin:5px 0}';
-            html += '.image-container{background:white;padding:20px;border-radius:10px;margin-bottom:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1);page-break-inside:avoid}';
-            html += '.image-container img{width:100%;max-height:500px;object-fit:contain;border-radius:5px;border:1px solid #eee}';
-            html += '.image-number{display:inline-block;background:#dc2626;color:white;padding:3px 10px;border-radius:15px;font-size:12px;margin-bottom:10px}';
-            html += '.footer{margin-top:30px;padding-top:15px;border-top:2px solid #dc2626;color:#999;text-align:center;font-size:12px}';
-            html += '@media print{body{background:white}.image-container{box-shadow:none;border:1px solid #ddd}}';
-            html += '</style></head><body>';
-            
-            // 头部信息
-            html += '<div class="header">';
-            html += '<h1>📷 事件图片附件</h1>';
-            html += '<div class="info"><strong>事件标题：</strong>' + escapeHtml(event.title) + '</div>';
-            html += '<div class="info"><strong>事件时间：</strong>' + formatDate(event.date) + '</div>';
-            if (event.description) {
-                html += '<div class="info"><strong>事件描述：</strong>' + escapeHtml(event.description) + '</div>';
-            }
-            html += '<div class="info"><strong>图片数量：</strong>' + event.images.length + ' 张</div>';
-            html += '</div>';
-            
-            // 图片列表
-            event.images.forEach(function(img, index) {
-                html += '<div class="image-container">';
-                html += '<span class="image-number">图片 ' + (index + 1) + ' / ' + event.images.length + '</span>';
-                html += '<img src="' + img.data + '" alt="' + escapeHtml(img.name || '图片' + (index + 1)) + '" onload="this.style.display=\'block\'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'">';
-                html += '<div style="display:none;color:#999;text-align:center;padding:20px;">图片加载失败</div>';
-                html += '</div>';
-            });
-            
-            // 页脚
-            html += '<div class="footer">';
-            html += '<p>本文件由事件时间线系统生成</p>';
-            html += '<p>生成日期：' + new Date().toLocaleDateString('zh-CN') + '</p>';
-            html += '</div>';
-            html += '</body></html>';
-            
-            printWindow.document.write(html);
-            printWindow.document.close();
-            showToast('图片PDF已生成', 'success');
-        }
-
-        // 更新统计
         function updateStats() {
             document.getElementById('totalCount').textContent = events.length;
         }
 
-        // 显示提示
         function showToast(message, type) {
             var colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500' };
             var toast = document.createElement('div');
-            toast.className = 'fixed bottom-4 right-4 ' + colors[type] + ' text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            toast.className = 'fixed bottom-4 right-4 ' + colors[type] + ' text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm';
             toast.textContent = message;
             document.body.appendChild(toast);
-            setTimeout(function() { toast.remove(); }, 3000);
+            setTimeout(function() { toast.remove(); }, 2500);
         }
 
-        // 显示错误
-        function showError(msg) {
-            document.getElementById('loadingScreen').innerHTML = '<div class="text-center"><i class="fas fa-exclamation-circle text-5xl text-red-500 mb-4"></i><p>' + msg + '</p></div>';
-        }
-
-        // 退出登录
         async function logout() {
             await supabaseClient.auth.signOut();
             localStorage.removeItem('cloudTimelineEvents');
