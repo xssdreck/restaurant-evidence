@@ -82,6 +82,16 @@
                             <span class="tag-btn" onclick="toggleTag(this)">物证</span>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label>📷 图片证据</label>
+                        <div style="border:2px dashed #ddd;padding:15px;text-align:center;border-radius:5px;cursor:pointer;" onclick="document.getElementById('imageFiles').click()">
+                            <span style="font-size:24px;">📷</span>
+                            <p style="margin:5px 0;font-size:14px;color:#666;">点击上传图片</p>
+                            <p style="margin:0;font-size:12px;color:#999;">支持 JPG, PNG</p>
+                        </div>
+                        <input type="file" id="imageFiles" accept="image/*" multiple style="display:none" onchange="handleImageSelect(event)">
+                        <div id="imagePreview" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;"></div>
+                    </div>
                     <button type="submit" class="btn-primary">💾 保存事件</button>
                 </form>
                 <div class="stats">
@@ -130,6 +140,54 @@ function toggleTag(btn) {
     btn.classList.toggle('active');
 }
 
+// 图片存储
+var selectedImages = [];
+
+// 处理图片选择
+function handleImageSelect(event) {
+    var files = Array.from(event.target.files);
+    var maxSize = 5 * 1024 * 1024; // 5MB
+    
+    files.forEach(function(file) {
+        if (file.size > maxSize) {
+            showToast('图片超过5MB: ' + file.name, 'error');
+            return;
+        }
+        
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            selectedImages.push({
+                name: file.name,
+                data: e.target.result
+            });
+            renderImagePreview();
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    event.target.value = '';
+}
+
+// 渲染图片预览
+function renderImagePreview() {
+    var container = document.getElementById('imagePreview');
+    container.innerHTML = '';
+    
+    selectedImages.forEach(function(img, index) {
+        var div = document.createElement('div');
+        div.style.cssText = 'position:relative;width:60px;height:60px;';
+        div.innerHTML = '<img src="' + img.data + '" style="width:100%;height:100%;object-fit:cover;border-radius:5px;border:1px solid #ddd;">' +
+            '<span onclick="removeImage(' + index + ')" style="position:absolute;top:-5px;right:-5px;background:#dc2626;color:white;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;">×</span>';
+        container.appendChild(div);
+    });
+}
+
+// 移除图片
+function removeImage(index) {
+    selectedImages.splice(index, 1);
+    renderImagePreview();
+}
+
 // 添加事件
 function addEvent(e) {
     e.preventDefault();
@@ -139,7 +197,8 @@ function addEvent(e) {
         date: document.getElementById('eventDate').value,
         title: document.getElementById('eventTitle').value,
         description: document.getElementById('eventDesc').value,
-        tags: []
+        tags: [],
+        images: selectedImages
     };
     
     // 获取选中的标签
@@ -159,6 +218,8 @@ function addEvent(e) {
     for (var j = 0; j < allTags.length; j++) {
         allTags[j].classList.remove('active');
     }
+    selectedImages = [];
+    renderImagePreview();
     
     renderTimeline();
     updateStats();
@@ -213,6 +274,16 @@ function renderTimeline() {
             }
             html += '</div>';
         }
+        
+        // 显示图片
+        if (event.images && event.images.length > 0) {
+            html += '<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;">';
+            for (var k = 0; k < event.images.length; k++) {
+                html += '<img src="' + event.images[k].data + '" style="width:80px;height:80px;object-fit:cover;border-radius:5px;border:1px solid #ddd;cursor:pointer;" onclick="viewImage(\'' + event.images[k].data + '\')">';
+            }
+            html += '</div>';
+        }
+        
         html += '</div>';
     }
     container.innerHTML = html;
@@ -329,6 +400,14 @@ function generatePDF() {
         html += '<div class="date">时间：' + formatDate(e.date) + '</div>';
         if (e.description) html += '<div class="desc">' + e.description.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
         if (e.tags.length) html += '<div class="tags">标签：' + e.tags.join('、') + '</div>';
+        // 添加图片到PDF
+        if (e.images && e.images.length > 0) {
+            html += '<div style="margin-top:10px;">';
+            for (var m = 0; m < e.images.length; m++) {
+                html += '<img src="' + e.images[m].data + '" style="width:100px;height:100px;object-fit:cover;border-radius:5px;margin-right:5px;margin-bottom:5px;">';
+            }
+            html += '</div>';
+        }
         html += '</div>';
     }
     
@@ -339,6 +418,17 @@ function generatePDF() {
     printWindow.document.write(html);
     printWindow.document.close();
     showToast('PDF打印窗口已打开', 'success');
+}
+
+// 查看大图
+function viewImage(imgData) {
+    var modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999;cursor:pointer;';
+    modal.innerHTML = '<img src="' + imgData + '" style="max-width:90%;max-height:90%;border-radius:5px;">';
+    modal.onclick = function() {
+        document.body.removeChild(modal);
+    };
+    document.body.appendChild(modal);
 }
 
 // 显示提示
